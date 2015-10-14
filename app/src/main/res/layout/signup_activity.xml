@@ -1,0 +1,57 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="com.quarkworks.apartmentgroceries.auth.SignupActivity">
+
+    <!-- username -->
+    <EditText
+        android:id="@+id/signup_activity_username_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:hint="username"
+        android:ems="10"
+        android:layout_marginTop="118dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <!-- password -->
+    <EditText
+        android:id="@+id/signup_activity_password_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:hint="password"
+        android:ems="10"
+        android:layout_below="@+id/signup_activity_username_id"
+        android:layout_alignLeft="@+id/signup_activity_username_id"
+        android:layout_alignStart="@+id/signup_activity_username_id" />
+
+    <!-- phone -->
+    <EditText
+        android:id="@+id/signup_activity_phone_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:hint="phone"
+        android:ems="10"
+        android:layout_below="@+id/signup_activity_password_id"
+        android:layout_alignLeft="@+id/signup_activity_username_id"
+        android:layout_alignStart="@+id/signup_activity_username_id" />
+
+    <!-- login button -->
+    <Button
+        android:id="@+id/signup_activity_submit_button_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sign Up"
+        android:layout_below="@+id/signup_activity_phone_id"
+        android:layout_centerHorizontal="true"
+        android:onClick="signupButtonOnClick"/>
+
+</RelativeLayout>
