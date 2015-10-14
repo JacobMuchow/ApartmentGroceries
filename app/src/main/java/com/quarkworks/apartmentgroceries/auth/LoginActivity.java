@@ -1,25 +1,18 @@
 package com.quarkworks.apartmentgroceries.auth;
 
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.service.NetworkRequest;
-import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
 
-import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.IOException;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -40,7 +33,6 @@ public class LoginActivity extends AppCompatActivity {
         usernameEditText = (EditText) findViewById(R.id.login_activity_username_id);
         passwordEditText = (EditText) findViewById(R.id.login_activity_password_id);
         statusTextView = (TextView) findViewById(R.id.login_activity_status_id);
-
     }
 
     /**
@@ -56,6 +48,7 @@ public class LoginActivity extends AppCompatActivity {
 
         if (username != null && password != null) {
             login(username, password);
+
         } else {
             statusTextView.setText("please input username and password");
         }
@@ -64,6 +57,7 @@ public class LoginActivity extends AppCompatActivity {
     /**
      * login AsyncTask
      * input: username and password
+     * TODO: use SyncUser.login();
      */
     private void login(String username, String password) {
 
@@ -104,6 +98,6 @@ public class LoginActivity extends AppCompatActivity {
             }
         };
 
-        new NetworkRequest(request, callback).execute();
+        //new NetworkRequest(request, callback).execute();
     }
 }
