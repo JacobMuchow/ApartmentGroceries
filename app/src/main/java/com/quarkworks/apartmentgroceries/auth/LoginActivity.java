@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.service.NetworkRequest;
+import com.quarkworks.apartmentgroceries.service.Promise;
 import com.squareup.okhttp.Request;
 
 import org.json.JSONObject;
@@ -53,6 +54,23 @@ public class LoginActivity extends AppCompatActivity {
             statusTextView.setText("please input username and password");
         }
     }
+
+    /**
+     * Remote sync callbacks
+     */
+    private Promise.Success loginSuccesCallback = new Promise.Success() {
+        @Override
+        public void onSuccess() {
+            //TODO: Launch home activity
+        }
+    };
+
+    private Promise.Failure loginFailureCallback = new Promise.Failure() {
+        @Override
+        public void onFailure() {
+            //TODO: failure message
+        }
+    };
 
     /**
      * login AsyncTask

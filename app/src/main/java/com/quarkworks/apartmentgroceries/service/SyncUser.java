@@ -10,31 +10,43 @@ import org.json.JSONObject;
 public class SyncUser {
     private static final String TAG = SyncUser.class.getSimpleName();
 
-    public static void login(String username, String password) {
+    public static Promise login(String username, String password) {
+        final Promise promise = new Promise();
 
         NetworkRequest.Callback callback = new NetworkRequest.Callback() {
             @Override
             public void done(@Nullable JSONObject jsonObject) {
 
-                //TODO: do stuff
+                //TODO: update realm
+
+                //TODO: update user prefernces
+
+                promise.onSuccess();
+
+                //or promise.onFailure() depending
             }
         };
 
         UrlTemplate template = UrlTemplateCreator.login(username, password);
         new NetworkRequest(template, callback).execute();
+        return promise;
     }
 
-    public static void logout() {
+    public static Promise logout() {
+        final Promise promise = new Promise();
 
         NetworkRequest.Callback callback = new NetworkRequest.Callback() {
             @Override
             public void done(@Nullable JSONObject jsonObject) {
 
                 //todo: logout
+
+                promise.onSuccess();
             }
         };
 
         UrlTemplate template = UrlTemplateCreator.logout();
         new NetworkRequest(template, callback).execute();
+        return promise;
     }
 }
