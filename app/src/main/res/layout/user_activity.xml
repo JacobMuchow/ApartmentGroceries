@@ -51,6 +51,13 @@
 
     </LinearLayout>
 
+    <!-- user list -->
+    <ListView
+        android:id="@+id/user_list_view_id"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/user_activity_linear_layout_update_id"/>
+
 
 
 </RelativeLayout>

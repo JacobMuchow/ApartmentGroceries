@@ -35,4 +35,10 @@ public class UrlTemplateCreator {
 
         return new UrlTemplate(GET, url, null);
     }
+
+    public static UrlTemplate getAllUser() {
+        String url = baseUrl + "users";
+
+        return new UrlTemplate(GET, url, null);
+    }
 }

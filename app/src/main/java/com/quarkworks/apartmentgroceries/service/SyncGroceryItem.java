@@ -39,8 +39,8 @@ public class SyncGroceryItem {
                 for (int i = 0; i < groceryJsonArray.length(); i++) {
 
                     try {
-                        RGroceryItem RGroceryItem = realm.createObject(RGroceryItem.class);
-                        RGroceryItem.setName(groceryJsonArray.getJSONObject(i).optString(JsonKeys.NAME));
+                        RGroceryItem groceryItem = realm.createObject(RGroceryItem.class);
+                        groceryItem.setName(groceryJsonArray.getJSONObject(i).optString(JsonKeys.NAME));
 
                     } catch(JSONException e) {
                         Log.d(TAG, "Error parsing grocery object");
