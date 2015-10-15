@@ -1,5 +1,6 @@
 package com.quarkworks.apartmentgroceries.service;
 
+import android.util.Log;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,7 +16,7 @@ public class UrlTemplateCreator {
     private static final String POST = "POST";
 
     public static UrlTemplate login(String username, String password) {
-        String url = baseUrl + "loginUrl";
+        String url = baseUrl + "login";
         Map<String, String> params = new HashMap<>();
         params.put("username", username);
         params.put("password", password);

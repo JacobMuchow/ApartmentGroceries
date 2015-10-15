@@ -13,8 +13,10 @@ public class UrlTemplate {
     private Map<String, String> params;
     private boolean useToken;
 
+    public UrlTemplate() {}
+
     public UrlTemplate(String method, String url, Map<String, String> params) {
-        new UrlTemplate(method, url, params, true);
+        this(method, url, params, true);
     }
 
     public UrlTemplate(String method, String url, Map<String, String> params, boolean useToken) {

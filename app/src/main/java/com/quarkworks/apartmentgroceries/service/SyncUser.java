@@ -1,6 +1,11 @@
 package com.quarkworks.apartmentgroceries.service;
 
+import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.quarkworks.apartmentgroceries.MyApplication;
 
 import org.json.JSONObject;
 
@@ -11,15 +16,27 @@ public class SyncUser {
     private static final String TAG = SyncUser.class.getSimpleName();
 
     public static Promise login(String username, String password) {
+
         final Promise promise = new Promise();
 
         NetworkRequest.Callback callback = new NetworkRequest.Callback() {
             @Override
             public void done(@Nullable JSONObject jsonObject) {
 
+                Log.d(TAG, "login jsonObject:" + jsonObject.toString());
+                String sessionToken = jsonObject.optString("sessionToken");
+                String username = jsonObject.optString("username");
+
+                Toast.makeText(MyApplication.getContext(), "sessionToken:" + sessionToken, Toast.LENGTH_LONG).show();
+                SharedPreferences sharedPreferences = MyApplication.getContext().getSharedPreferences("login", 0);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString("sessionToken", sessionToken);
+                editor.putString("username", username);
+                editor.commit();
+
                 //TODO: update realm
 
-                //TODO: update user prefernces
+                //TODO: update user preferences
 
                 promise.onSuccess();
 

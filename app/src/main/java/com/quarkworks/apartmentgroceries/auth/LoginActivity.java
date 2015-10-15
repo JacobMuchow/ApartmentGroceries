@@ -7,10 +7,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.service.NetworkRequest;
 import com.quarkworks.apartmentgroceries.service.Promise;
+import com.quarkworks.apartmentgroceries.service.SyncUser;
+import com.quarkworks.apartmentgroceries.service.UrlTemplateCreator;
 import com.squareup.okhttp.Request;
 
 import org.json.JSONObject;
@@ -48,7 +51,8 @@ public class LoginActivity extends AppCompatActivity {
         Log.d(LOG_TAG, "username:" + username);
 
         if (username != null && password != null) {
-            login(username, password);
+//            login(username, password);
+            SyncUser.login(username, password);
 
         } else {
             statusTextView.setText("please input username and password");
@@ -62,6 +66,7 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         public void onSuccess() {
             //TODO: Launch home activity
+            Toast.makeText(getApplicationContext(), "login success", Toast.LENGTH_LONG).show();
         }
     };
 
@@ -81,15 +86,15 @@ public class LoginActivity extends AppCompatActivity {
 
         if (username == null || password == null) return;
 
-        String url = "https://api.parse.com/1/login?username=" + username
-                + "&password=" + password;
-        Request request = new Request.Builder()
-                .url(url)
-                .addHeader("X-Parse-Application-Id", "GlvuJjSGKTkc3DxedowpvgCMNOZeGQjxvRApSqGD")
-                .addHeader("X-Parse-REST-API-Key", "0b3HDSEgt3EgXxyDHLOV0M7yQZwsexVG8ryTqzKI")
-                .addHeader("X-Parse-Revocable-Session", "1")
-                .method("GET", null) // GET method not allow request body so we pass username and secret in url directly
-                .build();
+//        String url = "https://api.parse.com/1/login?username=" + username
+//                + "&password=" + password;
+//        Request request = new Request.Builder()
+//                .url(url)
+//                .addHeader("X-Parse-Application-Id", "GlvuJjSGKTkc3DxedowpvgCMNOZeGQjxvRApSqGD")
+//                .addHeader("X-Parse-REST-API-Key", "0b3HDSEgt3EgXxyDHLOV0M7yQZwsexVG8ryTqzKI")
+//                .addHeader("X-Parse-Revocable-Session", "1")
+//                .method("GET", null) // GET method not allow request body so we pass username and secret in url directly
+//                .build();
 
         NetworkRequest.Callback callback = new NetworkRequest.Callback() {
 
@@ -116,6 +121,6 @@ public class LoginActivity extends AppCompatActivity {
             }
         };
 
-        //new NetworkRequest(request, callback).execute();
+//        new NetworkRequest(UrlTemplateCreator.login(username, password), callback).execute();
     }
 }
