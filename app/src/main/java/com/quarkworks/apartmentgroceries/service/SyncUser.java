@@ -3,7 +3,6 @@ package com.quarkworks.apartmentgroceries.service;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.quarkworks.apartmentgroceries.MyApplication;
 
@@ -27,7 +26,6 @@ public class SyncUser {
                 String sessionToken = jsonObject.optString("sessionToken");
                 String username = jsonObject.optString("username");
 
-                Toast.makeText(MyApplication.getContext(), "sessionToken:" + sessionToken, Toast.LENGTH_LONG).show();
                 SharedPreferences sharedPreferences = MyApplication.getContext().getSharedPreferences("login", 0);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString("sessionToken", sessionToken);

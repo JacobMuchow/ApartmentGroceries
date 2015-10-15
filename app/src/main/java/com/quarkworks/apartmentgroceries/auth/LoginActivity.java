@@ -1,6 +1,6 @@
 package com.quarkworks.apartmentgroceries.auth;
 
-import android.content.SharedPreferences;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -9,18 +9,15 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.quarkworks.apartmentgroceries.MyApplication;
 import com.quarkworks.apartmentgroceries.R;
-import com.quarkworks.apartmentgroceries.service.NetworkRequest;
+import com.quarkworks.apartmentgroceries.main.HomeActivity;
 import com.quarkworks.apartmentgroceries.service.Promise;
 import com.quarkworks.apartmentgroceries.service.SyncUser;
-import com.quarkworks.apartmentgroceries.service.UrlTemplateCreator;
-import com.squareup.okhttp.Request;
-
-import org.json.JSONObject;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private static final String LOG_TAG = LoginActivity.class.getSimpleName();
+    private static final String TAG = LoginActivity.class.getSimpleName();
 
     private EditText usernameEditText;
     private EditText passwordEditText;
@@ -48,11 +45,9 @@ public class LoginActivity extends AppCompatActivity {
         username = usernameEditText.getText().toString();
         password = passwordEditText.getText().toString();
 
-        Log.d(LOG_TAG, "username:" + username);
-
         if (username != null && password != null) {
-//            login(username, password);
             SyncUser.login(username, password);
+            loginSuccesCallback.onSuccess();
 
         } else {
             statusTextView.setText("please input username and password");
@@ -65,7 +60,9 @@ public class LoginActivity extends AppCompatActivity {
     private Promise.Success loginSuccesCallback = new Promise.Success() {
         @Override
         public void onSuccess() {
-            //TODO: Launch home activity
+            // Launch home activity
+            Intent intent = new Intent(MyApplication.getContext(), HomeActivity.class);
+            startActivity(intent);
             Toast.makeText(getApplicationContext(), "login success", Toast.LENGTH_LONG).show();
         }
     };
@@ -76,51 +73,4 @@ public class LoginActivity extends AppCompatActivity {
             //TODO: failure message
         }
     };
-
-    /**
-     * login AsyncTask
-     * input: username and password
-     * TODO: use SyncUser.login();
-     */
-    private void login(String username, String password) {
-
-        if (username == null || password == null) return;
-
-//        String url = "https://api.parse.com/1/login?username=" + username
-//                + "&password=" + password;
-//        Request request = new Request.Builder()
-//                .url(url)
-//                .addHeader("X-Parse-Application-Id", "GlvuJjSGKTkc3DxedowpvgCMNOZeGQjxvRApSqGD")
-//                .addHeader("X-Parse-REST-API-Key", "0b3HDSEgt3EgXxyDHLOV0M7yQZwsexVG8ryTqzKI")
-//                .addHeader("X-Parse-Revocable-Session", "1")
-//                .method("GET", null) // GET method not allow request body so we pass username and secret in url directly
-//                .build();
-
-        NetworkRequest.Callback callback = new NetworkRequest.Callback() {
-
-            @Override
-            public void done(JSONObject jsonObject) {
-                if (jsonObject == null) {
-                    Log.e(LOG_TAG, "Error get login response json");
-                    return;
-                }
-
-                saveLoginSessionInfo(jsonObject);
-            }
-
-            private void saveLoginSessionInfo(JSONObject jsonObject) {
-
-                String sessionToken = jsonObject.optString("sessionToken");
-                String username = jsonObject.optString("username");
-
-                SharedPreferences sharedPreferences = getSharedPreferences("login", 0);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString("sessionToken", sessionToken);
-                editor.putString("username", username);
-                editor.commit();
-            }
-        };
-
-//        new NetworkRequest(UrlTemplateCreator.login(username, password), callback).execute();
-    }
 }
