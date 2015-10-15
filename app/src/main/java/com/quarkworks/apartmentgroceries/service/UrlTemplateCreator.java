@@ -29,4 +29,10 @@ public class UrlTemplateCreator {
 
         return new UrlTemplate(GET, url, null);
     }
+
+    public static UrlTemplate getAllGroceryItem() {
+        String url = baseUrl + "classes/GroceryItem";
+
+        return new UrlTemplate(GET, url, null);
+    }
 }

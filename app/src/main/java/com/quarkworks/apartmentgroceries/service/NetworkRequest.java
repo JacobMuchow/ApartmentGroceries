@@ -42,8 +42,11 @@ public class NetworkRequest extends AsyncTask<Void, String, String> {
         StringBuilder urlStringBuilder = new StringBuilder(url);
         urlStringBuilder.append("?");
 
-        for (Map.Entry entry : template.getParams().entrySet()) {
-            urlStringBuilder.append(entry.getKey() + "=" + entry.getValue() + "&");
+        Map<String, String> paramsMap = template.getParams();
+        if (paramsMap != null) {
+            for (Map.Entry entry : paramsMap.entrySet()) {
+                urlStringBuilder.append(entry.getKey() + "=" + entry.getValue() + "&");
+            }
         }
 
         Request.Builder builder = new Request.Builder()
