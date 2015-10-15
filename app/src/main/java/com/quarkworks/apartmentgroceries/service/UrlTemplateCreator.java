@@ -30,13 +30,13 @@ public class UrlTemplateCreator {
         return new UrlTemplate(GET, url, null);
     }
 
-    public static UrlTemplate getAllGroceryItem() {
+    public static UrlTemplate getAllGroceryItems() {
         String url = baseUrl + "classes/GroceryItem";
 
         return new UrlTemplate(GET, url, null);
     }
 
-    public static UrlTemplate getAllUser() {
+    public static UrlTemplate getAllUsers() {
         String url = baseUrl + "users";
 
         return new UrlTemplate(GET, url, null);

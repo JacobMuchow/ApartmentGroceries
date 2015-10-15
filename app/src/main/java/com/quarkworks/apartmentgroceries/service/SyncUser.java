@@ -75,7 +75,7 @@ public class SyncUser {
         return promise;
     }
 
-    public static Promise getAllUser() {
+    public static Promise getAll() {
 
         final Promise promise = new Promise();
 
@@ -83,35 +83,29 @@ public class SyncUser {
             @Override
             public void done(@Nullable JSONObject jsonObject) {
 
-                Realm realm = DataStore.getDataStore().getRealm();
+                Realm realm = DataStore.getInstance().getRealm();
                 realm.beginTransaction();
                 realm.clear(RUser.class);
 
-                Log.d(TAG, "user jsonObject:" + jsonObject);
+                try {
+                    JSONArray userJsonArray = jsonObject.optJSONArray(JsonKeys.RESULTS);
 
-                JSONArray userJsonArray = jsonObject.optJSONArray(JsonKeys.RESULTS);
-
-                for (int i = 0; i < userJsonArray.length(); i++) {
-
-                    try {
+                    for (int i = 0; i < userJsonArray.length(); i++) {
                         RUser user = realm.createObject(RUser.class);
                         user.setName(userJsonArray.getJSONObject(i).optString(JsonKeys.USERNAME));
-                        Log.d(TAG, "user in parsing:" + user.getName());
-                    } catch(JSONException e) {
-                        Log.d(TAG, "Error parsing user object");
                     }
 
+                    realm.commitTransaction();
+                    promise.onSuccess();
+                } catch(JSONException e) {
+                    Log.e(TAG, "Error parsing user object", e);
+                    realm.cancelTransaction();
+                    promise.onFailure();
                 }
-
-                realm.commitTransaction();
-
-                promise.onSuccess();
-
-                //or promise.onFailure() depending
             }
         };
 
-        UrlTemplate template = UrlTemplateCreator.getAllUser();
+        UrlTemplate template = UrlTemplateCreator.getAllUsers();
         new NetworkRequest(template, callback).execute();
         return promise;
     }

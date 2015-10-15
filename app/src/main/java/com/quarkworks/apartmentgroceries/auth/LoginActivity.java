@@ -19,12 +19,12 @@ public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = LoginActivity.class.getSimpleName();
 
+    /*
+        References
+     */
     private EditText usernameEditText;
     private EditText passwordEditText;
     private TextView statusTextView;
-
-    private String username;
-    private String password;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,15 +42,15 @@ public class LoginActivity extends AppCompatActivity {
      */
     public void loginButtonOnClick(View view) {
 
-        username = usernameEditText.getText().toString();
-        password = passwordEditText.getText().toString();
+        String username = usernameEditText.getText().toString();
+        String password = passwordEditText.getText().toString();
 
         if (username != null && password != null) {
-            SyncUser.login(username, password);
+            SyncUser.login(username, password).setCallbacks(loginSuccesCallback, loginFailureCallback);
             loginSuccesCallback.onSuccess();
 
         } else {
-            statusTextView.setText("please input username and password");
+            statusTextView.setText(getResources().getString(R.string.username_or_password_empty));
         }
     }
 

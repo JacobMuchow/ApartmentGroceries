@@ -13,33 +13,33 @@
         android:id="@+id/login_activity_username_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:hint="username"
-        android:ems="10"
         android:layout_marginTop="118dp"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:inputType="textPersonName"
+        android:hint="username"
+        android:ems="10" />
 
     <!-- password -->
     <EditText
         android:id="@+id/login_activity_password_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="textPassword"
-        android:hint="password"
-        android:ems="10"
         android:layout_below="@+id/login_activity_username_id"
         android:layout_alignLeft="@+id/login_activity_username_id"
-        android:layout_alignStart="@+id/login_activity_username_id" />
+        android:layout_alignStart="@+id/login_activity_username_id"
+        android:inputType="textPassword"
+        android:hint="password"
+        android:ems="10" />
 
     <!-- login button -->
     <Button
         android:id="@+id/login_activity_login_button_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Login"
         android:layout_below="@+id/login_activity_password_id"
         android:layout_centerHorizontal="true"
+        android:text="@string/login"
         android:onClick="loginButtonOnClick"/>
 
     <!-- login status message-->
@@ -47,9 +47,9 @@
         android:id="@+id/login_activity_status_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_below="@+id/login_activity_login_button_id"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="69dp" />
+        android:layout_marginTop="69dp"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
 </RelativeLayout>

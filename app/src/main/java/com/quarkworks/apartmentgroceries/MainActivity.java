@@ -3,13 +3,12 @@ package com.quarkworks.apartmentgroceries;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.quarkworks.apartmentgroceries.auth.LoginActivity;
 import com.quarkworks.apartmentgroceries.auth.SignupActivity;
-import com.quarkworks.apartmentgroceries.auth.UserActivity;
+import com.quarkworks.apartmentgroceries.user.UserActivity;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -39,17 +38,14 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
                 return true;
 
-            case R.id.action_signup:
+            case R.id.action_sign_up:
                 intent = new Intent(this, SignupActivity.class);
                 startActivity(intent);
                 return true;
 
-            case R.id.action_user_update:
+            case R.id.action_user:
                 intent = new Intent(this, UserActivity.class);
                 startActivity(intent);
-                return true;
-
-            case R.id.action_settings:
                 return true;
 
         }

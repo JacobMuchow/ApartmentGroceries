@@ -30,33 +30,31 @@ public class SyncGroceryItem {
             @Override
             public void done(@Nullable JSONObject jsonObject) {
 
-                Realm realm = DataStore.getDataStore().getRealm();
+
+                Realm realm = DataStore.getInstance().getRealm();
                 realm.beginTransaction();
                 realm.clear(RGroceryItem.class);
 
-                JSONArray groceryJsonArray = jsonObject.optJSONArray(JsonKeys.RESULTS);
+                try {
 
-                for (int i = 0; i < groceryJsonArray.length(); i++) {
+                    JSONArray groceryJsonArray = jsonObject.optJSONArray(JsonKeys.RESULTS);
 
-                    try {
+                    for (int i = 0; i < groceryJsonArray.length(); i++) {
                         RGroceryItem groceryItem = realm.createObject(RGroceryItem.class);
                         groceryItem.setName(groceryJsonArray.getJSONObject(i).optString(JsonKeys.NAME));
-
-                    } catch(JSONException e) {
-                        Log.d(TAG, "Error parsing grocery object");
                     }
 
+                    realm.commitTransaction();
+                    promise.onSuccess();
+                } catch(JSONException e) {
+                    Log.e(TAG, "Error parsing grocery object", e);
+                    realm.cancelTransaction();
+                    promise.onFailure();
                 }
-
-                realm.commitTransaction();
-
-                promise.onSuccess();
-
-                //or promise.onFailure() depending
             }
         };
 
-        UrlTemplate template = UrlTemplateCreator.getAllGroceryItem();
+        UrlTemplate template = UrlTemplateCreator.getAllGroceryItems();
         new NetworkRequest(template, callback).execute();
         return promise;
     }

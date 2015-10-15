@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.quarkworks.apartmentgroceries.R;
+import com.quarkworks.apartmentgroceries.service.DataStore;
 import com.quarkworks.apartmentgroceries.service.SyncGroceryItem;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
 
@@ -19,8 +20,6 @@ public class HomeActivity extends AppCompatActivity {
 
     private static final String TAG = HomeActivity.class.getSimpleName();
 
-    private RealmResults<RGroceryItem> groceries;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,10 +27,7 @@ public class HomeActivity extends AppCompatActivity {
 
         SyncGroceryItem.getAll();
 
-        Realm realm = Realm.getInstance(this);
-
-        RealmQuery<RGroceryItem> query = realm.where(RGroceryItem.class);
-        groceries = query.findAll();
+        RealmResults<RGroceryItem> groceries = DataStore.getInstance().getRealm().where(RGroceryItem.class).findAll();
 
         RealmBaseAdapter<RGroceryItem> realmBaseAdapter = new RealmBaseAdapter<RGroceryItem>(this, groceries, true) {
             @Override
