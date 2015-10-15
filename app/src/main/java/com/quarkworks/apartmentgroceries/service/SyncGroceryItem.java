@@ -1,19 +1,13 @@
 package com.quarkworks.apartmentgroceries.service;
 
-import android.content.SharedPreferences;
-import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.quarkworks.apartmentgroceries.MyApplication;
-import com.quarkworks.apartmentgroceries.service.models.Grocery;
+import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import io.realm.Realm;
 
@@ -36,19 +30,17 @@ public class SyncGroceryItem {
             @Override
             public void done(@Nullable JSONObject jsonObject) {
 
-                Log.d(TAG, "grocery item jsonObject:" + jsonObject.toString());
-
                 Realm realm = DataStore.getDataStore().getRealm();
                 realm.beginTransaction();
-                realm.clear(Grocery.class);
+                realm.clear(RGroceryItem.class);
 
                 JSONArray groceryJsonArray = jsonObject.optJSONArray(JsonKeys.RESULTS);
 
                 for (int i = 0; i < groceryJsonArray.length(); i++) {
 
                     try {
-                        Grocery grocery = realm.createObject(Grocery.class);
-                        grocery.setName(groceryJsonArray.getJSONObject(i).optString(JsonKeys.NAME));
+                        RGroceryItem RGroceryItem = realm.createObject(RGroceryItem.class);
+                        RGroceryItem.setName(groceryJsonArray.getJSONObject(i).optString(JsonKeys.NAME));
 
                     } catch(JSONException e) {
                         Log.d(TAG, "Error parsing grocery object");

@@ -5,7 +5,7 @@ import io.realm.RealmObject;
 /**
  * Created by zz on 10/14/15.
  */
-public class Grocery extends RealmObject {
+public class RGroceryItem extends RealmObject {
     private String name;
 
     public String getName() {

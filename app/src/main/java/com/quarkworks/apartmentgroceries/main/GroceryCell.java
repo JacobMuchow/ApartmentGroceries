@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.quarkworks.apartmentgroceries.R;
-import com.quarkworks.apartmentgroceries.service.models.Grocery;
+import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
 
 /**
  * Created by zz on 10/14/15.
@@ -37,7 +37,7 @@ public class GroceryCell extends RelativeLayout{
         nameTextView = (TextView) findViewById(R.id.grocery_cell_name_id);
     }
 
-    public void setViewData(Grocery grocery){
-        nameTextView.setText(grocery.getName());
+    public void setViewData(RGroceryItem groceryItem){
+        nameTextView.setText(groceryItem.getName());
     }
 }

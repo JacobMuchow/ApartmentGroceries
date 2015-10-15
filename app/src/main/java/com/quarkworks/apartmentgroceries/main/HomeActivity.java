@@ -2,14 +2,13 @@ package com.quarkworks.apartmentgroceries.main;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.service.SyncGroceryItem;
-import com.quarkworks.apartmentgroceries.service.models.Grocery;
+import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
 
 import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
@@ -20,7 +19,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private static final String TAG = HomeActivity.class.getSimpleName();
 
-    private RealmResults<Grocery> groceries;
+    private RealmResults<RGroceryItem> groceries;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,10 +30,10 @@ public class HomeActivity extends AppCompatActivity {
 
         Realm realm = Realm.getInstance(this);
 
-        RealmQuery<Grocery> query = realm.where(Grocery.class);
+        RealmQuery<RGroceryItem> query = realm.where(RGroceryItem.class);
         groceries = query.findAll();
 
-        RealmBaseAdapter<Grocery> realmBaseAdapter = new RealmBaseAdapter<Grocery>(this, groceries, true) {
+        RealmBaseAdapter<RGroceryItem> realmBaseAdapter = new RealmBaseAdapter<RGroceryItem>(this, groceries, true) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 GroceryCell groceryCell = convertView != null ?
