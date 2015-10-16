@@ -7,6 +7,7 @@ import io.realm.RealmObject;
  */
 public class RGroceryItem extends RealmObject {
     private String name;
+    private String groupId;
 
     public String getName() {
         return name;
@@ -14,5 +15,13 @@ public class RGroceryItem extends RealmObject {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
 }

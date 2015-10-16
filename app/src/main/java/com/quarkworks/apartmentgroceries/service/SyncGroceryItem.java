@@ -18,8 +18,10 @@ public class SyncGroceryItem {
     private static final String TAG = SyncGroceryItem.class.getSimpleName();
 
     private static final class JsonKeys {
-        private static final String RESULTS = "results";
+        private static final String GROUPID = "groupId";
         private static final String NAME = "name";
+        private static final String OBJECTID = "objectId";
+        private static final String RESULTS = "results";
     }
 
     public static Promise getAll() {
@@ -30,6 +32,7 @@ public class SyncGroceryItem {
             @Override
             public void done(@Nullable JSONObject jsonObject) {
 
+                Log.d(TAG, "grocey item jsonObject:" + jsonObject.toString());
 
                 Realm realm = DataStore.getInstance().getRealm();
                 realm.beginTransaction();
@@ -38,13 +41,18 @@ public class SyncGroceryItem {
                 try {
 
                     JSONArray groceryJsonArray = jsonObject.optJSONArray(JsonKeys.RESULTS);
+                    if (groceryJsonArray != null) {
+                        for (int i = 0; i < groceryJsonArray.length(); i++) {
+                            RGroceryItem groceryItem = realm.createObject(RGroceryItem.class);
+                            groceryItem.setName(groceryJsonArray.getJSONObject(i).getString(JsonKeys.NAME));
+                            groceryItem.setGroupId(groceryJsonArray.getJSONObject(i)
+                                    .getJSONObject(JsonKeys.GROUPID).getString(JsonKeys.OBJECTID));
+                        }
 
-                    for (int i = 0; i < groceryJsonArray.length(); i++) {
-                        RGroceryItem groceryItem = realm.createObject(RGroceryItem.class);
-                        groceryItem.setName(groceryJsonArray.getJSONObject(i).optString(JsonKeys.NAME));
+                        realm.commitTransaction();
+                    } else {
+                        realm.cancelTransaction();
                     }
-
-                    realm.commitTransaction();
                     promise.onSuccess();
                 } catch(JSONException e) {
                     Log.e(TAG, "Error parsing grocery object", e);

@@ -2,6 +2,7 @@ package com.quarkworks.apartmentgroceries.main;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -11,9 +12,7 @@ import com.quarkworks.apartmentgroceries.service.DataStore;
 import com.quarkworks.apartmentgroceries.service.SyncGroceryItem;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
 
-import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
-import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
 public class HomeActivity extends AppCompatActivity {
@@ -35,7 +34,7 @@ public class HomeActivity extends AppCompatActivity {
                 GroceryCell groceryCell = convertView != null ?
                         (GroceryCell) convertView : new GroceryCell(parent.getContext());
                 groceryCell.setViewData(getItem(position));
-
+                Log.d(TAG, "groupId:" + getItem(position).getGroupId());
                 return groceryCell;
             }
         };
