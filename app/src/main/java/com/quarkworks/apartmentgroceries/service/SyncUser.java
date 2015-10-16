@@ -97,7 +97,7 @@ public class SyncUser {
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString(JsonKeys.SESSION_TOKEN, sessionToken);
                     editor.commit();
-                    // TODO: GET USERNAME AND USER ID
+
                     promise.onSuccess();
                 } catch (JSONException e) {
                     Log.e(TAG, "sign up failure", e);

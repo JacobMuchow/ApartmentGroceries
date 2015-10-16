@@ -26,6 +26,8 @@ public class SyncGroceryItem {
         private static final String NAME = "name";
         private static final String OBJECTID = "objectId";
         private static final String RESULTS = "results";
+        private static final String CREATEDBY = "createdBy";
+        private static final String PURCHASEDBY = "purchasedBy";
     }
 
     public static Promise getAll() {
@@ -48,10 +50,19 @@ public class SyncGroceryItem {
                     if (groceryJsonArray != null) {
                         for (int i = 0; i < groceryJsonArray.length(); i++) {
                             RGroceryItem groceryItem = realm.createObject(RGroceryItem.class);
-                            groceryItem.setGroceryId(groceryJsonArray.getJSONObject(i).getString(JsonKeys.OBJECTID));
-                            groceryItem.setName(groceryJsonArray.getJSONObject(i).getString(JsonKeys.NAME));
+                            groceryItem.setGroceryId(groceryJsonArray.getJSONObject(i)
+                                    .getString(JsonKeys.OBJECTID));
+                            groceryItem.setName(groceryJsonArray.getJSONObject(i)
+                                    .getString(JsonKeys.NAME));
                             groceryItem.setGroupId(groceryJsonArray.getJSONObject(i)
                                     .getJSONObject(JsonKeys.GROUPID).getString(JsonKeys.OBJECTID));
+                            groceryItem.setCreatedBy(groceryJsonArray.getJSONObject(i)
+                                    .getJSONObject(JsonKeys.CREATEDBY).getString(JsonKeys.OBJECTID));
+                            JSONObject purchasedByObj = groceryJsonArray.getJSONObject(i)
+                                    .optJSONObject(JsonKeys.PURCHASEDBY);
+                            if (purchasedByObj != null) {
+                                groceryItem.setPurchasedBy(purchasedByObj.getString(JsonKeys.OBJECTID));
+                            }
                         }
 
                         realm.commitTransaction();

@@ -14,11 +14,25 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
+    <!-- created by -->
+    <TextView
+        android:id="@+id/grocery_item_detail_created_id"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/grocery_item_detail_name_id" />
+
+    <!-- purchased by-->
+    <TextView
+        android:id="@+id/grocery_item_detail_purchased_id"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/grocery_item_detail_created_id"/>
+
     <!-- group name -->
     <TextView
         android:id="@+id/grocery_item_detail_group_id"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/grocery_item_detail_name_id"/>
+        android:layout_below="@+id/grocery_item_detail_purchased_id"/>
 
 </RelativeLayout>
