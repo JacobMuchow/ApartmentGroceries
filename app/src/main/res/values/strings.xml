@@ -23,5 +23,9 @@
     <string name="login_failure_message">Invalid username or password</string>
     <string name="login_success_message">Login success</string>
     <string name="sign_up_failure_message">Username exists</string>
+    <string name="title_activity_grocery_card_pager">GroceryCardPager</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
 
 </resources>

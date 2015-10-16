@@ -38,6 +38,10 @@
             android:name=".main.HomeActivity"
             android:label="@string/title_activity_home" >
         </activity>
+        <activity
+            android:name=".main.GroceryCardPagerActivity"
+            android:label="@string/title_activity_grocery_card_pager" >
+        </activity>
     </application>
 
 </manifest>

@@ -1,10 +1,12 @@
 package com.quarkworks.apartmentgroceries.main;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.quarkworks.apartmentgroceries.R;
@@ -19,6 +21,8 @@ public class HomeActivity extends AppCompatActivity {
 
     private static final String TAG = HomeActivity.class.getSimpleName();
 
+    public static final String POSITION = "POSITION";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,7 +30,7 @@ public class HomeActivity extends AppCompatActivity {
 
         SyncGroceryItem.getAll();
 
-        RealmResults<RGroceryItem> groceries = DataStore.getInstance().getRealm().where(RGroceryItem.class).findAll();
+        final RealmResults<RGroceryItem> groceries = DataStore.getInstance().getRealm().where(RGroceryItem.class).findAll();
 
         RealmBaseAdapter<RGroceryItem> realmBaseAdapter = new RealmBaseAdapter<RGroceryItem>(this, groceries, true) {
             @Override
@@ -41,5 +45,13 @@ public class HomeActivity extends AppCompatActivity {
 
         ListView listView = (ListView) findViewById(R.id.home_list_view_id);
         listView.setAdapter(realmBaseAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(getApplicationContext(), GroceryCardPagerActivity.class);
+                intent.putExtra(POSITION, position);
+                startActivity(intent);
+            }
+        });
     }
 }
