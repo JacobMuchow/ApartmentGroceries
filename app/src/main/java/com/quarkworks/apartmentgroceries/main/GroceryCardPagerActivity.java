@@ -1,5 +1,6 @@
 package com.quarkworks.apartmentgroceries.main;
 
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -20,6 +21,8 @@ import io.realm.RealmResults;
 
 public class GroceryCardPagerActivity extends AppCompatActivity {
     private static final String TAG = GroceryCardPagerActivity.class.getSimpleName();
+
+    public static final String GROCER_ITEM_ID = "groceryId";
 
     private static int NUM_PAGES = 0;
     private ViewPager viewPager;
@@ -86,6 +89,14 @@ public class GroceryCardPagerActivity extends AppCompatActivity {
             View rootView = inflater.inflate(R.layout.grocery_card_pager_fragment, container, false);
             TextView nameTextView = (TextView)rootView.findViewById(R.id.grocery_card_pager_fragment_grocery_item_name_id);
             nameTextView.setText(fGroceryItems.get(fPosition).getName());
+            nameTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getContext(), GroceryItemDetailActivity.class);
+                    intent.putExtra(GROCER_ITEM_ID, fGroceryItems.get(fPosition).getGroceryId());
+                    startActivity(intent);
+                }
+            });
             return rootView;
         }
     }

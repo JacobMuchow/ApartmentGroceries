@@ -42,6 +42,10 @@
             android:name=".main.GroceryCardPagerActivity"
             android:label="@string/title_activity_grocery_card_pager" >
         </activity>
+        <activity
+            android:name=".main.GroceryItemDetailActivity"
+            android:label="@string/title_activity_grocery_item_detail" >
+        </activity>
     </application>
 
 </manifest>

@@ -44,6 +44,7 @@ public class SyncGroceryItem {
                     if (groceryJsonArray != null) {
                         for (int i = 0; i < groceryJsonArray.length(); i++) {
                             RGroceryItem groceryItem = realm.createObject(RGroceryItem.class);
+                            groceryItem.setGroceryId(groceryJsonArray.getJSONObject(i).getString(JsonKeys.OBJECTID));
                             groceryItem.setName(groceryJsonArray.getJSONObject(i).getString(JsonKeys.NAME));
                             groceryItem.setGroupId(groceryJsonArray.getJSONObject(i)
                                     .getJSONObject(JsonKeys.GROUPID).getString(JsonKeys.OBJECTID));

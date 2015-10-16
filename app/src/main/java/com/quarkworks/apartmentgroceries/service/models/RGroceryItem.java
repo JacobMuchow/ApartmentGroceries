@@ -6,8 +6,18 @@ import io.realm.RealmObject;
  * Created by zz on 10/14/15.
  */
 public class RGroceryItem extends RealmObject {
+
+    private String groceryId;
     private String name;
     private String groupId;
+
+    public String getGroceryId() {
+        return groceryId;
+    }
+
+    public void setGroceryId(String groceryId) {
+        this.groceryId = groceryId;
+    }
 
     public String getName() {
         return name;
