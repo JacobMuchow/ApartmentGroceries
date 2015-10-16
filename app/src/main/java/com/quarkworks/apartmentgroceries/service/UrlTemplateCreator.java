@@ -12,16 +12,27 @@ public class UrlTemplateCreator {
 
     private static final String baseUrl = "https://api.parse.com/1/";
 
-    private static final String GET = "GET";
-    private static final String POST = "POST";
+    public static final String GET = "GET";
+    public static final String POST = "POST";
+    public static final String USERNAME = "username";
+    public static final String PASSWORD = "password";
 
     public static UrlTemplate login(String username, String password) {
         String url = baseUrl + "login";
         Map<String, String> params = new HashMap<>();
-        params.put("username", username);
-        params.put("password", password);
+        params.put(USERNAME, username);
+        params.put(PASSWORD, password);
 
-        return new UrlTemplate(GET, url, params);
+        return new UrlTemplate(GET, url, params, false);
+    }
+
+    public static UrlTemplate signUp(String username, String password) {
+        String url = baseUrl + "users";
+        Map<String, String> params = new HashMap<>();
+        params.put(USERNAME, username);
+        params.put(PASSWORD, password);
+
+        return new UrlTemplate(POST, url, params, false);
     }
 
     public static UrlTemplate logout() {

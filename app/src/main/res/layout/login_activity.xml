@@ -39,17 +39,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/login_activity_password_id"
         android:layout_centerHorizontal="true"
-        android:text="@string/login"
-        android:onClick="loginButtonOnClick"/>
-
-    <!-- login status message-->
-    <TextView
-        android:id="@+id/login_activity_status_id"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/login_activity_login_button_id"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="69dp"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:text="@string/login_button"/>
 
 </RelativeLayout>

@@ -7,7 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.quarkworks.apartmentgroceries.auth.LoginActivity;
-import com.quarkworks.apartmentgroceries.auth.SignupActivity;
+import com.quarkworks.apartmentgroceries.auth.SignUpActivity;
 import com.quarkworks.apartmentgroceries.user.UserActivity;
 
 
@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_sign_up:
-                intent = new Intent(this, SignupActivity.class);
+                intent = new Intent(this, SignUpActivity.class);
                 startActivity(intent);
                 return true;
 

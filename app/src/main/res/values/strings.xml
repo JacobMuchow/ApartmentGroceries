@@ -1,15 +1,27 @@
 <resources>
     <string name="app_name">Apartment Groceries</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="title_activity_login">Login Activity</string>
-    <string name="title_activity_signup">Signup Activity</string>
 
-    <string name="login">Login</string>
+    <!-- button -->
+    <string name="login_button">Login</string>
+    <string name="sign_up_button">Sign Up</string>
+
+    <!-- menu -->
     <string name="action_login">Login</string>
     <string name="action_user">User</string>
     <string name="action_sign_up">Sign Up</string>
-    <string name="title_activity_user">User Activity</string>
-    <string name="title_activity_home">Home Activity</string>
 
-    <string name="username_or_password_empty">Please input username and password.</string>
+    <!-- activity title -->
+    <string name="title_activity_login">Login</string>
+    <string name="title_activity_signup">Signup</string>
+    <string name="title_activity_user">User</string>d
+    <string name="title_activity_home">Home</string>
+
+    <!-- login or sign up-->
+    <string name="empty_username_or_password">Please input username and password.</string>
+    <string name="password_not_match">Passwords do not match.</string>
+    <string name="login_or_sign_up_session">session</string>
+    <string name="login_failure_message">Invalid username or password</string>
+    <string name="login_success_message">Login success</string>
+    <string name="sign_up_failure_message">Username exists</string>
+
 </resources>

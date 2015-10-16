@@ -1,111 +1,81 @@
 package com.quarkworks.apartmentgroceries.auth;
 
-import android.os.AsyncTask;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.quarkworks.apartmentgroceries.MyApplication;
 import com.quarkworks.apartmentgroceries.R;
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.Response;
+import com.quarkworks.apartmentgroceries.main.HomeActivity;
+import com.quarkworks.apartmentgroceries.service.Promise;
+import com.quarkworks.apartmentgroceries.service.SyncUser;
 
-import java.io.IOException;
+public class SignUpActivity extends AppCompatActivity {
+    private static final String TAG = SignUpActivity.class.getSimpleName();
 
-public class SignupActivity extends AppCompatActivity {
-
-    private static final String LOG_TAG = SignupActivity.class.getSimpleName();
-
+    /*
+        References
+     */
     private EditText usernameEditText;
     private EditText passwordEditText;
-    private EditText phoneEditText;
-
-    private String username;
-    private String password;
-    private String phone;
+    private EditText secondPasswordEditText;
+    private Button signUpButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.signup_activity);
+        setContentView(R.layout.sign_up_activity);
 
-        usernameEditText = (EditText) findViewById(R.id.signup_activity_username_id);
-        passwordEditText = (EditText) findViewById(R.id.signup_activity_password_id);
-        phoneEditText = (EditText) findViewById(R.id.signup_activity_phone_id);
-        
-    }
+        usernameEditText = (EditText) findViewById(R.id.sign_up_username_id);
+        passwordEditText = (EditText) findViewById(R.id.sign_up_password_id);
+        secondPasswordEditText = (EditText) findViewById(R.id.sign_up_second_password_id);
+        signUpButton = (Button) findViewById(R.id.sign_up_submit_button_id);
 
-    /**
-     * sign up button onclick
-     * @param view
-     */
-    public void signupButtonOnClick(View view) {
+        signUpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String username = usernameEditText.getText().toString();
+                String password = passwordEditText.getText().toString();
+                String secondPassword = secondPasswordEditText.getText().toString();
 
-        username = usernameEditText.getText().toString();
-        password = passwordEditText.getText().toString();
-        phone = phoneEditText.getText().toString();
-        Log.d(LOG_TAG, "username:" + username + ", password:" + password + ", phone:" + phone);
-
-        if (username != null && password != null) {
-            SignupAsyncTask signupAsyncTask = new SignupAsyncTask();
-            signupAsyncTask.execute(username, password);
-        } else {
-            Toast.makeText(this, "sorry, please input username and password.", Toast.LENGTH_LONG).show();
-        }
-
-
-    }
-
-    private class SignupAsyncTask extends AsyncTask<String, Void, String> {
-        @Override
-        protected String doInBackground(String... params) {
-
-            String username = params[0];
-            String password = params[1];
-//            String phone = params[2];
-
-            String json = "{\"username\":\"" +
-                    username +
-                    "\", \"password\":\"" +
-                    password +
-//                    "\", \"phone\":\"" +
-//                    phone +
-                    "\"}";
-            MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-            RequestBody requestBody = RequestBody.create(JSON, json);
-            Log.d(LOG_TAG, "sign up request body:" + requestBody.toString());
-            OkHttpClient client;
-            client = new OkHttpClient();
-
-            String url = "https://api.parse.com/1/users";
-            Request request = new Request.Builder()
-                    .url(url)
-                    .addHeader("X-Parse-Application-Id", "GlvuJjSGKTkc3DxedowpvgCMNOZeGQjxvRApSqGD")
-                    .addHeader("X-Parse-REST-API-Key", "0b3HDSEgt3EgXxyDHLOV0M7yQZwsexVG8ryTqzKI")
-                    .addHeader("X-Parse-Revocable-Session", "1")
-                    .method("POST", requestBody)
-                    .build();
-
-            Response response = null;
-
-
-            try {
-                response = client.newCall(request).execute();
-                return response.body().string();
-            } catch (IOException e) {
-                Log.d(LOG_TAG, "Error: client.newCall failed");
+                if (!username.isEmpty() && !password.isEmpty() && !secondPassword.isEmpty()) {
+                    if (password.equals(secondPassword)) {
+                        SyncUser.signUp(username, password)
+                                .setCallbacks(signUpSuccessCallback, signUpFailureCallback);
+                    } else {
+                        Toast.makeText(getApplicationContext(),
+                                getString(R.string.password_not_match),
+                                Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(),
+                            getString(R.string.empty_username_or_password),
+                            Toast.LENGTH_LONG).show();
+                }
             }
-
-            return null;
-        }
-
-        protected void onPostExecute(String result) {
-            //todo: set up profile SharedPreferences
-        }
+        });
     }
+
+    private Promise.Success signUpSuccessCallback = new Promise.Success() {
+        @Override
+        public void onSuccess() {
+            Intent intent = new Intent(MyApplication.getContext(), HomeActivity.class);
+            startActivity(intent);
+            Toast.makeText(getApplicationContext(), getString(R.string.login_success_message),
+                    Toast.LENGTH_LONG).show();
+        }
+    };
+
+    private Promise.Failure signUpFailureCallback = new Promise.Failure() {
+        @Override
+        public void onFailure() {
+            Toast.makeText(getApplicationContext(),
+                    getString(R.string.sign_up_failure_message), Toast.LENGTH_LONG).show();
+        }
+    };
 }
