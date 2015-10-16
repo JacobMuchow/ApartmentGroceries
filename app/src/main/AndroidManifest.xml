@@ -46,6 +46,10 @@
             android:name=".main.GroceryItemDetailActivity"
             android:label="@string/title_activity_grocery_item_detail" >
         </activity>
+        <activity
+            android:name=".main.AddGroceryItemActivity"
+            android:label="@string/title_activity_add_grocery_item" >
+        </activity>
     </application>
 
 </manifest>

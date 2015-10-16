@@ -1,8 +1,12 @@
 package com.quarkworks.apartmentgroceries.service;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.quarkworks.apartmentgroceries.MyApplication;
+import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
 
 import org.json.JSONArray;
@@ -64,6 +68,34 @@ public class SyncGroceryItem {
         };
 
         UrlTemplate template = UrlTemplateCreator.getAllGroceryItems();
+        new NetworkRequest(template, callback).execute();
+        return promise;
+    }
+
+    public static Promise add(RGroceryItem rGroceryItem) {
+
+        final Promise promise = new Promise();
+
+        NetworkRequest.Callback callback = new NetworkRequest.Callback() {
+            @Override
+            public void done(@Nullable JSONObject jsonObject) {
+                Log.d(TAG, "add grocery jsonObject:" + jsonObject);
+
+                try {
+                    String groceryId = jsonObject.getString(JsonKeys.OBJECTID);
+                    if (!groceryId.isEmpty()) {
+                        promise.onSuccess();
+                    } else {
+                        promise.onFailure();
+                    }
+                } catch (JSONException e) {
+                    Log.e(TAG, "adding grocery failed", e);
+                    promise.onFailure();
+                }
+            }
+        };
+
+        UrlTemplate template = UrlTemplateCreator.addGroceryItem(rGroceryItem);
         new NetworkRequest(template, callback).execute();
         return promise;
     }

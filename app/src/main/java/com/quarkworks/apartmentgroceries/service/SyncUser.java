@@ -22,9 +22,11 @@ public class SyncUser {
     private static final String TAG = SyncUser.class.getSimpleName();
 
     private static final class JsonKeys {
+        private static final String OBJECTID = "objectId";
         private static final String RESULTS = "results";
         private static final String SESSION_TOKEN = "sessionToken";
         private static final String USERNAME = "username";
+        private static final String USERID = "userId";
     }
 
     public static Promise login(String username, String password) {
@@ -38,6 +40,7 @@ public class SyncUser {
                 try {
                     String sessionToken = jsonObject.getString(JsonKeys.SESSION_TOKEN);
                     String username = jsonObject.getString(JsonKeys.USERNAME);
+                    String userId = jsonObject.getString(JsonKeys.OBJECTID);
 
                     Context context = MyApplication.getContext();
                     SharedPreferences sharedPreferences = context
@@ -45,6 +48,7 @@ public class SyncUser {
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString(JsonKeys.SESSION_TOKEN, sessionToken);
                     editor.putString(JsonKeys.USERNAME, username);
+                    editor.putString(JsonKeys.USERID, userId);
                     editor.commit();
 
                     promise.onSuccess();
@@ -93,7 +97,7 @@ public class SyncUser {
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString(JsonKeys.SESSION_TOKEN, sessionToken);
                     editor.commit();
-
+                    // TODO: GET USERNAME AND USER ID
                     promise.onSuccess();
                 } catch (JSONException e) {
                     Log.e(TAG, "sign up failure", e);

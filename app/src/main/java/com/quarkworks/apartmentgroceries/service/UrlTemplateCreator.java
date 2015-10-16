@@ -2,6 +2,8 @@ package com.quarkworks.apartmentgroceries.service;
 
 import android.util.Log;
 
+import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -73,5 +75,14 @@ public class UrlTemplateCreator {
         String url = baseUrl + "users";
 
         return new UrlTemplate(GET, url, null);
+    }
+
+    public static UrlTemplate addGroceryItem(RGroceryItem rGroceryItem) {
+        String url = baseUrl + "classes/GroceryItem";
+        Map<String, String> params = new HashMap<>();
+
+        params.put("name", rGroceryItem.getName());
+
+        return new UrlTemplate(POST, url, params);
     }
 }

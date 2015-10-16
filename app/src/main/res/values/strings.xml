@@ -4,17 +4,22 @@
     <!-- button -->
     <string name="login_button">Login</string>
     <string name="sign_up_button">Sign Up</string>
+    <string name="add_button">Add</string>
 
     <!-- menu -->
     <string name="action_login">Login</string>
     <string name="action_user">User</string>
     <string name="action_sign_up">Sign Up</string>
+    <string name="action_add_grocery">Add grocery</string>
 
     <!-- activity title -->
     <string name="title_activity_login">Login</string>
     <string name="title_activity_signup">Signup</string>
     <string name="title_activity_user">User</string>d
     <string name="title_activity_home">Home</string>
+    <string name="title_activity_grocery_card_pager">Grocery Card Pager</string>
+    <string name="title_activity_grocery_item_detail">Grocery Detail</string>
+    <string name="title_activity_add_grocery_item">Add Grocery</string>
 
     <!-- login or sign up-->
     <string name="empty_username_or_password">Please input username and password.</string>
@@ -23,10 +28,9 @@
     <string name="login_failure_message">Invalid username or password</string>
     <string name="login_success_message">Login success</string>
     <string name="sign_up_failure_message">Username exists</string>
-    <string name="title_activity_grocery_card_pager">GroceryCardPager</string>
 
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
-    <string name="title_activity_grocery_item_detail">Grocery Detail</string>
-
+    <!-- response message -->
+    <string name="grocery_item_name_empty">Please input a item name</string>
+    <string name="add_grocery_item_success">Add an item successfully</string>
+    <string name="add_grocery_item_failure">Add an item failed</string>
 </resources>
