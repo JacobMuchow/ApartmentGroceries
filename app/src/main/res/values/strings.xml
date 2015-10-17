@@ -5,6 +5,7 @@
     <string name="login_button">Login</string>
     <string name="sign_up_button">Sign Up</string>
     <string name="add_button">Add</string>
+    <string name="join_group_button">Join</string>
 
     <!-- menu -->
     <string name="action_user">User</string>
@@ -33,8 +34,10 @@
 
     <!-- response message -->
     <string name="grocery_item_name_empty">Please input a item name</string>
-    <string name="add_grocery_item_success">Add an item successfully</string>
-    <string name="add_grocery_item_failure">Add an item failed</string>
-    <string name="add_group_success">Add a group successfully</string>
-    <string name="add_group_failure">Add a group failed</string>
+    <string name="add_grocery_item_success">Added an item successfully</string>
+    <string name="add_grocery_item_failure">Added an item failed</string>
+    <string name="add_group_success">Added a group successfully</string>
+    <string name="add_group_failure">Added a group failed</string>
+    <string name="join_group_success">Joined a group successfully</string>
+    <string name="join_group_failure">Joined a group failed</string>
 </resources>

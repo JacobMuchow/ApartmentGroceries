@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.quarkworks.apartmentgroceries.MyApplication;
@@ -45,6 +46,11 @@ public class NetworkRequest extends AsyncTask<Void, String, String> {
         RequestBody requestBody = null;
         Map<String, String> paramsMap = template.getParams();
 
+        if (paramsMap != null) {
+            String objectId = paramsMap.get("objectId");
+            if (objectId != null) url = url + "/" + objectId;
+        }
+
         // add parameters to url if using GET, or we build RequestBody
         if (method.equals(UrlTemplateCreator.GET)) {
             StringBuilder urlStringBuilder = new StringBuilder(url);
@@ -63,7 +69,13 @@ public class NetworkRequest extends AsyncTask<Void, String, String> {
                 int size = paramsMap.size();
                 int i = 0;
                 for (Map.Entry entry : paramsMap.entrySet()) {
-                    jsonBuilder.append("\"" + entry.getKey() + "\":\"" + entry.getValue() + "\"");
+                    String entryValue = entry.getValue().toString();
+                    if(entryValue.charAt(0) == '{') {
+                        jsonBuilder.append("\"" + entry.getKey() + "\":" + entry.getValue() + "");
+                    } else {
+                        jsonBuilder.append("\"" + entry.getKey() + "\":\"" + entry.getValue() + "\"");
+                    }
+
                     if (i < size - 1) {
                         jsonBuilder.append(",");
                     }

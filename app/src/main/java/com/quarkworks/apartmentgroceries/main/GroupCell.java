@@ -1,13 +1,20 @@
 package com.quarkworks.apartmentgroceries.main;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.quarkworks.apartmentgroceries.MyApplication;
 import com.quarkworks.apartmentgroceries.R;
-import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
+import com.quarkworks.apartmentgroceries.service.Promise;
+import com.quarkworks.apartmentgroceries.service.SyncUser;
 import com.quarkworks.apartmentgroceries.service.models.RGroup;
 
 /**
@@ -18,6 +25,7 @@ public class GroupCell extends RelativeLayout{
     private static final String TAG = GroupCell.class.getSimpleName();
 
     private TextView nameTextView;
+    private Button joinGroupButton;
 
     public GroupCell(Context context) {
         super(context);
@@ -37,9 +45,55 @@ public class GroupCell extends RelativeLayout{
     private void initialize() {
         LayoutInflater.from(getContext()).inflate(R.layout.group_cell, this);
         nameTextView = (TextView) findViewById(R.id.group_cell_name_id);
+        joinGroupButton = (Button) findViewById(R.id.group_cell_join_group_button_id);
     }
 
     public void setViewData(RGroup group){
         nameTextView.setText(group.getName());
+        SharedPreferences sharedPreferences =
+                MyApplication.getContext().getSharedPreferences(
+                        MyApplication.getContext()
+                                .getString(R.string.login_or_sign_up_session), 0);
+        String groupId = sharedPreferences.getString(SyncUser.JsonKeys.GROUPID, null);
+        if (groupId.equals(group.getGroupId())) {
+            joinGroupButton.setVisibility(GONE);
+        } else {
+            joinGroupButton.setVisibility(VISIBLE);
+        }
     }
+
+    public void setJoinGroupButton(RGroup group) {
+        final String groupId = group.getGroupId();
+        joinGroupButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedPreferences sharedPreferences =
+                        MyApplication.getContext().getSharedPreferences(
+                                MyApplication.getContext()
+                                        .getString(R.string.login_or_sign_up_session), 0);
+                String userId = sharedPreferences.getString(SyncUser.JsonKeys.USERID, null);
+                SyncUser.joinGroup(userId, groupId)
+                        .setCallbacks(joinGroupSuccesCallback, joinGroupFailureCallback);
+            }
+        });
+    }
+
+    private Promise.Success joinGroupSuccesCallback = new Promise.Success() {
+        @Override
+        public void onSuccess() {
+            Toast.makeText(MyApplication.getContext(),
+                    MyApplication.getContext().getString(R.string.join_group_success),
+                    Toast.LENGTH_LONG).show();
+            GroupActivity.groupRealmBaseAdapter.notifyDataSetChanged();
+        }
+    };
+
+    private Promise.Failure joinGroupFailureCallback = new Promise.Failure() {
+        @Override
+        public void onFailure() {
+            Toast.makeText(MyApplication.getContext(),
+                    MyApplication.getContext().getString(R.string.join_group_failure),
+                    Toast.LENGTH_LONG).show();
+        }
+    };
 }

@@ -40,7 +40,6 @@ public class HomeActivity extends AppCompatActivity {
                 GroceryCell groceryCell = convertView != null ?
                         (GroceryCell) convertView : new GroceryCell(parent.getContext());
                 groceryCell.setViewData(getItem(position));
-                Log.d(TAG, "groupId:" + getItem(position).getGroupId());
                 return groceryCell;
             }
         };

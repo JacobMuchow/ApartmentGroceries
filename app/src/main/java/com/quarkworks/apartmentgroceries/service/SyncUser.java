@@ -21,12 +21,14 @@ import io.realm.Realm;
 public class SyncUser {
     private static final String TAG = SyncUser.class.getSimpleName();
 
-    private static final class JsonKeys {
+    public static final class JsonKeys {
+        public static final String GROUPID = "groupId";
         private static final String OBJECTID = "objectId";
         private static final String RESULTS = "results";
-        private static final String SESSION_TOKEN = "sessionToken";
-        private static final String USERNAME = "username";
-        private static final String USERID = "userId";
+        public static final String SESSION_TOKEN = "sessionToken";
+        public static final String USERNAME = "username";
+        public static final String USERID = "userId";
+        public static final String UPDATEAT = "updatedAt";
     }
 
     public static Promise login(String username, String password) {
@@ -36,7 +38,7 @@ public class SyncUser {
         NetworkRequest.Callback callback = new NetworkRequest.Callback() {
             @Override
             public void done(@Nullable JSONObject jsonObject) {
-
+                Log.d(TAG, "login jsonObject:" + jsonObject);
                 try {
                     String sessionToken = jsonObject.getString(JsonKeys.SESSION_TOKEN);
                     String username = jsonObject.getString(JsonKeys.USERNAME);
@@ -142,6 +144,37 @@ public class SyncUser {
         };
 
         UrlTemplate template = UrlTemplateCreator.getAllUsers();
+        new NetworkRequest(template, callback).execute();
+        return promise;
+    }
+
+    public static Promise joinGroup(String userId, String groupId) {
+
+        final Promise promise = new Promise();
+
+        NetworkRequest.Callback callback = new NetworkRequest.Callback() {
+            @Override
+            public void done(@Nullable JSONObject jsonObject) {
+                Log.d(TAG, "jsonObject:" + jsonObject.toString());
+                try {
+                    String groupId = jsonObject.getJSONObject(JsonKeys.GROUPID)
+                            .getString(JsonKeys.OBJECTID);
+                    Context context = MyApplication.getContext();
+                    SharedPreferences sharedPreferences = context
+                            .getSharedPreferences(context.getString(R.string.login_or_sign_up_session), 0);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString(JsonKeys.GROUPID, groupId);
+                    editor.commit();
+
+                    promise.onSuccess();
+                } catch (JSONException e) {
+                    Log.e(TAG, "joining group failure", e);
+                    promise.onFailure();
+                }
+            }
+        };
+
+        UrlTemplate template = UrlTemplateCreator.joinGroup(userId, groupId);
         new NetworkRequest(template, callback).execute();
         return promise;
     }

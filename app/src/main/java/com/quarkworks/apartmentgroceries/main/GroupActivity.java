@@ -12,9 +12,7 @@ import android.widget.ListView;
 
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.service.DataStore;
-import com.quarkworks.apartmentgroceries.service.SyncGroceryItem;
 import com.quarkworks.apartmentgroceries.service.SyncGroup;
-import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
 import com.quarkworks.apartmentgroceries.service.models.RGroup;
 
 import io.realm.RealmBaseAdapter;
@@ -22,6 +20,8 @@ import io.realm.RealmResults;
 
 public class GroupActivity extends AppCompatActivity {
     private static final String TAG = GroupActivity.class.getSimpleName();
+
+    public static RealmBaseAdapter<RGroup> groupRealmBaseAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,18 +32,19 @@ public class GroupActivity extends AppCompatActivity {
 
         final RealmResults<RGroup> groups = DataStore.getInstance().getRealm().where(RGroup.class).findAll();
 
-        RealmBaseAdapter<RGroup> realmBaseAdapter = new RealmBaseAdapter<RGroup>(this, groups, true) {
+        groupRealmBaseAdapter = new RealmBaseAdapter<RGroup>(this, groups, true) {
             @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
+            public View getView(final int position, View convertView, ViewGroup parent) {
                 GroupCell groupCell = convertView != null ?
                         (GroupCell) convertView : new GroupCell(parent.getContext());
                 groupCell.setViewData(getItem(position));
+                groupCell.setJoinGroupButton(getItem(position));
                 return groupCell;
             }
         };
 
         ListView listView = (ListView) findViewById(R.id.group_list_view_id);
-        listView.setAdapter(realmBaseAdapter);
+        listView.setAdapter(groupRealmBaseAdapter);
     }
 
     @Override

@@ -4,6 +4,8 @@ import android.util.Log;
 
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
 import com.quarkworks.apartmentgroceries.service.models.RGroup;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.RequestBody;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,6 +23,7 @@ public class UrlTemplateCreator {
 
     public static final String GET = "GET";
     public static final String POST = "POST";
+    public static final String PUT = "PUT";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
 
@@ -99,5 +102,28 @@ public class UrlTemplateCreator {
         params.put("name", rGroup.getName());
 
         return new UrlTemplate(POST, url, params);
+    }
+
+    public static UrlTemplate joinGroup(String userId, String groupId) {
+        String url = baseUrl + "users";
+        Map<String, String> params = new HashMap<>();
+        JSONObject groupObject = new JSONObject();
+
+        try {
+            groupObject.put("__type", "Pointer");
+            groupObject.put("className", "Group");
+            groupObject.put("objectId", groupId);
+
+            Log.d(TAG, "groupObject:" + groupObject.toString());
+            params.put("groupId", groupObject.toString());
+            params.put("objectId", userId);
+
+            return new UrlTemplate(PUT, url, params, true);
+
+        } catch (JSONException e) {
+            Log.d(TAG, "Error creating group object for where in joinGroup()", e);
+        }
+
+        return null;
     }
 }
