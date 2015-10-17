@@ -11,8 +11,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme" >
-        <activity
-            android:name=".MainActivity">
+        <activity android:name=".MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -46,6 +45,14 @@
         <activity
             android:name=".main.AddGroceryItemActivity"
             android:label="@string/title_activity_add_grocery_item" >
+        </activity>
+        <activity
+            android:name=".main.GroupActivity"
+            android:label="@string/title_activity_group" >
+        </activity>
+        <activity
+            android:name=".main.AddGroupActivity"
+            android:label="@string/title_activity_add_group" >
         </activity>
     </application>
 

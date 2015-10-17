@@ -14,8 +14,8 @@ import com.quarkworks.apartmentgroceries.main.HomeActivity;
 import com.quarkworks.apartmentgroceries.service.Promise;
 import com.quarkworks.apartmentgroceries.service.SyncUser;
 
-public class SSignUpActivity extends AppCompatActivity {
-    private static final String TAG = SSignUpActivity.class.getSimpleName();
+public class SignUpActivity extends AppCompatActivity {
+    private static final String TAG = SignUpActivity.class.getSimpleName();
 
     /*
         References

@@ -59,7 +59,7 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.add_grocery_item_menu, menu);
+        getMenuInflater().inflate(R.menu.home_menu, menu);
         return true;
     }
 
@@ -73,7 +73,10 @@ public class HomeActivity extends AppCompatActivity {
                 intent = new Intent(this, AddGroceryItemActivity.class);
                 startActivity(intent);
                 return true;
-
+            case R.id.action_list_group:
+                intent = new Intent(this, GroupActivity.class);
+                startActivity(intent);
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
