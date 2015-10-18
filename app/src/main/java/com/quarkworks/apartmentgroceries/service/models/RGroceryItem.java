@@ -10,6 +10,7 @@ public class RGroceryItem extends RealmObject {
     private String groceryId;
     private String name;
     private String groupId;
+    private String groupName;
     private String createdBy;
     private String purchasedBy;
 
@@ -35,6 +36,14 @@ public class RGroceryItem extends RealmObject {
 
     public void setGroupId(String groupId) {
         this.groupId = groupId;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 
     public String getCreatedBy() {

@@ -18,7 +18,6 @@ public class GroceryItemDetailActivity extends AppCompatActivity {
     private TextView createdByTextView;
     private TextView groceryItemNameTextView;
     private TextView groupNameTextView;
-    private TextView purchasedByTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,15 +27,13 @@ public class GroceryItemDetailActivity extends AppCompatActivity {
         createdByTextView = (TextView) findViewById(R.id.grocery_item_detail_created_id);
         groceryItemNameTextView = (TextView) findViewById(R.id.grocery_item_detail_name_id);
         groupNameTextView = (TextView) findViewById(R.id.grocery_item_detail_group_id);
-        purchasedByTextView = (TextView) findViewById(R.id.grocery_item_detail_purchased_id);
 
         String groceryId = getIntent().getExtras().getString(GroceryCardPagerActivity.GROCER_ITEM_ID);
         RGroceryItem rGroceryItem = DataStore.getInstance().getRealm()
                 .where(RGroceryItem.class).equalTo("groceryId", groceryId).findFirst();
 
-        createdByTextView.setText(rGroceryItem.getGroceryId());
+        createdByTextView.setText(rGroceryItem.getCreatedBy());
         groceryItemNameTextView.setText(rGroceryItem.getName());
-        groupNameTextView.setText(rGroceryItem.getGroupId());
-        purchasedByTextView.setText(rGroceryItem.getPurchasedBy());
+        groupNameTextView.setText(rGroceryItem.getGroupName());
     }
 }

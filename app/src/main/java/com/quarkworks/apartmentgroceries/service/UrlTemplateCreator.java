@@ -24,8 +24,10 @@ public class UrlTemplateCreator {
     public static final String GET = "GET";
     public static final String POST = "POST";
     public static final String PUT = "PUT";
+    public static final String INCLUDE = "include";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
+
 
     public static UrlTemplate login(String username, String password) {
         String url = baseUrl + "login";
@@ -53,7 +55,10 @@ public class UrlTemplateCreator {
 
     public static UrlTemplate getAllGroceryItems() {
         String url = baseUrl + "classes/GroceryItem";
-        return new UrlTemplate(GET, url, null);
+        Map<String, String> params = new HashMap<>();
+        params.put(INCLUDE, "createdBy,groupId,purchasedBy");
+
+        return new UrlTemplate(GET, url, params);
     }
 
     public static UrlTemplate getGroceryItemsByGroupId(String groupId) {

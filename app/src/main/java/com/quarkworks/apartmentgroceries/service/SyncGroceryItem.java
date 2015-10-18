@@ -28,6 +28,7 @@ public class SyncGroceryItem {
         private static final String RESULTS = "results";
         private static final String CREATEDBY = "createdBy";
         private static final String PURCHASEDBY = "purchasedBy";
+        private static final String USERNAME = "username";
     }
 
     public static Promise getAll() {
@@ -56,12 +57,14 @@ public class SyncGroceryItem {
                                     .getString(JsonKeys.NAME));
                             groceryItem.setGroupId(groceryJsonArray.getJSONObject(i)
                                     .getJSONObject(JsonKeys.GROUPID).getString(JsonKeys.OBJECTID));
+                            groceryItem.setGroupName(groceryJsonArray.getJSONObject(i)
+                                    .getJSONObject(JsonKeys.GROUPID).getString(JsonKeys.NAME));
                             groceryItem.setCreatedBy(groceryJsonArray.getJSONObject(i)
-                                    .getJSONObject(JsonKeys.CREATEDBY).getString(JsonKeys.OBJECTID));
+                                    .getJSONObject(JsonKeys.CREATEDBY).getString(JsonKeys.USERNAME));
                             JSONObject purchasedByObj = groceryJsonArray.getJSONObject(i)
                                     .optJSONObject(JsonKeys.PURCHASEDBY);
                             if (purchasedByObj != null) {
-                                groceryItem.setPurchasedBy(purchasedByObj.getString(JsonKeys.OBJECTID));
+                                groceryItem.setPurchasedBy(purchasedByObj.getString(JsonKeys.USERNAME));
                             }
                         }
 

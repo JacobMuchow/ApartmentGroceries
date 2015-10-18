@@ -88,7 +88,9 @@ public class GroceryCardPagerActivity extends AppCompatActivity {
 
             View rootView = inflater.inflate(R.layout.grocery_card_pager_fragment, container, false);
             TextView nameTextView = (TextView)rootView.findViewById(R.id.grocery_card_pager_fragment_grocery_item_name_id);
+            TextView createdByTextView = (TextView) rootView.findViewById(R.id.grocery_card_pager_fragment_grocery_item_created_by_id);
             nameTextView.setText(fGroceryItems.get(fPosition).getName());
+            createdByTextView.setText(fGroceryItems.get(fPosition).getCreatedBy());
             nameTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

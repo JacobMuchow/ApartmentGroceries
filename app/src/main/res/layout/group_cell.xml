@@ -10,13 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="20dp"/>
 
-    <TextView
-        android:id="@+id/group_cell_created_at_id"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/group_cell_name_id"
-        android:layout_margin="20dp"/>
-
+    <!-- join group button-->
     <Button
         android:id="@+id/group_cell_join_group_button_id"
         android:layout_width="wrap_content"
