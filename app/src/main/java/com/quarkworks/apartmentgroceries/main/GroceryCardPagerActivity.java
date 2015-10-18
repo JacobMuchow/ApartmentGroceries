@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.service.DataStore;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
+import com.quarkworks.apartmentgroceries.user.UserDetailActivity;
 
 import io.realm.RealmResults;
 
@@ -42,7 +43,7 @@ public class GroceryCardPagerActivity extends AppCompatActivity {
         groceryCardPagerAdapter = new GroceryCardPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(groceryCardPagerAdapter);
 
-        int position = getIntent().getExtras().getInt(HomeActivity.POSITION);
+        int position = getIntent().getExtras().getInt(GroceryCell.POSITION);
         viewPager.setCurrentItem(position);
 
     }
@@ -91,6 +92,7 @@ public class GroceryCardPagerActivity extends AppCompatActivity {
             TextView createdByTextView = (TextView) rootView.findViewById(R.id.grocery_card_pager_fragment_grocery_item_created_by_id);
             nameTextView.setText(fGroceryItems.get(fPosition).getName());
             createdByTextView.setText(fGroceryItems.get(fPosition).getCreatedBy());
+
             nameTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -99,6 +101,17 @@ public class GroceryCardPagerActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
             });
+
+            createdByTextView.setOnClickListener(new View.OnClickListener() {
+                String username = fGroceryItems.get(fPosition).getCreatedBy();
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getContext(), UserDetailActivity.class);
+                    intent.putExtra(GroceryCell.USERNAME, username);
+                    getContext().startActivity(intent);
+                }
+            });
+
             return rootView;
         }
     }

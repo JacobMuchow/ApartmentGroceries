@@ -23,8 +23,6 @@ public class HomeActivity extends AppCompatActivity {
 
     private static final String TAG = HomeActivity.class.getSimpleName();
 
-    public static final String POSITION = "POSITION";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,20 +38,14 @@ public class HomeActivity extends AppCompatActivity {
                 GroceryCell groceryCell = convertView != null ?
                         (GroceryCell) convertView : new GroceryCell(parent.getContext());
                 groceryCell.setViewData(getItem(position));
+                groceryCell.setCardViewOnClick(position);
+                groceryCell.setNameTextViewOnClick(getItem(position));
                 return groceryCell;
             }
         };
 
         ListView listView = (ListView) findViewById(R.id.home_list_view_id);
         listView.setAdapter(realmBaseAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getApplicationContext(), GroceryCardPagerActivity.class);
-                intent.putExtra(POSITION, position);
-                startActivity(intent);
-            }
-        });
     }
 
     @Override

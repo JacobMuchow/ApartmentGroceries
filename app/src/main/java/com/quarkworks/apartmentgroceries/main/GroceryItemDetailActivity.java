@@ -1,13 +1,16 @@
 package com.quarkworks.apartmentgroceries.main;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.service.DataStore;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
+import com.quarkworks.apartmentgroceries.user.UserDetailActivity;
 
 public class GroceryItemDetailActivity extends AppCompatActivity {
     private static final String TAG = GroceryItemDetailActivity.class.getSimpleName();
@@ -29,11 +32,22 @@ public class GroceryItemDetailActivity extends AppCompatActivity {
         groupNameTextView = (TextView) findViewById(R.id.grocery_item_detail_group_id);
 
         String groceryId = getIntent().getExtras().getString(GroceryCardPagerActivity.GROCER_ITEM_ID);
-        RGroceryItem rGroceryItem = DataStore.getInstance().getRealm()
+        RGroceryItem groceryItem = DataStore.getInstance().getRealm()
                 .where(RGroceryItem.class).equalTo("groceryId", groceryId).findFirst();
 
-        createdByTextView.setText(rGroceryItem.getCreatedBy());
-        groceryItemNameTextView.setText(rGroceryItem.getName());
-        groupNameTextView.setText(rGroceryItem.getGroupName());
+        createdByTextView.setText(groceryItem.getCreatedBy());
+        groceryItemNameTextView.setText(groceryItem.getName());
+        groupNameTextView.setText(groceryItem.getGroupName());
+
+        final String username = groceryItem.getCreatedBy();
+        createdByTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(GroceryItemDetailActivity.this, UserDetailActivity.class);
+                intent.putExtra(GroceryCell.USERNAME, username);
+                startActivity(intent);
+            }
+        });
+
     }
 }

@@ -54,6 +54,10 @@
             android:name=".main.AddGroupActivity"
             android:label="@string/title_activity_add_group" >
         </activity>
+        <activity
+            android:name=".user.UserDetailActivity"
+            android:label="@string/title_activity_user_detail" >
+        </activity>
     </application>
 
 </manifest>
