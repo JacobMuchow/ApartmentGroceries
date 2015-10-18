@@ -31,6 +31,7 @@
     <string name="login_or_sign_up_session">session</string>
     <string name="login_failure_message">Invalid username or password</string>
     <string name="login_success_message">Login success</string>
+    <string name="choose_group_message">Please join a group</string>
     <string name="sign_up_failure_message">Username exists</string>
 
     <!-- response message -->

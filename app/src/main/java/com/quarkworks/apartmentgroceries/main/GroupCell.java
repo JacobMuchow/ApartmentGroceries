@@ -1,7 +1,9 @@
 package com.quarkworks.apartmentgroceries.main;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -55,7 +57,7 @@ public class GroupCell extends RelativeLayout{
                         MyApplication.getContext()
                                 .getString(R.string.login_or_sign_up_session), 0);
         String groupId = sharedPreferences.getString(SyncUser.JsonKeys.GROUPID, null);
-        if (groupId.equals(group.getGroupId())) {
+        if (!TextUtils.isEmpty(groupId) && groupId.equals(group.getGroupId())) {
             joinGroupButton.setVisibility(GONE);
         } else {
             joinGroupButton.setVisibility(VISIBLE);
@@ -81,10 +83,12 @@ public class GroupCell extends RelativeLayout{
     private Promise.Success joinGroupSuccesCallback = new Promise.Success() {
         @Override
         public void onSuccess() {
+            Intent intent = new Intent(getContext(), HomeActivity.class);
+            getContext().startActivity(intent);
+
             Toast.makeText(MyApplication.getContext(),
                     MyApplication.getContext().getString(R.string.join_group_success),
-                    Toast.LENGTH_LONG).show();
-            GroupActivity.groupRealmBaseAdapter.notifyDataSetChanged();
+                    Toast.LENGTH_SHORT).show();
         }
     };
 

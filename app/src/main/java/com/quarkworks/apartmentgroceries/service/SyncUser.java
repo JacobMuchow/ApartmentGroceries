@@ -3,6 +3,7 @@ package com.quarkworks.apartmentgroceries.service;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.quarkworks.apartmentgroceries.MyApplication;
@@ -51,6 +52,12 @@ public class SyncUser {
                     editor.putString(JsonKeys.SESSION_TOKEN, sessionToken);
                     editor.putString(JsonKeys.USERNAME, username);
                     editor.putString(JsonKeys.USERID, userId);
+
+                    JSONObject groupIdObj = jsonObject.optJSONObject(JsonKeys.GROUPID);
+                    if (groupIdObj != null) {
+                        String groupId = groupIdObj.optString(JsonKeys.OBJECTID);
+                        editor.putString(JsonKeys.GROUPID, groupId);
+                    }
                     editor.commit();
 
                     promise.onSuccess();
