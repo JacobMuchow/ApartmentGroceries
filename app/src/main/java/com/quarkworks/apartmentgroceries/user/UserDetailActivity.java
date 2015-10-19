@@ -23,27 +23,4 @@ public class UserDetailActivity extends AppCompatActivity {
         String username = getIntent().getExtras().getString(GroceryCell.USERNAME);
         Toast.makeText(this, "username:" + username, Toast.LENGTH_SHORT).show();
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.user_detail_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        Intent intent;
-        switch (item.getItemId()) {
-            case R.id.action_logout:
-                SharedPreferences sharedPreferences =
-                        getSharedPreferences(getApplication().getString(R.string.login_or_sign_up_session), 0);
-                sharedPreferences.edit().clear().commit();
-                intent = new Intent(this, LoginActivity.class);
-                startActivity(intent);
-                return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 }

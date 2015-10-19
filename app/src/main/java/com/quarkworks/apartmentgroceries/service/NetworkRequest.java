@@ -121,15 +121,18 @@ public class NetworkRequest extends AsyncTask<Void, String, String> {
     @Override
     protected void onPostExecute(String response) {
 
-        JSONObject jsonObject = null;
-
         try {
-            jsonObject = new JSONObject(response);
+            if (!TextUtils.isEmpty(response)) {
+                JSONObject jsonObject = new JSONObject(response);
+                callback.done(jsonObject);
+            } else {
+                Log.e(TAG, "The response is null in onPostExecute");
+            }
         } catch (JSONException e) {
             Log.e(TAG, "Error parssing JSON from url: " + template.getUrl(), e);
         }
 
-        callback.done(jsonObject);
+
     }
 
     public interface Callback {

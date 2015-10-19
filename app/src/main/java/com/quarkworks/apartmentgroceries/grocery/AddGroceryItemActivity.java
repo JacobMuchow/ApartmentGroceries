@@ -1,6 +1,7 @@
 package com.quarkworks.apartmentgroceries.grocery;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -13,6 +14,7 @@ import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.main.HomeActivity;
 import com.quarkworks.apartmentgroceries.service.Promise;
 import com.quarkworks.apartmentgroceries.service.SyncGroceryItem;
+import com.quarkworks.apartmentgroceries.service.SyncUser;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
 
 public class AddGroceryItemActivity extends AppCompatActivity {
@@ -22,7 +24,7 @@ public class AddGroceryItemActivity extends AppCompatActivity {
     private Button addButton;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_grocery_activity);
 
@@ -37,6 +39,10 @@ public class AddGroceryItemActivity extends AppCompatActivity {
                 if (!groceryItemName.isEmpty()) {
 
                     RGroceryItem rGroceryItem = new RGroceryItem();
+                    SharedPreferences sharedPreferences = getSharedPreferences(
+                            getString(R.string.login_or_sign_up_session), 0);
+                    rGroceryItem.setCreatedBy(sharedPreferences.getString(SyncUser.JsonKeys.USER_ID, null));
+                    rGroceryItem.setGroupId(sharedPreferences.getString(SyncUser.JsonKeys.GROUP_ID, null));
                     rGroceryItem.setName(groceryItemName);
                     SyncGroceryItem.add(rGroceryItem)
                             .setCallbacks(addSuccesCallback, addFailureCallback);
