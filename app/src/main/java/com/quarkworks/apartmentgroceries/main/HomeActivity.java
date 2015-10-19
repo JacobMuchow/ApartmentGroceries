@@ -1,9 +1,14 @@
 package com.quarkworks.apartmentgroceries.main;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.quarkworks.apartmentgroceries.R;
@@ -11,14 +16,14 @@ import com.quarkworks.apartmentgroceries.service.DataStore;
 import com.quarkworks.apartmentgroceries.service.SyncGroceryItem;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
 
-import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
-import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
 public class HomeActivity extends AppCompatActivity {
 
     private static final String TAG = HomeActivity.class.getSimpleName();
+
+    public static final String POSITION = "POSITION";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +32,7 @@ public class HomeActivity extends AppCompatActivity {
 
         SyncGroceryItem.getAll();
 
-        RealmResults<RGroceryItem> groceries = DataStore.getInstance().getRealm().where(RGroceryItem.class).findAll();
+        final RealmResults<RGroceryItem> groceries = DataStore.getInstance().getRealm().where(RGroceryItem.class).findAll();
 
         RealmBaseAdapter<RGroceryItem> realmBaseAdapter = new RealmBaseAdapter<RGroceryItem>(this, groceries, true) {
             @Override
@@ -35,12 +40,42 @@ public class HomeActivity extends AppCompatActivity {
                 GroceryCell groceryCell = convertView != null ?
                         (GroceryCell) convertView : new GroceryCell(parent.getContext());
                 groceryCell.setViewData(getItem(position));
-
+                Log.d(TAG, "groupId:" + getItem(position).getGroupId());
                 return groceryCell;
             }
         };
 
         ListView listView = (ListView) findViewById(R.id.home_list_view_id);
         listView.setAdapter(realmBaseAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(getApplicationContext(), GroceryCardPagerActivity.class);
+                intent.putExtra(POSITION, position);
+                startActivity(intent);
+            }
+        });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.add_grocery_item_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        Intent intent;
+
+        switch (item.getItemId()) {
+            case R.id.action_add_grocery:
+                intent = new Intent(this, AddGroceryItemActivity.class);
+                startActivity(intent);
+                return true;
+
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

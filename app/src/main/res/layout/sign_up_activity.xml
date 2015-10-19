@@ -6,52 +6,51 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.quarkworks.apartmentgroceries.auth.SignupActivity">
+    tools:context="com.quarkworks.apartmentgroceries.auth.RenameThisActivity">
 
     <!-- username -->
     <EditText
-        android:id="@+id/signup_activity_username_id"
+        android:id="@+id/sign_up_username_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:hint="username"
-        android:ems="10"
         android:layout_marginTop="118dp"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:inputType="textPersonName"
+        android:hint="username"
+        android:ems="10" />
 
     <!-- password -->
     <EditText
-        android:id="@+id/signup_activity_password_id"
+        android:id="@+id/sign_up_password_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/sign_up_username_id"
+        android:layout_alignLeft="@+id/sign_up_username_id"
+        android:layout_alignStart="@+id/sign_up_username_id"
         android:inputType="textPassword"
         android:hint="password"
-        android:ems="10"
-        android:layout_below="@+id/signup_activity_username_id"
-        android:layout_alignLeft="@+id/signup_activity_username_id"
-        android:layout_alignStart="@+id/signup_activity_username_id" />
+        android:ems="10" />
 
-    <!-- phone -->
+    <!-- second password-->
     <EditText
-        android:id="@+id/signup_activity_phone_id"
+        android:id="@+id/sign_up_second_password_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/sign_up_password_id"
+        android:layout_alignLeft="@+id/sign_up_username_id"
+        android:layout_alignStart="@+id/sign_up_username_id"
         android:inputType="textPassword"
-        android:hint="phone"
-        android:ems="10"
-        android:layout_below="@+id/signup_activity_password_id"
-        android:layout_alignLeft="@+id/signup_activity_username_id"
-        android:layout_alignStart="@+id/signup_activity_username_id" />
+        android:hint="password"
+        android:ems="10" />
 
-    <!-- login button -->
+    <!-- sign up button -->
     <Button
-        android:id="@+id/signup_activity_submit_button_id"
+        android:id="@+id/sign_up_submit_button_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Sign Up"
-        android:layout_below="@+id/signup_activity_phone_id"
+        android:layout_below="@+id/sign_up_second_password_id"
         android:layout_centerHorizontal="true"
-        android:onClick="signupButtonOnClick"/>
+        android:text="@string/sign_up_button" />
 
 </RelativeLayout>

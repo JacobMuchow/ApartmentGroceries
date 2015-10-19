@@ -1,10 +1,12 @@
 package com.quarkworks.apartmentgroceries.service;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.quarkworks.apartmentgroceries.MyApplication;
+import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.service.models.RUser;
 
 import org.json.JSONArray;
@@ -20,8 +22,11 @@ public class SyncUser {
     private static final String TAG = SyncUser.class.getSimpleName();
 
     private static final class JsonKeys {
+        private static final String OBJECTID = "objectId";
         private static final String RESULTS = "results";
+        private static final String SESSION_TOKEN = "sessionToken";
         private static final String USERNAME = "username";
+        private static final String USERID = "userId";
     }
 
     public static Promise login(String username, String password) {
@@ -32,23 +37,26 @@ public class SyncUser {
             @Override
             public void done(@Nullable JSONObject jsonObject) {
 
-                Log.d(TAG, "login jsonObject:" + jsonObject.toString());
-                String sessionToken = jsonObject.optString("sessionToken");
-                String username = jsonObject.optString("username");
+                try {
+                    String sessionToken = jsonObject.getString(JsonKeys.SESSION_TOKEN);
+                    String username = jsonObject.getString(JsonKeys.USERNAME);
+                    String userId = jsonObject.getString(JsonKeys.OBJECTID);
 
-                SharedPreferences sharedPreferences = MyApplication.getContext().getSharedPreferences("login", 0);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString("sessionToken", sessionToken);
-                editor.putString("username", username);
-                editor.commit();
+                    Context context = MyApplication.getContext();
+                    SharedPreferences sharedPreferences = context
+                            .getSharedPreferences(context.getString(R.string.login_or_sign_up_session), 0);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString(JsonKeys.SESSION_TOKEN, sessionToken);
+                    editor.putString(JsonKeys.USERNAME, username);
+                    editor.putString(JsonKeys.USERID, userId);
+                    editor.commit();
 
-                //TODO: update realm
+                    promise.onSuccess();
 
-                //TODO: update user preferences
-
-                promise.onSuccess();
-
-                //or promise.onFailure() depending
+                } catch (JSONException e) {
+                    Log.e(TAG, "login failure", e);
+                    promise.onFailure();
+                }
             }
         };
 
@@ -63,14 +71,42 @@ public class SyncUser {
         NetworkRequest.Callback callback = new NetworkRequest.Callback() {
             @Override
             public void done(@Nullable JSONObject jsonObject) {
-
-                //todo: logout
-
                 promise.onSuccess();
             }
         };
 
         UrlTemplate template = UrlTemplateCreator.logout();
+        new NetworkRequest(template, callback).execute();
+        return promise;
+    }
+
+    public static Promise signUp(String username, String password) {
+
+        final Promise promise = new Promise();
+
+        NetworkRequest.Callback callback = new NetworkRequest.Callback() {
+            @Override
+            public void done(@Nullable JSONObject jsonObject) {
+
+                try {
+                    String sessionToken = jsonObject.getString(JsonKeys.SESSION_TOKEN);
+
+                    Context context = MyApplication.getContext();
+                    SharedPreferences sharedPreferences = context
+                            .getSharedPreferences(context.getString(R.string.login_or_sign_up_session), 0);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString(JsonKeys.SESSION_TOKEN, sessionToken);
+                    editor.commit();
+
+                    promise.onSuccess();
+                } catch (JSONException e) {
+                    Log.e(TAG, "sign up failure", e);
+                    promise.onFailure();
+                }
+            }
+        };
+
+        UrlTemplate template = UrlTemplateCreator.signUp(username, password);
         new NetworkRequest(template, callback).execute();
         return promise;
     }
