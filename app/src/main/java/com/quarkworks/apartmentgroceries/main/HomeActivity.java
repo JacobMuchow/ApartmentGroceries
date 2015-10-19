@@ -19,6 +19,7 @@ import com.quarkworks.apartmentgroceries.service.DataStore;
 import com.quarkworks.apartmentgroceries.service.SyncGroceryItem;
 import com.quarkworks.apartmentgroceries.service.SyncUser;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
+import com.quarkworks.apartmentgroceries.user.UserActivity;
 
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
@@ -70,6 +71,10 @@ public class HomeActivity extends AppCompatActivity {
                 return true;
             case R.id.action_list_group:
                 intent = new Intent(this, GroupActivity.class);
+                startActivity(intent);
+                return true;
+            case R.id.action_user:
+                intent = new Intent(this, UserActivity.class);
                 startActivity(intent);
                 return true;
             case R.id.action_logout:
