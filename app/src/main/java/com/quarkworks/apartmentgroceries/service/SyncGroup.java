@@ -4,7 +4,6 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
 import com.quarkworks.apartmentgroceries.service.models.RGroup;
 
 import org.json.JSONArray;
@@ -20,9 +19,8 @@ public class SyncGroup {
     private static final String TAG = SyncGroup.class.getSimpleName();
 
     private static final class JsonKeys {
-        private static final String GROUPID = "groupId";
         private static final String NAME = "name";
-        private static final String OBJECTID = "objectId";
+        private static final String OBJECT_ID = "objectId";
         private static final String RESULTS = "results";
     }
 
@@ -33,29 +31,31 @@ public class SyncGroup {
         NetworkRequest.Callback callback = new NetworkRequest.Callback() {
             @Override
             public void done(@Nullable JSONObject jsonObject) {
-
-                Log.d(TAG, "grocey item jsonObject:" + jsonObject.toString());
+                if (jsonObject == null) {
+                    Log.e(TAG, "Error getting group from server");
+                    promise.onFailure();
+                    return;
+                }
 
                 Realm realm = DataStore.getInstance().getRealm();
                 realm.beginTransaction();
                 realm.clear(RGroup.class);
 
                 try {
-
                     JSONArray groupJsonArray = jsonObject.getJSONArray(JsonKeys.RESULTS);
-                    if (groupJsonArray != null) {
-                        for (int i = 0; i < groupJsonArray.length(); i++) {
-                            RGroup groupItem = realm.createObject(RGroup.class);
-                            groupItem.setGroupId(groupJsonArray.getJSONObject(i)
-                                    .getString(JsonKeys.OBJECTID));
-                            groupItem.setName(groupJsonArray.getJSONObject(i)
-                                    .getString(JsonKeys.NAME));
-                        }
 
-                        realm.commitTransaction();
-                    } else {
-                        realm.cancelTransaction();
+                    for (int i = 0; i < groupJsonArray.length(); i++) {
+                        try {
+                            RGroup groupItem = realm.createObject(RGroup.class);
+                            JSONObject groupJsonObj = groupJsonArray.getJSONObject(i);
+                            groupItem.setGroupId(groupJsonObj.getString(JsonKeys.OBJECT_ID));
+                            groupItem.setName(groupJsonObj.getString(JsonKeys.NAME));
+                        } catch (JSONException e) {
+                            Log.e(TAG, "Error parsing group object", e);
+                        }
                     }
+
+                    realm.commitTransaction();
                     promise.onSuccess();
                 } catch(JSONException e) {
                     Log.e(TAG, "Error parsing group object", e);
@@ -77,10 +77,14 @@ public class SyncGroup {
         NetworkRequest.Callback callback = new NetworkRequest.Callback() {
             @Override
             public void done(@Nullable JSONObject jsonObject) {
-                Log.d(TAG, "add group jsonObject:" + jsonObject);
+                if (jsonObject == null) {
+                    Log.e(TAG, "Error adding group object");
+                    promise.onFailure();
+                    return;
+                }
 
                 try {
-                    String groupId = jsonObject.getString(JsonKeys.OBJECTID);
+                    String groupId = jsonObject.getString(JsonKeys.OBJECT_ID);
                     if (!TextUtils.isEmpty(groupId)) {
                         promise.onSuccess();
                     } else {

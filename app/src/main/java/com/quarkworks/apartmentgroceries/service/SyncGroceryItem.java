@@ -1,12 +1,8 @@
 package com.quarkworks.apartmentgroceries.service;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.quarkworks.apartmentgroceries.MyApplication;
-import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
 
 import org.json.JSONArray;
@@ -22,12 +18,12 @@ public class SyncGroceryItem {
     private static final String TAG = SyncGroceryItem.class.getSimpleName();
 
     private static final class JsonKeys {
-        private static final String GROUPID = "groupId";
+        private static final String GROUP_ID = "groupId";
         private static final String NAME = "name";
-        private static final String OBJECTID = "objectId";
+        private static final String OBJECT_ID = "objectId";
         private static final String RESULTS = "results";
-        private static final String CREATEDBY = "createdBy";
-        private static final String PURCHASEDBY = "purchasedBy";
+        private static final String CREATED_BY = "createdBy";
+        private static final String PURCHASED_BY = "purchasedBy";
         private static final String USERNAME = "username";
     }
 
@@ -38,43 +34,45 @@ public class SyncGroceryItem {
         NetworkRequest.Callback callback = new NetworkRequest.Callback() {
             @Override
             public void done(@Nullable JSONObject jsonObject) {
-
-                Log.d(TAG, "grocey item jsonObject:" + jsonObject.toString());
+                if (jsonObject == null) {
+                    Log.e(TAG, "Error getting grocery items from server");
+                    promise.onFailure();
+                    return;
+                }
 
                 Realm realm = DataStore.getInstance().getRealm();
                 realm.beginTransaction();
                 realm.clear(RGroceryItem.class);
 
                 try {
+                    JSONArray groceryJsonArray = jsonObject.getJSONArray(JsonKeys.RESULTS);
 
-                    JSONArray groceryJsonArray = jsonObject.optJSONArray(JsonKeys.RESULTS);
-                    if (groceryJsonArray != null) {
-                        for (int i = 0; i < groceryJsonArray.length(); i++) {
+                    for (int i = 0; i < groceryJsonArray.length(); i++) {
+                        try {
                             RGroceryItem groceryItem = realm.createObject(RGroceryItem.class);
-                            groceryItem.setGroceryId(groceryJsonArray.getJSONObject(i)
-                                    .getString(JsonKeys.OBJECTID));
-                            groceryItem.setName(groceryJsonArray.getJSONObject(i)
-                                    .getString(JsonKeys.NAME));
-                            groceryItem.setGroupId(groceryJsonArray.getJSONObject(i)
-                                    .getJSONObject(JsonKeys.GROUPID).getString(JsonKeys.OBJECTID));
-                            groceryItem.setGroupName(groceryJsonArray.getJSONObject(i)
-                                    .getJSONObject(JsonKeys.GROUPID).getString(JsonKeys.NAME));
-                            groceryItem.setCreatedBy(groceryJsonArray.getJSONObject(i)
-                                    .getJSONObject(JsonKeys.CREATEDBY).getString(JsonKeys.USERNAME));
-                            JSONObject purchasedByObj = groceryJsonArray.getJSONObject(i)
-                                    .optJSONObject(JsonKeys.PURCHASEDBY);
+                            JSONObject groceryJsonObj = groceryJsonArray.getJSONObject(i);
+
+                            groceryItem.setGroceryId(groceryJsonObj.getString(JsonKeys.OBJECT_ID));
+                            groceryItem.setName(groceryJsonObj.getString(JsonKeys.NAME));
+                            groceryItem.setGroupId(groceryJsonObj
+                                    .getJSONObject(JsonKeys.GROUP_ID).getString(JsonKeys.OBJECT_ID));
+                            groceryItem.setGroupName(groceryJsonObj
+                                    .getJSONObject(JsonKeys.GROUP_ID).getString(JsonKeys.NAME));
+                            groceryItem.setCreatedBy(groceryJsonObj
+                                    .getJSONObject(JsonKeys.CREATED_BY).getString(JsonKeys.USERNAME));
+                            JSONObject purchasedByObj = groceryJsonObj.optJSONObject(JsonKeys.PURCHASED_BY);
                             if (purchasedByObj != null) {
                                 groceryItem.setPurchasedBy(purchasedByObj.getString(JsonKeys.USERNAME));
                             }
+                        } catch (JSONException e) {
+                            Log.e(TAG, "Error parsing grocery object", e);
                         }
-
-                        realm.commitTransaction();
-                    } else {
-                        realm.cancelTransaction();
                     }
+
+                    realm.commitTransaction();
                     promise.onSuccess();
                 } catch(JSONException e) {
-                    Log.e(TAG, "Error parsing grocery object", e);
+                    Log.e(TAG, "Error getting grocery object from server", e);
                     realm.cancelTransaction();
                     promise.onFailure();
                 }
@@ -93,10 +91,14 @@ public class SyncGroceryItem {
         NetworkRequest.Callback callback = new NetworkRequest.Callback() {
             @Override
             public void done(@Nullable JSONObject jsonObject) {
-                Log.d(TAG, "add grocery jsonObject:" + jsonObject);
+                if (jsonObject == null) {
+                    Log.e(TAG, "Error adding grocery object");
+                    promise.onFailure();
+                    return;
+                }
 
                 try {
-                    String groceryId = jsonObject.getString(JsonKeys.OBJECTID);
+                    String groceryId = jsonObject.getString(JsonKeys.OBJECT_ID);
                     if (!groceryId.isEmpty()) {
                         promise.onSuccess();
                     } else {

@@ -46,7 +46,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 if (!username.isEmpty() && !password.isEmpty()) {
                     SyncUser.login(username, password)
-                            .setCallbacks(loginSuccesCallback, loginFailureCallback);
+                            .setCallbacks(loginSuccessCallback, loginFailureCallback);
                 } else {
                     Toast.makeText(getApplicationContext(),
                             getResources().getString(R.string.empty_username_or_password),
@@ -64,12 +64,12 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    public Promise.Success loginSuccesCallback = new Promise.Success() {
+    public Promise.Success loginSuccessCallback = new Promise.Success() {
         @Override
         public void onSuccess() {
             SharedPreferences sharedPreferences = getApplication()
-                    .getSharedPreferences(getApplication().getString(R.string.login_or_sign_up_session), 0);
-            String groupId = sharedPreferences.getString("groupId", null);
+                    .getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
+            String groupId = sharedPreferences.getString(SyncUser.JsonKeys.GROUP_ID, null);
             Intent intent;
             if (TextUtils.isEmpty(groupId)) {
                 intent = new Intent(MyApplication.getContext(), GroupActivity.class);

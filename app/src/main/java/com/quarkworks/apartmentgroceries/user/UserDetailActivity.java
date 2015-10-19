@@ -38,7 +38,7 @@ public class UserDetailActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_logout:
                 SharedPreferences sharedPreferences =
-                        this.getSharedPreferences(getApplication().getString(R.string.login_or_sign_up_session), 0);
+                        getSharedPreferences(getApplication().getString(R.string.login_or_sign_up_session), 0);
                 sharedPreferences.edit().clear().commit();
                 intent = new Intent(this, LoginActivity.class);
                 startActivity(intent);

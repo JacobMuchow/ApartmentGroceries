@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -56,7 +55,7 @@ public class GroupCell extends RelativeLayout{
                 MyApplication.getContext().getSharedPreferences(
                         MyApplication.getContext()
                                 .getString(R.string.login_or_sign_up_session), 0);
-        String groupId = sharedPreferences.getString(SyncUser.JsonKeys.GROUPID, null);
+        String groupId = sharedPreferences.getString(SyncUser.JsonKeys.GROUP_ID, null);
         if (!TextUtils.isEmpty(groupId) && groupId.equals(group.getGroupId())) {
             joinGroupButton.setVisibility(GONE);
         } else {
@@ -73,7 +72,7 @@ public class GroupCell extends RelativeLayout{
                         MyApplication.getContext().getSharedPreferences(
                                 MyApplication.getContext()
                                         .getString(R.string.login_or_sign_up_session), 0);
-                String userId = sharedPreferences.getString(SyncUser.JsonKeys.USERID, null);
+                String userId = sharedPreferences.getString(SyncUser.JsonKeys.USER_ID, null);
                 SyncUser.joinGroup(userId, groupId)
                         .setCallbacks(joinGroupSuccesCallback, joinGroupFailureCallback);
             }

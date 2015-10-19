@@ -8,6 +8,7 @@ import android.text.TextUtils;
 
 import com.quarkworks.apartmentgroceries.auth.LoginActivity;
 import com.quarkworks.apartmentgroceries.main.HomeActivity;
+import com.quarkworks.apartmentgroceries.service.SyncUser;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -16,10 +17,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
-
         SharedPreferences sharedPreferences = getApplication()
-                .getSharedPreferences(getApplication().getString(R.string.login_or_sign_up_session), 0);
-        String sessionToken = sharedPreferences.getString("sessionToken", null);
+                .getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
+        String sessionToken = sharedPreferences.getString(SyncUser.JsonKeys.GROUP_ID, null);
 
         Intent intent;
         if (TextUtils.isEmpty(sessionToken)) {

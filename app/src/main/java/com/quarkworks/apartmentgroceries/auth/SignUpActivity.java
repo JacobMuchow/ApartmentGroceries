@@ -68,7 +68,7 @@ public class SignUpActivity extends AppCompatActivity {
     private Promise.Success signUpSuccessCallback = new Promise.Success() {
         @Override
         public void onSuccess() {
-            SyncUser.login(username, password).setCallbacks(signUpLoginSuccesCallback, null);
+            SyncUser.login(username, password).setSuccessCallack(signUpLoginSuccesCallback);
         }
     };
 
@@ -85,7 +85,7 @@ public class SignUpActivity extends AppCompatActivity {
         public void onSuccess() {
             SharedPreferences sharedPreferences = getApplication()
                     .getSharedPreferences(getApplication().getString(R.string.login_or_sign_up_session), 0);
-            String groupId = sharedPreferences.getString("groupId", null);
+            String groupId = sharedPreferences.getString(SyncUser.JsonKeys.GROUP_ID, null);
             Intent intent;
             if (TextUtils.isEmpty(groupId)) {
                 intent = new Intent(MyApplication.getContext(), GroupActivity.class);
