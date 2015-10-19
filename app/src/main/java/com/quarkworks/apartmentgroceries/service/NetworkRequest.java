@@ -124,7 +124,9 @@ public class NetworkRequest extends AsyncTask<Void, String, String> {
         JSONObject jsonObject = null;
 
         try {
-            jsonObject = new JSONObject(response);
+            if (!TextUtils.isEmpty(response)) {
+                jsonObject = new JSONObject(response);
+            }
         } catch (JSONException e) {
             Log.e(TAG, "Error parssing JSON from url: " + template.getUrl(), e);
         }

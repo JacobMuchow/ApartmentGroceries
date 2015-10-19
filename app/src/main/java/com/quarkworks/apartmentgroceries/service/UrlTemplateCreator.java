@@ -50,7 +50,7 @@ public class UrlTemplateCreator {
     public static UrlTemplate logout() {
         String url = baseUrl + "logout";
 
-        return new UrlTemplate(GET, url, null);
+        return new UrlTemplate(POST, url, null);
     }
 
     public static UrlTemplate getAllGroceryItems() {
@@ -96,6 +96,26 @@ public class UrlTemplateCreator {
         Map<String, String> params = new HashMap<>();
 
         params.put("name", rGroceryItem.getName());
+
+        JSONObject groupIdObj=new JSONObject();
+        try {
+            groupIdObj.put("__type", "Pointer");
+            groupIdObj.put("className", "Group");
+            groupIdObj.put("objectId", rGroceryItem.getGroupId());
+            params.put("groupId", groupIdObj.toString());
+        } catch (JSONException e) {
+            Log.d(TAG, "Error creating group id object for where in addGroceryItem", e);
+        }
+
+        JSONObject createdByObj = new JSONObject();
+        try {
+            createdByObj.put("__type", "Pointer");
+            createdByObj.put("className", "_User");
+            createdByObj.put("objectId", rGroceryItem.getCreatedBy());
+            params.put("createdBy", createdByObj.toString());
+        } catch (JSONException e) {
+            Log.d(TAG, "Error creating created by object for where in addGroceryItem", e);
+        }
 
         return new UrlTemplate(POST, url, params);
     }

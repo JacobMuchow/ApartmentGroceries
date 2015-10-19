@@ -1,6 +1,7 @@
 package com.quarkworks.apartmentgroceries.main;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,8 +13,10 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.quarkworks.apartmentgroceries.R;
+import com.quarkworks.apartmentgroceries.auth.LoginActivity;
 import com.quarkworks.apartmentgroceries.service.DataStore;
 import com.quarkworks.apartmentgroceries.service.SyncGroceryItem;
+import com.quarkworks.apartmentgroceries.service.SyncUser;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
 
 import io.realm.RealmBaseAdapter;
@@ -66,6 +69,14 @@ public class HomeActivity extends AppCompatActivity {
                 return true;
             case R.id.action_list_group:
                 intent = new Intent(this, GroupActivity.class);
+                startActivity(intent);
+                return true;
+            case R.id.action_logout:
+                SyncUser.logout();
+                SharedPreferences sharedPreferences =
+                        this.getSharedPreferences(getApplication().getString(R.string.login_or_sign_up_session), 0);
+                sharedPreferences.edit().clear().commit();
+                intent = new Intent(this, LoginActivity.class);
                 startActivity(intent);
                 return true;
         }

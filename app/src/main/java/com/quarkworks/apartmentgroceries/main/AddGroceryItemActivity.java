@@ -1,6 +1,7 @@
 package com.quarkworks.apartmentgroceries.main;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -34,9 +35,15 @@ public class AddGroceryItemActivity extends AppCompatActivity {
                 String groceryItemName = groceryItemNameEditText.getText().toString();
 
                 if (!groceryItemName.isEmpty()) {
+                    SharedPreferences sharedPreferences = getApplication()
+                            .getSharedPreferences(getApplication().getString(R.string.login_or_sign_up_session), 0);
+                    String groupId = sharedPreferences.getString("groupId", null);
+                    String userId = sharedPreferences.getString("userId", null);
 
                     RGroceryItem rGroceryItem = new RGroceryItem();
                     rGroceryItem.setName(groceryItemName);
+                    rGroceryItem.setGroupId(groupId);
+                    rGroceryItem.setCreatedBy(userId);
                     SyncGroceryItem.add(rGroceryItem)
                             .setCallbacks(addSuccesCallback, addFailureCallback);
                 } else {
