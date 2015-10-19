@@ -1,4 +1,4 @@
-package com.quarkworks.apartmentgroceries.main;
+package com.quarkworks.apartmentgroceries.grocery;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,7 +10,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
-import com.quarkworks.apartmentgroceries.user.UserActivity;
 import com.quarkworks.apartmentgroceries.user.UserDetailActivity;
 
 /**

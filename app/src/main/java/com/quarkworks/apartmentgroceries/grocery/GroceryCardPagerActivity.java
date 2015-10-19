@@ -1,4 +1,4 @@
-package com.quarkworks.apartmentgroceries.main;
+package com.quarkworks.apartmentgroceries.grocery;
 
 import android.content.Intent;
 import android.support.v4.app.Fragment;
@@ -7,7 +7,6 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

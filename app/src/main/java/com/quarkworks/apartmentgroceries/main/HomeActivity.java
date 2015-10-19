@@ -3,15 +3,16 @@ package com.quarkworks.apartmentgroceries.main;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.quarkworks.apartmentgroceries.R;
+import com.quarkworks.apartmentgroceries.grocery.AddGroceryItemActivity;
+import com.quarkworks.apartmentgroceries.grocery.GroceryCell;
+import com.quarkworks.apartmentgroceries.group.GroupActivity;
 import com.quarkworks.apartmentgroceries.service.DataStore;
 import com.quarkworks.apartmentgroceries.service.SyncGroceryItem;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;

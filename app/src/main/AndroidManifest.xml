@@ -35,23 +35,23 @@
             android:label="@string/title_activity_home" >
         </activity>
         <activity
-            android:name=".main.GroceryCardPagerActivity"
+            android:name=".grocery.GroceryCardPagerActivity"
             android:label="@string/title_activity_grocery_card_pager" >
         </activity>
         <activity
-            android:name=".main.GroceryItemDetailActivity"
+            android:name=".grocery.GroceryItemDetailActivity"
             android:label="@string/title_activity_grocery_item_detail" >
         </activity>
         <activity
-            android:name=".main.AddGroceryItemActivity"
+            android:name=".grocery.AddGroceryItemActivity"
             android:label="@string/title_activity_add_grocery_item" >
         </activity>
         <activity
-            android:name=".main.GroupActivity"
+            android:name=".group.GroupActivity"
             android:label="@string/title_activity_group" >
         </activity>
         <activity
-            android:name=".main.AddGroupActivity"
+            android:name=".group.AddGroupActivity"
             android:label="@string/title_activity_add_group" >
         </activity>
         <activity
