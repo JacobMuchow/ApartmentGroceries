@@ -12,6 +12,7 @@
     <string name="action_add_grocery">Add grocery</string>
     <string name="action_add_group">Add group</string>
     <string name="action_list_group">Group</string>
+    <string name="action_logout">Logout</string>
 
     <!-- activity title -->
     <string name="title_activity_login">Login</string>
