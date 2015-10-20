@@ -6,6 +6,7 @@
     <string name="sign_up_button">Sign Up</string>
     <string name="add_button">Add</string>
     <string name="join_group_button">Join</string>
+    <string name="add_photo_button">Add photo</string>
 
     <!-- menu -->
     <string name="action_user">User</string>
@@ -13,6 +14,7 @@
     <string name="action_add_group">Add group</string>
     <string name="action_list_group">Group</string>
     <string name="action_logout">Logout</string>
+    <string name="action_edit_photo">Edit Photo</string>
 
     <!-- activity title -->
     <string name="title_activity_login">Login</string>
@@ -25,6 +27,7 @@
     <string name="title_activity_group">Group</string>
     <string name="title_activity_add_group">Add Group</string>
     <string name="title_activity_user_detail">User Detail</string>
+    <string name="title_activity_photo">Photo</string>
 
     <!-- login or sign up-->
     <string name="empty_username_or_password">Please input username and password.</string>
