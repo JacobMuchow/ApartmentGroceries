@@ -21,8 +21,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.Map;
 
-import okio.BufferedSink;
-
 /**
  * Created by zz on 10/14/15.
  */
@@ -45,10 +43,14 @@ public class NetworkRequest extends AsyncTask<Void, String, String> {
         String method = template.getMethod();
         RequestBody requestBody = null;
         Map<String, String> paramsMap = template.getParams();
+        Map<String, byte[]> parmasMapByte = template.getParamsByte();
 
         if (paramsMap != null) {
-            String objectId = paramsMap.get("objectId");
-            if (objectId != null) url = url + "/" + objectId;
+            String objectId = paramsMap.get(UrlTemplateCreator.OBJECT_ID);
+            if (objectId != null) {
+                url = url + "/" + objectId;
+                paramsMap.remove(UrlTemplateCreator.OBJECT_ID);
+            }
         }
 
         // add parameters to url if using GET, or we build RequestBody
@@ -62,6 +64,8 @@ public class NetworkRequest extends AsyncTask<Void, String, String> {
                 }
             }
             url = urlStringBuilder.toString();
+        } else if (parmasMapByte != null) {
+            requestBody = RequestBody.create(MediaType.parse("image/jpeg"), parmasMapByte.get("content"));
         } else {
             StringBuilder jsonBuilder = new StringBuilder();
             jsonBuilder.append("{");
@@ -84,8 +88,8 @@ public class NetworkRequest extends AsyncTask<Void, String, String> {
             }
             jsonBuilder.append("}");
             Log.d(TAG, "jsonBuilder:" + jsonBuilder);
-            MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-            requestBody = RequestBody.create(JSON, jsonBuilder.toString());
+            MediaType ContentTypeJSON = MediaType.parse("application/json; charset=utf-8");
+            requestBody = RequestBody.create(ContentTypeJSON, jsonBuilder.toString());
         }
 
         Request.Builder builder = new Request.Builder()
@@ -95,6 +99,8 @@ public class NetworkRequest extends AsyncTask<Void, String, String> {
                 .addHeader("X-Parse-Revocable-Session", "1")
                 .method(method, requestBody);
 
+
+        Log.d(TAG, builder.toString());
         if(template.useToken()) {
             Context context = MyApplication.getContext();
             SharedPreferences sharedPreferences =
@@ -106,6 +112,10 @@ public class NetworkRequest extends AsyncTask<Void, String, String> {
                 return null;
             }
             builder.addHeader("X-Parse-Session-Token", sessionToken);
+        }
+
+        if (parmasMapByte != null) {
+            builder.addHeader("Content-Type", "image/jpeg");
         }
 
         try {
@@ -129,7 +139,7 @@ public class NetworkRequest extends AsyncTask<Void, String, String> {
                 Log.e(TAG, "The response is null in onPostExecute");
             }
         } catch (JSONException e) {
-            Log.e(TAG, "Error parssing JSON from url: " + template.getUrl(), e);
+            Log.e(TAG, "Error parsing JSON from url: " + template.getUrl(), e);
         }
     }
 

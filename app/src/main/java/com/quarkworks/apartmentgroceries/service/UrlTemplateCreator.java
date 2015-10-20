@@ -27,6 +27,7 @@ public class UrlTemplateCreator {
     public static final String INCLUDE = "include";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
+    public static final String OBJECT_ID = "objectId";
 
 
     public static UrlTemplate login(String username, String password) {
@@ -150,5 +151,35 @@ public class UrlTemplateCreator {
         }
 
         return null;
+    }
+
+    public static UrlTemplate updateProfilePhoto(String userId, String photoName) {
+        String url = baseUrl + "users";
+        Map<String, String> params = new HashMap<>();
+        JSONObject photoObject = new JSONObject();
+
+        try {
+            photoObject.put("__type", "File");
+            photoObject.put("name", photoName);
+
+            Log.d(TAG, "photoObject:" + photoObject.toString());
+            params.put("photo", photoObject.toString());
+            params.put("objectId", userId);
+
+            return new UrlTemplate(PUT, url, params, true);
+
+        } catch (JSONException e) {
+            Log.d(TAG, "Error creating photo object for where clause in updateProfilePhoto()", e);
+        }
+
+        return null;
+    }
+
+    public static UrlTemplate uploadProfilePhoto(String photoName, byte[] content) {
+        String url = baseUrl + "files/" + photoName;
+        Map<String, byte[]> params = new HashMap<>();
+        params.put("content", content);
+
+        return new UrlTemplate(POST, url, null, params, false);
     }
 }

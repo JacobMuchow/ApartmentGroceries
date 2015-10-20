@@ -46,4 +46,8 @@
     <string name="add_group_failure">Added a group failed</string>
     <string name="join_group_success">Joined a group successfully</string>
     <string name="join_group_failure">Joined a group failed</string>
+
+    <!-- photo -->
+    <string name="photo_date_format_string">yyyyMMddHHmmss</string>
+    <string name="photo_select_source">select source</string>
 </resources>

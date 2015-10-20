@@ -2,6 +2,7 @@ package com.quarkworks.apartmentgroceries.user;
 
 import android.content.ComponentName;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
@@ -10,14 +11,24 @@ import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.quarkworks.apartmentgroceries.R;
+import com.quarkworks.apartmentgroceries.service.SyncUser;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class PhotoActivity extends AppCompatActivity {
@@ -43,13 +54,27 @@ public class PhotoActivity extends AppCompatActivity {
                 openImageIntent();
             }
         });
+
+        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
+        String photoUrl = sharedPreferences.getString(SyncUser.JsonKeys.URL, null);
+
+        if (!TextUtils.isEmpty(photoUrl)) {
+            Glide.with(this)
+                    .load(photoUrl)
+                    .centerCrop()
+                    .crossFade()
+                    .into(photoImageView);
+        }
+
     }
 
     private void openImageIntent() {
         // root to save image
-        final File root = new File(Environment.getExternalStorageDirectory() + File.separator + "MyDir" + File.separator);
+        String directoryName = dateToString(new Date(), getString(R.string.photo_date_format_string));
+        Log.d(TAG, directoryName);
+        final File root = new File(Environment.getExternalStorageDirectory() + File.separator + directoryName + File.separator);
         root.mkdirs();
-        final String photoName = "photo";
+        final String photoName = directoryName;
         final File sdImageMainDirectory = new File(root, photoName);
         outputFileUri = Uri.fromFile(sdImageMainDirectory);
 
@@ -72,7 +97,7 @@ public class PhotoActivity extends AppCompatActivity {
         galleryIntent.setType("image/*");
         galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
 
-        final Intent chooserIntent = Intent.createChooser(galleryIntent, "select source");
+        final Intent chooserIntent = Intent.createChooser(galleryIntent, getString(R.string.photo_select_source));
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, camaraIntents.toArray(new Parcelable[camaraIntents.size()]));
         startActivityForResult(chooserIntent, SELECT_PICTURE_REQUEST_CODE);
     }
@@ -100,8 +125,42 @@ public class PhotoActivity extends AppCompatActivity {
                     selectedImageUri = data == null ? null : data.getData();
                 }
 
+                InputStream inputStream;
+                try {
+                    inputStream = getContentResolver().openInputStream(selectedImageUri);
+
+                    byte[] inputData;
+                    try {
+                        String photoName = dateToString(new Date(), getString(R.string.photo_date_format_string));
+                        inputData = getBytes(inputStream);
+                        SyncUser.uploadProfilePhoto(photoName + ".jpg", inputData);
+                    } catch (IOException e) {
+                        Log.e(TAG, "Error reading image byte data from uri");
+                    }
+
+                } catch (FileNotFoundException e) {
+                    Log.e(TAG, "Error file with uri " + selectedImageUri + " not found", e);
+                }
+
                 photoImageView.setImageURI(selectedImageUri);
             }
         }
+    }
+
+    private byte[] getBytes(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+        int bufferSize = 1024;
+        byte[] buffer = new byte[bufferSize];
+
+        int len;
+        while ((len = inputStream.read(buffer)) != -1) {
+            byteBuffer.write(buffer, 0, len);
+        }
+        return byteBuffer.toByteArray();
+    }
+
+    private String dateToString (Date date, String format) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(format);
+        return dateFormat.format(date);
     }
 }
