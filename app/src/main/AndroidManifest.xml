@@ -9,7 +9,6 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/AppTheme" >
         <activity android:name=".MainActivity" >
@@ -21,22 +20,43 @@
         </activity>
         <activity
             android:name=".auth.LoginActivity"
-            android:label="@string/title_activity_login"
-            android:screenOrientation="portrait" >
+            android:label="@string/title_activity_login" >
         </activity>
         <activity
-            android:name=".auth.SignupActivity"
-            android:label="@string/title_activity_signup"
-            android:screenOrientation="portrait" >
+            android:name=".auth.SignUpActivity"
+            android:label="@string/title_activity_signup" >
         </activity>
         <activity
             android:name=".user.UserActivity"
-            android:label="@string/title_activity_user"
-            android:screenOrientation="portrait" >
+            android:label="@string/title_activity_user" >
         </activity>
         <activity
             android:name=".main.HomeActivity"
             android:label="@string/title_activity_home" >
+        </activity>
+        <activity
+            android:name=".grocery.GroceryCardPagerActivity"
+            android:label="@string/title_activity_grocery_card_pager" >
+        </activity>
+        <activity
+            android:name=".grocery.GroceryItemDetailActivity"
+            android:label="@string/title_activity_grocery_item_detail" >
+        </activity>
+        <activity
+            android:name=".grocery.AddGroceryItemActivity"
+            android:label="@string/title_activity_add_grocery_item" >
+        </activity>
+        <activity
+            android:name=".group.GroupActivity"
+            android:label="@string/title_activity_group" >
+        </activity>
+        <activity
+            android:name=".group.AddGroupActivity"
+            android:label="@string/title_activity_add_group" >
+        </activity>
+        <activity
+            android:name=".user.UserDetailActivity"
+            android:label="@string/title_activity_user_detail" >
         </activity>
     </application>
 

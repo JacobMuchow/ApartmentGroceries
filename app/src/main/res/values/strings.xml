@@ -1,15 +1,46 @@
 <resources>
     <string name="app_name">Apartment Groceries</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="title_activity_login">Login Activity</string>
-    <string name="title_activity_signup">Signup Activity</string>
 
-    <string name="login">Login</string>
-    <string name="action_login">Login</string>
+    <!-- button -->
+    <string name="login_button">Login</string>
+    <string name="sign_up_button">Sign Up</string>
+    <string name="add_button">Add</string>
+    <string name="join_group_button">Join</string>
+
+    <!-- menu -->
     <string name="action_user">User</string>
-    <string name="action_sign_up">Sign Up</string>
-    <string name="title_activity_user">User Activity</string>
-    <string name="title_activity_home">Home Activity</string>
+    <string name="action_add_grocery">Add grocery</string>
+    <string name="action_add_group">Add group</string>
+    <string name="action_list_group">Group</string>
+    <string name="action_logout">Logout</string>
 
-    <string name="username_or_password_empty">Please input username and password.</string>
+    <!-- activity title -->
+    <string name="title_activity_login">Login</string>
+    <string name="title_activity_signup">SignUp</string>
+    <string name="title_activity_user">User</string>d
+    <string name="title_activity_home">Home</string>
+    <string name="title_activity_grocery_card_pager">Grocery Card Pager</string>
+    <string name="title_activity_grocery_item_detail">Grocery Detail</string>
+    <string name="title_activity_add_grocery_item">Add Grocery</string>
+    <string name="title_activity_group">Group</string>
+    <string name="title_activity_add_group">Add Group</string>
+    <string name="title_activity_user_detail">User Detail</string>
+
+    <!-- login or sign up-->
+    <string name="empty_username_or_password">Please input username and password.</string>
+    <string name="password_not_match">Passwords do not match.</string>
+    <string name="login_or_sign_up_session">session</string>
+    <string name="login_failure_message">Invalid username or password</string>
+    <string name="login_success_message">Login success</string>
+    <string name="choose_group_message">Please join a group</string>
+    <string name="sign_up_failure_message">Username exists</string>
+
+    <!-- response message -->
+    <string name="grocery_item_name_empty">Please input a item name</string>
+    <string name="add_grocery_item_success">Added an item successfully</string>
+    <string name="add_grocery_item_failure">Added an item failed</string>
+    <string name="add_group_success">Added a group successfully</string>
+    <string name="add_group_failure">Added a group failed</string>
+    <string name="join_group_success">Joined a group successfully</string>
+    <string name="join_group_failure">Joined a group failed</string>
 </resources>
