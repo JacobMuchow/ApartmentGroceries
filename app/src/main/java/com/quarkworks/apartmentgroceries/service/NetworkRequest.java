@@ -131,8 +131,6 @@ public class NetworkRequest extends AsyncTask<Void, String, String> {
         } catch (JSONException e) {
             Log.e(TAG, "Error parssing JSON from url: " + template.getUrl(), e);
         }
-
-
     }
 
     public interface Callback {
