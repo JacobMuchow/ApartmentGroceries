@@ -38,9 +38,7 @@ public class HomeActivity extends AppCompatActivity {
             public View getView(int position, View convertView, ViewGroup parent) {
                 GroceryCell groceryCell = convertView != null ?
                         (GroceryCell) convertView : new GroceryCell(parent.getContext());
-                groceryCell.setViewData(getItem(position));
-                groceryCell.setCardViewOnClick(position);
-                groceryCell.setNameTextViewOnClick(getItem(position));
+                groceryCell.setViewData(getItem(position), position);
                 return groceryCell;
             }
         };

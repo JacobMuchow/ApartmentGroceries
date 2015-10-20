@@ -37,7 +37,6 @@ public class GroupActivity extends AppCompatActivity {
                 GroupCell groupCell = convertView != null ?
                         (GroupCell) convertView : new GroupCell(parent.getContext());
                 groupCell.setViewData(getItem(position));
-                groupCell.setJoinGroupButton(getItem(position));
                 return groupCell;
             }
         };

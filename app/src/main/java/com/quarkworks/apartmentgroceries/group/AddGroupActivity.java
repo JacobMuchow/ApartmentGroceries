@@ -37,7 +37,7 @@ public class AddGroupActivity extends AppCompatActivity {
                     RGroup groupItem = new RGroup();
                     groupItem.setName(groupItemName);
                     SyncGroup.add(groupItem)
-                            .setCallbacks(addSuccesCallback, addFailureCallback);
+                            .setCallbacks(addSuccessCallback, addFailureCallback);
                 } else {
                     Toast.makeText(getApplicationContext(),
                             getString(R.string.grocery_item_name_empty), Toast.LENGTH_LONG).show();
@@ -46,7 +46,7 @@ public class AddGroupActivity extends AppCompatActivity {
         });
     }
 
-    private Promise.Success addSuccesCallback = new Promise.Success() {
+    private Promise.Success addSuccessCallback = new Promise.Success() {
         @Override
         public void onSuccess() {
             Intent intent = new Intent(MyApplication.getContext(), GroupActivity.class);

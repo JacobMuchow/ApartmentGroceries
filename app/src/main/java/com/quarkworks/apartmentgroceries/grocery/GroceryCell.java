@@ -24,7 +24,6 @@ public class GroceryCell extends RelativeLayout{
     private TextView nameTextView;
     private TextView createdByTextView;
     private TextView purchasedByTextView;
-    private CardView groceryHomeCardView;
 
     public GroceryCell(Context context) {
         super(context);
@@ -46,28 +45,14 @@ public class GroceryCell extends RelativeLayout{
         nameTextView = (TextView) findViewById(R.id.grocery_cell_grocery_name_id);
         createdByTextView = (TextView) findViewById(R.id.grocery_cell_created_by_id);
         purchasedByTextView = (TextView) findViewById(R.id.grocery_cell_purchased_by_id);
-        groceryHomeCardView = (CardView) findViewById(R.id.grocery_card_view_id);
     }
 
-    public void setViewData(RGroceryItem groceryItem){
+    public void setViewData(final RGroceryItem groceryItem, final int position){
         nameTextView.setText(groceryItem.getName());
         createdByTextView.setText(groceryItem.getCreatedBy());
         purchasedByTextView.setText(groceryItem.getPurchasedBy());
-    }
-    public void setNameTextViewOnClick(RGroceryItem groceryItem) {
-        final String username = groceryItem.getCreatedBy();
-        createdByTextView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getContext(), UserDetailActivity.class);
-                intent.putExtra(USERNAME, username);
-                getContext().startActivity(intent);
-            }
-        });
-    }
 
-    public void setCardViewOnClick(final int position) {
-        groceryHomeCardView.setOnClickListener(new OnClickListener() {
+        nameTextView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getContext(), GroceryCardPagerActivity.class);
@@ -75,5 +60,23 @@ public class GroceryCell extends RelativeLayout{
                 getContext().startActivity(intent);
             }
         });
+
+        createdByTextView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), UserDetailActivity.class);
+                intent.putExtra(USERNAME, groceryItem.getCreatedBy());
+                getContext().startActivity(intent);
+            }
+        });
+        purchasedByTextView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), UserDetailActivity.class);
+                intent.putExtra(USERNAME, groceryItem.getPurchasedBy());
+                getContext().startActivity(intent);
+            }
+        });
+
     }
 }

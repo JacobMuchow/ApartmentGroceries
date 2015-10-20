@@ -68,7 +68,7 @@ public class SignUpActivity extends AppCompatActivity {
     private Promise.Success signUpSuccessCallback = new Promise.Success() {
         @Override
         public void onSuccess() {
-            SyncUser.login(username, password).setSuccessCallack(signUpLoginSuccesCallback);
+            SyncUser.login(username, password).setSuccessCallack(signUpLoginSuccessCallback);
         }
     };
 
@@ -80,7 +80,7 @@ public class SignUpActivity extends AppCompatActivity {
         }
     };
 
-    private Promise.Success signUpLoginSuccesCallback = new Promise.Success() {
+    private Promise.Success signUpLoginSuccessCallback = new Promise.Success() {
         @Override
         public void onSuccess() {
             SharedPreferences sharedPreferences = getApplication()

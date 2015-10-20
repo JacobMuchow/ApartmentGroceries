@@ -50,22 +50,19 @@ public class GroupCell extends RelativeLayout{
         joinGroupButton = (Button) findViewById(R.id.group_cell_join_group_button_id);
     }
 
-    public void setViewData(RGroup group){
+    public void setViewData(final RGroup group){
         nameTextView.setText(group.getName());
         SharedPreferences sharedPreferences =
                 MyApplication.getContext().getSharedPreferences(
                         MyApplication.getContext()
                                 .getString(R.string.login_or_sign_up_session), 0);
-        String groupId = sharedPreferences.getString(SyncUser.JsonKeys.GROUP_ID, null);
+        final String groupId = sharedPreferences.getString(SyncUser.JsonKeys.GROUP_ID, null);
         if (!TextUtils.isEmpty(groupId) && groupId.equals(group.getGroupId())) {
             joinGroupButton.setVisibility(GONE);
         } else {
             joinGroupButton.setVisibility(VISIBLE);
         }
-    }
 
-    public void setJoinGroupButton(RGroup group) {
-        final String groupId = group.getGroupId();
         joinGroupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -74,18 +71,20 @@ public class GroupCell extends RelativeLayout{
                                 MyApplication.getContext()
                                         .getString(R.string.login_or_sign_up_session), 0);
                 String userId = sharedPreferences.getString(SyncUser.JsonKeys.USER_ID, null);
-                SyncUser.joinGroup(userId, groupId)
-                        .setCallbacks(joinGroupSuccesCallback, joinGroupFailureCallback);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString(SyncUser.JsonKeys.GROUP_ID, group.getGroupId());
+                editor.commit();
+                SyncUser.joinGroup(userId, group.getGroupId())
+                        .setCallbacks(joinGroupSuccessCallback, joinGroupFailureCallback);
             }
         });
     }
 
-    private Promise.Success joinGroupSuccesCallback = new Promise.Success() {
+    private Promise.Success joinGroupSuccessCallback = new Promise.Success() {
         @Override
         public void onSuccess() {
             Intent intent = new Intent(getContext(), HomeActivity.class);
             getContext().startActivity(intent);
-
             Toast.makeText(MyApplication.getContext(),
                     MyApplication.getContext().getString(R.string.join_group_success),
                     Toast.LENGTH_SHORT).show();
