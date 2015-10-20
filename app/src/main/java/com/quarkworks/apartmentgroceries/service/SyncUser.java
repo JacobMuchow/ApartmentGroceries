@@ -246,13 +246,23 @@ public class SyncUser {
                                 promise.onFailure();
                                 return;
                             }
+
                             Log.d(TAG, "updating image response:" + jsonObject.toString());
+
+                            try {
+                                String updatedAt = jsonObject.getString(JsonKeys.UPDATED_AT);
+                                if (!TextUtils.isEmpty(updatedAt)) {
+                                    promise.onSuccess();
+                                }
+                            } catch (JSONException e) {
+                                Log.e(TAG, "Error parsing updating user photo response json", e);
+                                promise.onFailure();
+                            }
                         }
                     };
 
                     UrlTemplate templateUpdateProfilePhoto = UrlTemplateCreator.updateProfilePhoto(userId, photoName);
                     new NetworkRequest(templateUpdateProfilePhoto, callbackUpdateProfilePhoto).execute();
-                    promise.onSuccess();
                 } catch (JSONException e) {
                     Log.e(TAG, "uploading photo failure", e);
                     promise.onFailure();
