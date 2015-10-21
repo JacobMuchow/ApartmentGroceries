@@ -8,6 +8,7 @@ import io.realm.RealmObject;
 public class RUser extends RealmObject {
     private String userId;
     private String name;
+    private String url;
 
     public String getUserId() {
         return userId;
@@ -23,5 +24,13 @@ public class RUser extends RealmObject {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

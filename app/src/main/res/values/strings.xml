@@ -54,4 +54,8 @@
     <!-- photo -->
     <string name="photo_date_format_string">yyyyMMddHHmmss</string>
     <string name="photo_select_source">select source</string>
+
+    <!-- grocery cell -->
+    <string name="grocery_cell_item_status_open">open</string>
+    <string name="grocery_cell_item_status_closed">closed</string>
 </resources>

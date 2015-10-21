@@ -2,50 +2,87 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_margin="@dimen/grocery_cell_margin"
     xmlns:card_view="http://schemas.android.com/apk/res-auto">
 
-    <!-- created by -->
-    <TextView
-        android:id="@+id/grocery_cell_created_by_id"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"/>
-
-    <android.support.v7.widget.CardView
-        android:id="@+id/grocery_card_view_id"
+    <RelativeLayout
+        android:id="@+id/grocery_cell_created_by_relative_layout_id"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/grocery_cell_created_by_id"
-        android:layout_gravity="center"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="10dp"
+        android:layout_margin="@dimen/grocery_cell_item_relative_layout_margin">
 
-        card_view:cardCornerRadius="4dp"
-        card_view:cardElevation="0dp">
-
-        <LinearLayout
-            android:layout_width="fill_parent"
+        <!-- photo -->
+        <android.support.v7.widget.CardView
+            android:id="@+id/grocery_cell_image_card_view_id"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_gravity="center"
+            card_view:cardCornerRadius="@dimen/grocery_cell_card_corner_radius"
+            card_view:cardElevation="@dimen/grocery_cell_card_elevation">
+            <ImageView
+                android:id="@+id/grocery_cell_created_by_image_view_id"
+                android:layout_width="@dimen/grocery_cell_photo_width_height"
+                android:layout_height="@dimen/grocery_cell_photo_width_height" />
+        </android.support.v7.widget.CardView>
+
+        <!-- created by -->
+        <TextView
+            android:id="@+id/grocery_cell_created_by_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/grocery_cell_image_card_view_id"
+            android:layout_centerVertical="true" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/grocery_cell_grocery_item_relative_layout_id"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/grocery_cell_item_relative_layout_margin"
+        android:layout_below="@+id/grocery_cell_created_by_relative_layout_id">
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/grocery_cell_card_view_id"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/grocery_cell_item_card_view_height"
+            android:layout_gravity="center"
+            card_view:cardCornerRadius="@dimen/grocery_cell_card_corner_radius"
+            card_view:cardElevation="@dimen/grocery_cell_card_elevation">
 
             <!-- grocery name -->
             <TextView
                 android:id="@+id/grocery_cell_grocery_name_id"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:layout_weight="1"/>
+                android:layout_gravity="center"/>
+        </android.support.v7.widget.CardView>
 
-            <!-- purchased by -->
-            <TextView
-                android:id="@+id/grocery_cell_purchased_by_id"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:layout_weight="1"
-                android:gravity="right"/>
+    </RelativeLayout>
 
-        </LinearLayout>
-    </android.support.v7.widget.CardView>
+    <RelativeLayout
+        android:id="@+id/grocery_cell_grocery_status_relative_layout_id"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/grocery_cell_item_relative_layout_margin"
+        android:layout_below="@+id/grocery_cell_grocery_item_relative_layout_id">
+
+        <!-- status -->
+        <TextView
+            android:id="@+id/grocery_cell_grocery_status_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true" />
+
+        <!-- purchased by -->
+        <TextView
+            android:id="@+id/grocery_cell_purchased_by_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"/>
+
+    </RelativeLayout>
 
 </RelativeLayout>

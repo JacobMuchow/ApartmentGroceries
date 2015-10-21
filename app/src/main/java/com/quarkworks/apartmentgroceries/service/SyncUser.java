@@ -14,6 +14,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import bolts.Continuation;
+import bolts.Task;
 import io.realm.Realm;
 
 /**
@@ -274,5 +276,31 @@ public class SyncUser {
         new NetworkRequest(template, callback).execute();
 
         return promise;
+    }
+
+    public static Task<RUser> getById(String userId) {
+
+        Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
+        UrlTemplate template = UrlTemplateCreator.getSingleUser(userId);
+        NetworkRequestBolts networkRequestBolts = new NetworkRequestBolts(template, taskCompletionSource);
+        return networkRequestBolts.runNetworkRequestBolts().continueWith(new Continuation<JSONObject, RUser>() {
+            @Override
+            public RUser then(Task task) throws Exception {
+
+                Log.d(TAG, "jsonString:" + task.getResult().toString());
+
+                JSONObject userJsonObj = new JSONObject(task.getResult().toString());
+                String userId = userJsonObj.getString(JsonKeys.OBJECT_ID);
+                String username = userJsonObj.getString(JsonKeys.USERNAME);
+                String url = userJsonObj.getJSONObject(JsonKeys.PHOTO).getString(JsonKeys.URL);
+
+                RUser rUser = new RUser();
+                rUser.setUserId(userId);
+                rUser.setName(username);
+                rUser.setUrl(url);
+
+                return rUser;
+            }
+        });
     }
 }
