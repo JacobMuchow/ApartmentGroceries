@@ -4,9 +4,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.quarkworks.apartmentgroceries.MyApplication;
@@ -20,6 +22,11 @@ import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
 public class AddGroceryItemActivity extends AppCompatActivity {
     private static final String TAG = AddGroceryItemActivity.class.getSimpleName();
 
+    /*
+        References
+     */
+    private Toolbar toolbar;
+    private TextView titleTextView;
     private EditText groceryItemNameEditText;
     private Button addButton;
 
@@ -27,6 +34,12 @@ public class AddGroceryItemActivity extends AppCompatActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_grocery_activity);
+
+        toolbar = (Toolbar) findViewById(R.id.main_toolbar_id);
+        titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
+        titleTextView.setText(getString(R.string.title_activity_add_grocery_item));
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         groceryItemNameEditText = (EditText) findViewById(R.id.add_grocery_item_name_id);
         addButton = (Button) findViewById(R.id.add_grocery_item_add_button_id);

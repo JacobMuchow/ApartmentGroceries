@@ -11,11 +11,13 @@ import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.quarkworks.apartmentgroceries.R;
@@ -37,6 +39,11 @@ public class PhotoActivity extends AppCompatActivity {
     private static final int SELECT_PICTURE_REQUEST_CODE = 1;
     private Uri outputFileUri;
 
+    /*
+        References
+     */
+    private Toolbar toolbar;
+    private TextView titleTextView;
     private Button addPhotoButton;
     private ImageView photoImageView;
 
@@ -44,6 +51,12 @@ public class PhotoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.photo_activity);
+
+        toolbar = (Toolbar) findViewById(R.id.main_toolbar_id);
+        titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
+        titleTextView.setText(getString(R.string.title_activity_user_detail));
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         photoImageView = (ImageView) findViewById(R.id.photo_image_view_id);
         addPhotoButton = (Button) findViewById(R.id.photo_add_button_id);

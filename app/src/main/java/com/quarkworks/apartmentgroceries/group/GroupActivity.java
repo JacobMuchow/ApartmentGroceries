@@ -3,11 +3,13 @@ package com.quarkworks.apartmentgroceries.group;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.service.DataStore;
@@ -20,12 +22,23 @@ import io.realm.RealmResults;
 public class GroupActivity extends AppCompatActivity {
     private static final String TAG = GroupActivity.class.getSimpleName();
 
+    /*
+        References
+     */
+    private Toolbar toolbar;
+    private TextView titleTextView;
     public static RealmBaseAdapter<RGroup> groupRealmBaseAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.group_activity);
+
+        toolbar = (Toolbar) findViewById(R.id.main_toolbar_id);
+        titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
+        titleTextView.setText(getString(R.string.title_activity_group));
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         SyncGroup.getAll();
 
