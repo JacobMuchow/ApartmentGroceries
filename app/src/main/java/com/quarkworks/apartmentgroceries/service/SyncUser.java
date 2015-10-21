@@ -218,64 +218,58 @@ public class SyncUser {
         return promise;
     }
 
-    public static Promise uploadProfilePhoto(String photoName, byte[] data) {
+    public static Task<JSONObject> updateProfilePhoto(String photoName, byte[] data) {
+        Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
+        UrlTemplate template = UrlTemplateCreator.uploadProfilePhoto(photoName, data);
+        NetworkRequestBolts networkRequestBolts = new NetworkRequestBolts(template, taskCompletionSource);
 
-        final Promise promise = new Promise();
-
-        NetworkRequest.Callback callback = new NetworkRequest.Callback() {
+        return networkRequestBolts.runNetworkRequestBolts().continueWith(new Continuation<JSONObject, Task<JSONObject>>() {
             @Override
-            public void done(@Nullable JSONObject jsonObject) {
-                if (jsonObject == null) {
+            public Task<JSONObject> then(Task<JSONObject> task) throws Exception {
+
+                if (task.getResult() == null) {
                     Log.e(TAG, "Error getting uploading photo response json");
-                    promise.onFailure();
-                    return;
+                    return null;
                 }
-                Log.d(TAG, "uploading image response:" + jsonObject.toString());
+
                 try {
-                    String photoName = jsonObject.getString("name");
-                    // parse photo json, get photo "name" and update user photo
-                    // TODO: refactor using bolts
+                    String photoName = task.getResult().getString("name");
+                    Log.d(TAG, "first:" + task.getResult().toString());
                     SharedPreferences sharedPreferences =
                             MyApplication.getContext().getSharedPreferences(
                                     MyApplication.getContext()
                                             .getString(R.string.login_or_sign_up_session), 0);
                     String userId = sharedPreferences.getString(SyncUser.JsonKeys.USER_ID, null);
-                    NetworkRequest.Callback callbackUpdateProfilePhoto = new NetworkRequest.Callback() {
-                        @Override
-                        public void done(@Nullable JSONObject jsonObject) {
-                            if (jsonObject == null) {
+
+                    Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
+                    UrlTemplate template = UrlTemplateCreator.updateProfilePhoto(userId, photoName);
+                    NetworkRequestBolts networkRequestBolts = new NetworkRequestBolts(template, taskCompletionSource);
+
+                    return networkRequestBolts.runNetworkRequestBolts().onSuccess(new Continuation<JSONObject, Void>() {
+                        public Void then(Task<JSONObject> task) throws Exception {
+                            if (task.getResult() == null) {
                                 Log.e(TAG, "Error getting updating photo response json");
-                                promise.onFailure();
-                                return;
                             }
 
-                            Log.d(TAG, "updating image response:" + jsonObject.toString());
-
                             try {
-                                String updatedAt = jsonObject.getString(JsonKeys.UPDATED_AT);
+                                String updatedAt = task.getResult().getString(SyncUser.JsonKeys.UPDATED_AT);
                                 if (!TextUtils.isEmpty(updatedAt)) {
-                                    promise.onSuccess();
+                                    // on success
                                 }
                             } catch (JSONException e) {
                                 Log.e(TAG, "Error parsing updating user photo response json", e);
-                                promise.onFailure();
                             }
+                            return null;
                         }
-                    };
+                    });
 
-                    UrlTemplate templateUpdateProfilePhoto = UrlTemplateCreator.updateProfilePhoto(userId, photoName);
-                    new NetworkRequest(templateUpdateProfilePhoto, callbackUpdateProfilePhoto).execute();
                 } catch (JSONException e) {
                     Log.e(TAG, "uploading photo failure", e);
-                    promise.onFailure();
                 }
+
+                return null;
             }
-        };
-
-        UrlTemplate template = UrlTemplateCreator.uploadProfilePhoto(photoName, data);
-        new NetworkRequest(template, callback).execute();
-
-        return promise;
+        });
     }
 
     public static Task<RUser> getById(String userId) {
@@ -283,6 +277,7 @@ public class SyncUser {
         Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
         UrlTemplate template = UrlTemplateCreator.getSingleUser(userId);
         NetworkRequestBolts networkRequestBolts = new NetworkRequestBolts(template, taskCompletionSource);
+
         return networkRequestBolts.runNetworkRequestBolts().continueWith(new Continuation<JSONObject, RUser>() {
             @Override
             public RUser then(Task task) throws Exception {

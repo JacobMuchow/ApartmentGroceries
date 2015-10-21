@@ -12,7 +12,6 @@ import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -22,6 +21,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.service.SyncUser;
+import com.quarkworks.apartmentgroceries.service.models.RUser;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -32,6 +32,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import bolts.Continuation;
+import bolts.Task;
 
 public class PhotoActivity extends AppCompatActivity {
     private static final String TAG = PhotoActivity.class.getSimpleName();
@@ -69,15 +72,20 @@ public class PhotoActivity extends AppCompatActivity {
         });
 
         SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
-        String photoUrl = sharedPreferences.getString(SyncUser.JsonKeys.URL, null);
+        String usrId = sharedPreferences.getString(SyncUser.JsonKeys.USER_ID, null);
 
-        if (!TextUtils.isEmpty(photoUrl)) {
-            Glide.with(this)
-                    .load(photoUrl)
-                    .centerCrop()
-                    .crossFade()
-                    .into(photoImageView);
-        }
+        SyncUser.getById(usrId).continueWith(new Continuation<RUser, Void>() {
+            @Override
+            public Void then(Task<RUser> task) throws Exception {
+                String url = task.getResult().getUrl();
+                Glide.with(getApplicationContext())
+                        .load(url)
+                        .centerCrop()
+                        .crossFade()
+                        .into(photoImageView);
+                return null;
+            }
+        }, Task.UI_THREAD_EXECUTOR);
 
     }
 
@@ -146,7 +154,7 @@ public class PhotoActivity extends AppCompatActivity {
                     try {
                         String photoName = dateToString(new Date(), getString(R.string.photo_date_format_string));
                         inputData = getBytes(inputStream);
-                        SyncUser.uploadProfilePhoto(photoName + ".jpg", inputData);
+                        SyncUser.updateProfilePhoto(photoName + ".jpg", inputData);
                     } catch (IOException e) {
                         Log.e(TAG, "Error reading image byte data from uri");
                     }
