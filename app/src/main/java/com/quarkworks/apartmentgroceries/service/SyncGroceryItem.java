@@ -25,7 +25,7 @@ public class SyncGroceryItem {
         private static final String CREATED_BY = "createdBy";
         private static final String PURCHASED_BY = "purchasedBy";
         private static final String USERNAME = "username";
-        private static final String PROFILE_URL = "url";
+        private static final String CREATED_AT ="createdAt";
     }
 
     public static Promise getAll() {
@@ -61,6 +61,7 @@ public class SyncGroceryItem {
                                     .getJSONObject(JsonKeys.GROUP_ID).getString(JsonKeys.NAME));
                             groceryItem.setCreatedBy(groceryJsonObj
                                     .getJSONObject(JsonKeys.CREATED_BY).getString(JsonKeys.OBJECT_ID));
+                            groceryItem.setCreatedAt(groceryJsonObj.getString(JsonKeys.CREATED_AT));
                             Log.d(TAG, "userId:" + groceryJsonObj
                                     .getJSONObject(JsonKeys.CREATED_BY).getString(JsonKeys.OBJECT_ID));
                             JSONObject purchasedByObj = groceryJsonObj.optJSONObject(JsonKeys.PURCHASED_BY);

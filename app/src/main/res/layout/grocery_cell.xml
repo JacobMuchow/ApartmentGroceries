@@ -2,8 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="@dimen/grocery_cell_margin"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto">
+    android:layout_margin="@dimen/grocery_cell_margin">
 
     <RelativeLayout
         android:id="@+id/grocery_cell_created_by_relative_layout_id"
@@ -12,26 +11,42 @@
         android:layout_margin="@dimen/grocery_cell_item_relative_layout_margin">
 
         <!-- photo -->
-        <android.support.v7.widget.CardView
-            android:id="@+id/grocery_cell_image_card_view_id"
+        <RelativeLayout
+            android:id="@+id/grocery_cell_created_by_linear_layout_id"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            card_view:cardCornerRadius="@dimen/grocery_cell_card_corner_radius"
-            card_view:cardElevation="@dimen/grocery_cell_card_elevation">
+            android:layout_height="wrap_content">
+
             <ImageView
                 android:id="@+id/grocery_cell_created_by_image_view_id"
                 android:layout_width="@dimen/grocery_cell_photo_width_height"
-                android:layout_height="@dimen/grocery_cell_photo_width_height" />
-        </android.support.v7.widget.CardView>
+                android:layout_height="@dimen/grocery_cell_photo_width_height"
+                android:padding="1dp"/>
+            <View
+                android:layout_width="@dimen/grocery_cell_photo_width_height"
+                android:layout_height="@dimen/grocery_cell_photo_width_height"
+                android:layout_alignLeft="@+id/grocery_cell_created_by_image_view_id"
+                android:layout_alignTop="@+id/grocery_cell_created_by_image_view_id"
+                android:layout_margin="0dp"
+                android:background="@drawable/photo_mask" />
+
+        </RelativeLayout>
 
         <!-- created by -->
         <TextView
             android:id="@+id/grocery_cell_created_by_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/grocery_cell_image_card_view_id"
+            android:padding="@dimen/text_view_padding_medium"
+            android:layout_toRightOf="@+id/grocery_cell_created_by_linear_layout_id"
             android:layout_centerVertical="true" />
+        <!-- created at -->
+        <TextView
+            android:id="@+id/grocery_cell_created_at_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:text="10/20/2015"/>
 
     </RelativeLayout>
 
@@ -42,21 +57,14 @@
         android:layout_margin="@dimen/grocery_cell_item_relative_layout_margin"
         android:layout_below="@+id/grocery_cell_created_by_relative_layout_id">
 
-        <android.support.v7.widget.CardView
-            android:id="@+id/grocery_cell_card_view_id"
+        <!-- grocery name -->
+        <TextView
+            android:id="@+id/grocery_cell_grocery_name_id"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/grocery_cell_item_card_view_height"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/text_view_padding_medium"
             android:layout_gravity="center"
-            card_view:cardCornerRadius="@dimen/grocery_cell_card_corner_radius"
-            card_view:cardElevation="@dimen/grocery_cell_card_elevation">
-
-            <!-- grocery name -->
-            <TextView
-                android:id="@+id/grocery_cell_grocery_name_id"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"/>
-        </android.support.v7.widget.CardView>
+            android:background="@drawable/rectangle_border"/>
 
     </RelativeLayout>
 
@@ -73,7 +81,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true" />
+            android:layout_alignParentLeft="true"/>
 
         <!-- purchased by -->
         <TextView

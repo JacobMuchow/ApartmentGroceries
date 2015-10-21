@@ -14,6 +14,8 @@
         android:layout_height="match_parent"
         android:padding="@dimen/activity_vertical_margin"
         android:layout_below="@+id/main_toolbar_id"
-        android:listSelector="@android:color/transparent"/>
+        android:listSelector="@android:color/transparent"
+        android:divider="@color/colorPrimary"
+        android:dividerHeight="1px"/>
 
 </RelativeLayout>
