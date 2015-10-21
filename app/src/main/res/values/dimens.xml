@@ -5,7 +5,8 @@
     <dimen name="activity_vertical_margin_land">30dp</dimen>
 
     <dimen name="rectangle_corner_radius">4dp</dimen>
-    <dimen name="text_view_padding_medium">8dp</dimen>
+    <dimen name="margin_padding_tiny">2dp</dimen>
+    <dimen name="margin_padding_medium">8dp</dimen>
 
     <!-- login and sign up -->
     <dimen name="login_sign_up_username_password_height">40dp</dimen>
@@ -17,7 +18,7 @@
     <dimen name="login_sign_up_password_margin_bottom">16dp</dimen>
 
     <!-- grocery cell -->
-    <dimen name="grocery_cell_margin">10dp</dimen>
+    <dimen name="grocery_cell_margin">4dp</dimen>
     <dimen name="grocery_cell_item_relative_layout_margin">2dp</dimen>
     <dimen name="grocery_cell_card_corner_radius">4dp</dimen>
     <dimen name="grocery_cell_card_elevation">0dp</dimen>
