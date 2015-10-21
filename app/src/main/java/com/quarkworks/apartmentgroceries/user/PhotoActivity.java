@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.quarkworks.apartmentgroceries.R;
+import com.quarkworks.apartmentgroceries.service.DataStore;
 import com.quarkworks.apartmentgroceries.service.SyncUser;
 import com.quarkworks.apartmentgroceries.service.models.RUser;
 
@@ -78,21 +79,17 @@ public class PhotoActivity extends AppCompatActivity {
         });
 
         SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
-        String usrId = sharedPreferences.getString(SyncUser.JsonKeys.USER_ID, null);
+        String userId = sharedPreferences.getString(SyncUser.JsonKeys.USER_ID, null);
 
-        SyncUser.getById(usrId).continueWith(new Continuation<RUser, Void>() {
-            @Override
-            public Void then(Task<RUser> task) throws Exception {
-                String url = task.getResult().getUrl();
-                Glide.with(getApplicationContext())
-                        .load(url)
-                        .centerCrop()
-                        .crossFade()
-                        .into(photoImageView);
-                return null;
-            }
-        }, Task.UI_THREAD_EXECUTOR);
+        final RUser rUser = DataStore.getInstance().getRealm().where(RUser.class)
+                .equalTo(SyncUser.JsonKeys.USER_ID, userId).findFirst();
 
+        Glide.with(this)
+                .load(rUser.getUrl())
+                .placeholder(R.drawable.ic_launcher)
+                .centerCrop()
+                .crossFade()
+                .into(photoImageView);
     }
 
     private void openImageIntent() {

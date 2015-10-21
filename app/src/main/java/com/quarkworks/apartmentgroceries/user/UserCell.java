@@ -16,7 +16,7 @@ public class UserCell extends RelativeLayout{
 
     private static final String TAG = UserCell.class.getSimpleName();
 
-    private TextView nameTextView;
+    private TextView usernameTextView;
 
     public UserCell(Context context) {
         super(context);
@@ -35,10 +35,10 @@ public class UserCell extends RelativeLayout{
 
     private void initialize() {
         LayoutInflater.from(getContext()).inflate(R.layout.user_cell, this);
-        nameTextView = (TextView) findViewById(R.id.user_cell_name_id);
+        usernameTextView = (TextView) findViewById(R.id.user_cell_name_id);
     }
 
     public void setViewData(RUser user){
-        nameTextView.setText(user.getName());
+        usernameTextView.setText(user.getUsername());
     }
 }

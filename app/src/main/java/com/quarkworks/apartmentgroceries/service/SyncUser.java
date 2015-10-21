@@ -32,6 +32,8 @@ public class SyncUser {
         public static final String USERNAME = "username";
         public static final String USER_ID = "userId";
         public static final String UPDATED_AT = "updatedAt";
+        public static final String EMAIL = "email";
+        public static final String PHONE = "phone";
         public static final String PHOTO = "photo";
         public static final String URL = "url";
     }
@@ -164,17 +166,37 @@ public class SyncUser {
                 realm.clear(RUser.class);
 
                 try {
-                    JSONArray userJsonArray = jsonObject.optJSONArray(JsonKeys.RESULTS);
+                    JSONArray userJsonArray = jsonObject.getJSONArray(JsonKeys.RESULTS);
 
                     for (int i = 0; i < userJsonArray.length(); i++) {
-                        RUser user = realm.createObject(RUser.class);
-                        user.setName(userJsonArray.getJSONObject(i).optString(JsonKeys.USERNAME));
+                        RUser rUser = realm.createObject(RUser.class);
+                        try {
+                            JSONObject userJsonObj = userJsonArray.getJSONObject(i);
+
+                            rUser.setUserId(userJsonObj.getString(JsonKeys.OBJECT_ID));
+                            rUser.setUsername(userJsonObj.getString(JsonKeys.USERNAME));
+                            rUser.setEmail(userJsonObj.optString(JsonKeys.EMAIL));
+                            rUser.setPhone(userJsonObj.optString(JsonKeys.PHONE));
+
+                            JSONObject groupIdObj = userJsonObj.optJSONObject(JsonKeys.GROUP_ID);
+                            if (groupIdObj != null) {
+                                rUser.setGroupId(groupIdObj.getString(JsonKeys.OBJECT_ID));
+                            }
+                            rUser.setPhone(userJsonObj.optString(JsonKeys.PHONE));
+                            JSONObject photoJsonObj = userJsonObj.optJSONObject(JsonKeys.PHOTO);
+                            if (photoJsonObj != null) {
+                                rUser.setUrl(photoJsonObj.getString(JsonKeys.URL));
+                            }
+
+                        } catch (JSONException e) {
+                            Log.e(TAG, "Error parsing user object", e);
+                        }
                     }
 
                     realm.commitTransaction();
                     promise.onSuccess();
                 } catch(JSONException e) {
-                    Log.e(TAG, "Error parsing user object", e);
+                    Log.e(TAG, "Error get user object from server", e);
                     realm.cancelTransaction();
                     promise.onFailure();
                 }
@@ -291,7 +313,7 @@ public class SyncUser {
 
                 RUser rUser = new RUser();
                 rUser.setUserId(userId);
-                rUser.setName(username);
+                rUser.setUsername(username);
                 rUser.setUrl(url);
 
                 return rUser;

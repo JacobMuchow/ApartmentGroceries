@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.quarkworks.apartmentgroceries.R;
+import com.quarkworks.apartmentgroceries.service.DataStore;
 import com.quarkworks.apartmentgroceries.service.SyncUser;
 import com.quarkworks.apartmentgroceries.service.Utilities;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
@@ -20,6 +21,7 @@ import com.quarkworks.apartmentgroceries.user.UserDetailActivity;
 
 import bolts.Continuation;
 import bolts.Task;
+import io.realm.RealmResults;
 
 /**
  * Created by zz on 10/14/15.
@@ -76,20 +78,17 @@ public class GroceryCell extends RelativeLayout {
         statusTextView.setTextColor(getResources().getColor(R.color.colorPrimary));
 
         photoImageView.setImageResource(R.drawable.ic_launcher);
-        SyncUser.getById(groceryItem.getCreatedBy()).continueWith(new Continuation<RUser, Void>() {
-            @Override
-            public Void then(Task<RUser> task) throws Exception {
-                String url = task.getResult().getUrl();
-                createdByTextView.setText(task.getResult().getName());
-                Glide.with(getContext())
-                        .load(url)
-                        .placeholder(R.drawable.ic_launcher)
-                        .centerCrop()
-                        .crossFade()
-                        .into(photoImageView);
-                return null;
-            }
-        }, Task.UI_THREAD_EXECUTOR);
+
+        final RUser rUser = DataStore.getInstance().getRealm().where(RUser.class)
+                .equalTo(SyncUser.JsonKeys.USER_ID, groceryItem.getCreatedBy()).findFirst();
+        createdByTextView.setText(rUser.getUsername());
+
+        Glide.with(getContext())
+                .load(rUser.getUrl())
+                .placeholder(R.drawable.ic_launcher)
+                .centerCrop()
+                .crossFade()
+                .into(photoImageView);
 
         nameTextView.setOnClickListener(new OnClickListener() {
             @Override

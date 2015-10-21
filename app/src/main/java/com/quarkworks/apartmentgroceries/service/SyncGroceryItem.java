@@ -62,8 +62,6 @@ public class SyncGroceryItem {
                             groceryItem.setCreatedBy(groceryJsonObj
                                     .getJSONObject(JsonKeys.CREATED_BY).getString(JsonKeys.OBJECT_ID));
                             groceryItem.setCreatedAt(groceryJsonObj.getString(JsonKeys.CREATED_AT));
-                            Log.d(TAG, "userId:" + groceryJsonObj
-                                    .getJSONObject(JsonKeys.CREATED_BY).getString(JsonKeys.OBJECT_ID));
                             JSONObject purchasedByObj = groceryJsonObj.optJSONObject(JsonKeys.PURCHASED_BY);
                             if (purchasedByObj != null) {
                                 groceryItem.setPurchasedBy(purchasedByObj.getString(JsonKeys.USERNAME));
