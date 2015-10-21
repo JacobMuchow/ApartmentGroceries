@@ -18,7 +18,7 @@
 
     <!-- activity title -->
     <string name="title_activity_login">Login</string>
-    <string name="title_activity_signup">SignUp</string>
+    <string name="title_activity_signup">Sign Up</string>
     <string name="title_activity_user">User</string>d
     <string name="title_activity_home">Home</string>
     <string name="title_activity_grocery_card_pager">Grocery Card Pager</string>
@@ -37,6 +37,10 @@
     <string name="login_success_message">Login success</string>
     <string name="choose_group_message">Please join a group</string>
     <string name="sign_up_failure_message">Username exists</string>
+    <string name="login_sign_up_hint_username">username</string>
+    <string name="login_sign_up_hint_password">password</string>
+    <string name="login_sign_up_hint_confirm_password">confirm password</string>
+    <string name="sign_up_terms">Click “Sign Up” means you agree to Terms and Privacy?</string>
 
     <!-- response message -->
     <string name="grocery_item_name_empty">Please input a item name</string>

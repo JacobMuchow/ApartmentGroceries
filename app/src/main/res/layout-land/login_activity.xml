@@ -18,14 +18,16 @@
             android:id="@+id/login_activity_username_id"
             android:layout_width="match_parent"
             android:layout_height="@dimen/login_sign_up_username_password_height"
-            android:layout_marginTop="@dimen/login_sign_up_margin_top"
+            android:layout_marginTop="@dimen/login_margin_top_land"
             android:layout_marginLeft="@dimen/login_sign_up_username_password_margin"
             android:layout_marginRight="@dimen/login_sign_up_username_password_margin"
             android:padding="@dimen/login_sign_up_username_password_padding"
+
             android:layout_centerHorizontal="true"
             android:inputType="textPersonName"
-            android:hint="@string/login_sign_up_hint_username"
+            android:hint="username"
             android:textAlignment="center"
+            android:ems="10"
             android:background="@drawable/rectangle_border"/>
 
         <!-- password -->
@@ -38,8 +40,9 @@
             android:layout_below="@+id/login_activity_username_id"
             android:layout_centerHorizontal="true"
             android:inputType="textPassword"
-            android:hint="@string/login_sign_up_hint_password"
+            android:hint="password"
             android:textAlignment="center"
+            android:ems="10"
             android:background="@drawable/rectangle_border"/>
 
         <!-- login button -->
@@ -70,6 +73,5 @@
             android:text="@string/sign_up_button"
             android:textColor="@android:color/black"
             style="@android:style/TextAppearance.Small" />
-
     </RelativeLayout>
 </RelativeLayout>

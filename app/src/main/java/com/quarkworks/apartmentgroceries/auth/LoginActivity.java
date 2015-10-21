@@ -4,10 +4,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.quarkworks.apartmentgroceries.MyApplication;
@@ -26,7 +28,9 @@ public class LoginActivity extends AppCompatActivity {
     private EditText usernameEditText;
     private EditText passwordEditText;
     private Button loginButton;
-    private Button signUpButton;
+    private TextView signUpTextView;
+    private Toolbar toolbar;
+    private TextView titleTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +40,10 @@ public class LoginActivity extends AppCompatActivity {
         usernameEditText = (EditText) findViewById(R.id.login_activity_username_id);
         passwordEditText = (EditText) findViewById(R.id.login_activity_password_id);
         loginButton = (Button) findViewById(R.id.login_activity_login_button_id);
-        signUpButton = (Button) findViewById(R.id.login_activity_sign_up_button_id);
+        signUpTextView = (TextView) findViewById(R.id.login_activity_sign_up_id);
+        toolbar = (Toolbar) findViewById(R.id.main_toolbar_id);
+        titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
+        titleTextView.setText(getString(R.string.title_activity_login));
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -55,7 +62,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        signUpButton.setOnClickListener(new View.OnClickListener() {
+        signUpTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
