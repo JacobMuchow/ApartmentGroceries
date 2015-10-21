@@ -34,18 +34,19 @@ public class GroceryCardPagerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.grocery_card_pager_activity);
 
-
+        /**
+         * Get view references
+         */
+        viewPager = (ViewPager) findViewById(R.id.grocery_card_pager_view_pager_id);
 
         groceryItems = DataStore.getInstance().getRealm().where(RGroceryItem.class).findAll();
         NUM_PAGES = groceryItems.size();
 
-        viewPager = (ViewPager) findViewById(R.id.grocery_card_pager_view_pager_id);
         groceryCardPagerAdapter = new GroceryCardPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(groceryCardPagerAdapter);
 
         int position = getIntent().getExtras().getInt(GroceryCell.POSITION);
         viewPager.setCurrentItem(position);
-
     }
 
     public static class GroceryCardPagerAdapter extends FragmentStatePagerAdapter {

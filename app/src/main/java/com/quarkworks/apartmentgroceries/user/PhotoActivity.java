@@ -55,15 +55,21 @@ public class PhotoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.photo_activity);
 
+        /**
+         * Get view references
+         */
         toolbar = (Toolbar) findViewById(R.id.main_toolbar_id);
         titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
-        titleTextView.setText(getString(R.string.title_activity_user_detail));
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-
         photoImageView = (ImageView) findViewById(R.id.photo_image_view_id);
         addPhotoButton = (Button) findViewById(R.id.photo_add_button_id);
 
+        /**
+         * Set view data
+         */
+        titleTextView.setText(getString(R.string.title_activity_user_detail));
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        
         addPhotoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

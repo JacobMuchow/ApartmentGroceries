@@ -27,24 +27,31 @@ public class SignUpActivity extends AppCompatActivity {
     /*
         References
      */
+    private Toolbar toolbar;
+    private TextView titleTextView;
     private EditText usernameEditText;
     private EditText passwordEditText;
     private EditText confirmPasswordEditText;
     private Button signUpButton;
-    private Toolbar toolbar;
-    private TextView titleTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sign_up_activity);
 
+        /**
+         * Get view references
+         */
+        toolbar = (Toolbar) findViewById(R.id.main_toolbar_id);
+        titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
         usernameEditText = (EditText) findViewById(R.id.sign_up_username_id);
         passwordEditText = (EditText) findViewById(R.id.sign_up_password_id);
         confirmPasswordEditText = (EditText) findViewById(R.id.sign_up_confirm_password_id);
         signUpButton = (Button) findViewById(R.id.sign_up_submit_button_id);
-        toolbar = (Toolbar) findViewById(R.id.main_toolbar_id);
-        titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
+
+        /**
+         * Set view data
+         */
         titleTextView.setText(getString(R.string.title_activity_signup));
 
         signUpButton.setOnClickListener(new View.OnClickListener() {

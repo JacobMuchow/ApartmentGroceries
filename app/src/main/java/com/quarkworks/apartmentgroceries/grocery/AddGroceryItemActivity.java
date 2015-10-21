@@ -35,14 +35,20 @@ public class AddGroceryItemActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_grocery_activity);
 
+        /**
+         * Get view references
+         */
         toolbar = (Toolbar) findViewById(R.id.main_toolbar_id);
         titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
+        groceryItemNameEditText = (EditText) findViewById(R.id.add_grocery_item_name_id);
+        addButton = (Button) findViewById(R.id.add_grocery_item_add_button_id);
+
+        /**
+         * Set view data
+         */
         titleTextView.setText(getString(R.string.title_activity_add_grocery_item));
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-        groceryItemNameEditText = (EditText) findViewById(R.id.add_grocery_item_name_id);
-        addButton = (Button) findViewById(R.id.add_grocery_item_add_button_id);
 
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override

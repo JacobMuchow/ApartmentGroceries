@@ -25,24 +25,31 @@ public class LoginActivity extends AppCompatActivity {
     /*
         References
      */
+    private Toolbar toolbar;
+    private TextView titleTextView;
     private EditText usernameEditText;
     private EditText passwordEditText;
     private Button loginButton;
     private TextView signUpTextView;
-    private Toolbar toolbar;
-    private TextView titleTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_activity);
 
+        /**
+         * Get view references
+         */
+        toolbar = (Toolbar) findViewById(R.id.main_toolbar_id);
+        titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
         usernameEditText = (EditText) findViewById(R.id.login_activity_username_id);
         passwordEditText = (EditText) findViewById(R.id.login_activity_password_id);
         loginButton = (Button) findViewById(R.id.login_activity_login_button_id);
         signUpTextView = (TextView) findViewById(R.id.login_activity_sign_up_id);
-        toolbar = (Toolbar) findViewById(R.id.main_toolbar_id);
-        titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
+
+        /**
+         * Set view data
+         */
         titleTextView.setText(getString(R.string.title_activity_login));
 
         loginButton.setOnClickListener(new View.OnClickListener() {
