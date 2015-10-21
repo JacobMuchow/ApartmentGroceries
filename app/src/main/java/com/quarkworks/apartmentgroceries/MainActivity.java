@@ -17,8 +17,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
-        SharedPreferences sharedPreferences = getApplication()
-                .getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
+        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
         String sessionToken = sharedPreferences.getString(SyncUser.JsonKeys.GROUP_ID, null);
 
         Intent intent;

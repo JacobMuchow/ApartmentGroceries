@@ -3,6 +3,7 @@ package com.quarkworks.apartmentgroceries.service;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.quarkworks.apartmentgroceries.MyApplication;
@@ -28,6 +29,9 @@ public class SyncUser {
         public static final String SESSION_TOKEN = "sessionToken";
         public static final String USERNAME = "username";
         public static final String USER_ID = "userId";
+        public static final String UPDATED_AT = "updatedAt";
+        public static final String PHOTO = "photo";
+        public static final String URL = "url";
     }
 
     public static Promise login(String username, String password) {
@@ -47,6 +51,11 @@ public class SyncUser {
                     String sessionToken = jsonObject.getString(JsonKeys.SESSION_TOKEN);
                     String username = jsonObject.getString(JsonKeys.USERNAME);
                     String userId = jsonObject.getString(JsonKeys.OBJECT_ID);
+                    JSONObject photoObj = jsonObject.optJSONObject(JsonKeys.PHOTO);
+                    String photoUrl = null;
+                    if (photoObj != null) {
+                        photoUrl = photoObj.getString(JsonKeys.URL);
+                    }
 
                     Context context = MyApplication.getContext();
                     SharedPreferences sharedPreferences = context
@@ -55,6 +64,9 @@ public class SyncUser {
                     editor.putString(JsonKeys.SESSION_TOKEN, sessionToken);
                     editor.putString(JsonKeys.USERNAME, username);
                     editor.putString(JsonKeys.USER_ID, userId);
+                    if (!TextUtils.isEmpty(photoUrl)) {
+                        editor.putString(JsonKeys.URL, photoUrl);
+                    }
 
                     JSONObject groupIdObj = jsonObject.optJSONObject(JsonKeys.GROUP_ID);
                     if (groupIdObj != null) {
@@ -186,15 +198,11 @@ public class SyncUser {
                 }
 
                 try {
-                    String groupId = jsonObject.getJSONObject(JsonKeys.GROUP_ID)
-                            .getString(JsonKeys.OBJECT_ID);
-                    Context context = MyApplication.getContext();
-                    SharedPreferences sharedPreferences = context
-                            .getSharedPreferences(context.getString(R.string.login_or_sign_up_session), 0);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString(JsonKeys.GROUP_ID, groupId);
-                    editor.commit();
-
+                    // after joining group successfully, we will get something like
+                    // {"updatedAt":"2015-10-20T05:49:21.524Z"}
+                    Log.d(TAG, jsonObject.toString());
+                    String groupId = jsonObject.getString(JsonKeys.UPDATED_AT);
+                    // TODO: do something
                     promise.onSuccess();
                 } catch (JSONException e) {
                     Log.e(TAG, "joining group failure", e);
@@ -205,6 +213,66 @@ public class SyncUser {
 
         UrlTemplate template = UrlTemplateCreator.joinGroup(userId, groupId);
         new NetworkRequest(template, callback).execute();
+        return promise;
+    }
+
+    public static Promise uploadProfilePhoto(String photoName, byte[] data) {
+
+        final Promise promise = new Promise();
+
+        NetworkRequest.Callback callback = new NetworkRequest.Callback() {
+            @Override
+            public void done(@Nullable JSONObject jsonObject) {
+                if (jsonObject == null) {
+                    Log.e(TAG, "Error getting uploading photo response json");
+                    promise.onFailure();
+                    return;
+                }
+                Log.d(TAG, "uploading image response:" + jsonObject.toString());
+                try {
+                    String photoName = jsonObject.getString("name");
+                    // parse photo json, get photo "name" and update user photo
+                    // TODO: refactor using bolts
+                    SharedPreferences sharedPreferences =
+                            MyApplication.getContext().getSharedPreferences(
+                                    MyApplication.getContext()
+                                            .getString(R.string.login_or_sign_up_session), 0);
+                    String userId = sharedPreferences.getString(SyncUser.JsonKeys.USER_ID, null);
+                    NetworkRequest.Callback callbackUpdateProfilePhoto = new NetworkRequest.Callback() {
+                        @Override
+                        public void done(@Nullable JSONObject jsonObject) {
+                            if (jsonObject == null) {
+                                Log.e(TAG, "Error getting updating photo response json");
+                                promise.onFailure();
+                                return;
+                            }
+
+                            Log.d(TAG, "updating image response:" + jsonObject.toString());
+
+                            try {
+                                String updatedAt = jsonObject.getString(JsonKeys.UPDATED_AT);
+                                if (!TextUtils.isEmpty(updatedAt)) {
+                                    promise.onSuccess();
+                                }
+                            } catch (JSONException e) {
+                                Log.e(TAG, "Error parsing updating user photo response json", e);
+                                promise.onFailure();
+                            }
+                        }
+                    };
+
+                    UrlTemplate templateUpdateProfilePhoto = UrlTemplateCreator.updateProfilePhoto(userId, photoName);
+                    new NetworkRequest(templateUpdateProfilePhoto, callbackUpdateProfilePhoto).execute();
+                } catch (JSONException e) {
+                    Log.e(TAG, "uploading photo failure", e);
+                    promise.onFailure();
+                }
+            }
+        };
+
+        UrlTemplate template = UrlTemplateCreator.uploadProfilePhoto(photoName, data);
+        new NetworkRequest(template, callback).execute();
+
         return promise;
     }
 }

@@ -27,6 +27,7 @@ public class UrlTemplateCreator {
     public static final String INCLUDE = "include";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
+    public static final String OBJECT_ID = "objectId";
 
 
     public static UrlTemplate login(String username, String password) {
@@ -50,7 +51,7 @@ public class UrlTemplateCreator {
     public static UrlTemplate logout() {
         String url = baseUrl + "logout";
 
-        return new UrlTemplate(GET, url, null);
+        return new UrlTemplate(POST, url, null);
     }
 
     public static UrlTemplate getAllGroceryItems() {
@@ -97,6 +98,26 @@ public class UrlTemplateCreator {
 
         params.put("name", rGroceryItem.getName());
 
+        JSONObject groupIdObj=new JSONObject();
+        try {
+            groupIdObj.put("__type", "Pointer");
+            groupIdObj.put("className", "Group");
+            groupIdObj.put("objectId", rGroceryItem.getGroupId());
+            params.put("groupId", groupIdObj.toString());
+        } catch (JSONException e) {
+            Log.d(TAG, "Error creating group id object for where in addGroceryItem", e);
+        }
+
+        JSONObject createdByObj = new JSONObject();
+        try {
+            createdByObj.put("__type", "Pointer");
+            createdByObj.put("className", "_User");
+            createdByObj.put("objectId", rGroceryItem.getCreatedBy());
+            params.put("createdBy", createdByObj.toString());
+        } catch (JSONException e) {
+            Log.d(TAG, "Error creating created by object for where in addGroceryItem", e);
+        }
+
         return new UrlTemplate(POST, url, params);
     }
 
@@ -130,5 +151,35 @@ public class UrlTemplateCreator {
         }
 
         return null;
+    }
+
+    public static UrlTemplate updateProfilePhoto(String userId, String photoName) {
+        String url = baseUrl + "users";
+        Map<String, String> params = new HashMap<>();
+        JSONObject photoObject = new JSONObject();
+
+        try {
+            photoObject.put("__type", "File");
+            photoObject.put("name", photoName);
+
+            Log.d(TAG, "photoObject:" + photoObject.toString());
+            params.put("photo", photoObject.toString());
+            params.put("objectId", userId);
+
+            return new UrlTemplate(PUT, url, params, true);
+
+        } catch (JSONException e) {
+            Log.d(TAG, "Error creating photo object for where clause in updateProfilePhoto()", e);
+        }
+
+        return null;
+    }
+
+    public static UrlTemplate uploadProfilePhoto(String photoName, byte[] content) {
+        String url = baseUrl + "files/" + photoName;
+        Map<String, byte[]> params = new HashMap<>();
+        params.put("content", content);
+
+        return new UrlTemplate(POST, url, null, params, false);
     }
 }
