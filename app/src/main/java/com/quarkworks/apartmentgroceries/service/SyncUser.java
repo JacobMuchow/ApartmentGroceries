@@ -38,28 +38,27 @@ public class SyncUser {
         public static final String URL = "url";
     }
 
-    public static Promise login(String username, String password) {
+    public static Task<Boolean> loginBolts(String username, String password) {
 
-        final Promise promise = new Promise();
+        Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
+        UrlTemplate template = UrlTemplateCreator.login(username, password);
+        NetworkRequestBolts networkRequestBolts = new NetworkRequestBolts(template, taskCompletionSource);
 
-        NetworkRequest.Callback callback = new NetworkRequest.Callback() {
+        return networkRequestBolts.runNetworkRequestBolts().continueWith(new Continuation<JSONObject, Boolean>() {
             @Override
-            public void done(@Nullable JSONObject jsonObject) {
-                if (jsonObject == null) {
-                    Log.e(TAG, "Error getting user json object from server");
-                    promise.onFailure();
-                    return;
+            public Boolean then(Task<JSONObject> task) throws Exception {
+                JSONObject loginJsonObj = task.getResult();
+
+                if (loginJsonObj == null) {
+                    Log.e(TAG, "Error login");
+                    return null;
                 }
 
                 try {
-                    String sessionToken = jsonObject.getString(JsonKeys.SESSION_TOKEN);
-                    String username = jsonObject.getString(JsonKeys.USERNAME);
-                    String userId = jsonObject.getString(JsonKeys.OBJECT_ID);
-                    JSONObject photoObj = jsonObject.optJSONObject(JsonKeys.PHOTO);
-                    String photoUrl = null;
-                    if (photoObj != null) {
-                        photoUrl = photoObj.getString(JsonKeys.URL);
-                    }
+
+                    String sessionToken = loginJsonObj.getString(JsonKeys.SESSION_TOKEN);
+                    String username = loginJsonObj.getString(JsonKeys.USERNAME);
+                    String userId = loginJsonObj.getString(JsonKeys.OBJECT_ID);
 
                     Context context = MyApplication.getContext();
                     SharedPreferences sharedPreferences = context
@@ -68,28 +67,22 @@ public class SyncUser {
                     editor.putString(JsonKeys.SESSION_TOKEN, sessionToken);
                     editor.putString(JsonKeys.USERNAME, username);
                     editor.putString(JsonKeys.USER_ID, userId);
-                    if (!TextUtils.isEmpty(photoUrl)) {
-                        editor.putString(JsonKeys.URL, photoUrl);
-                    }
 
-                    JSONObject groupIdObj = jsonObject.optJSONObject(JsonKeys.GROUP_ID);
+                    JSONObject groupIdObj = loginJsonObj.optJSONObject(JsonKeys.GROUP_ID);
                     if (groupIdObj != null) {
                         String groupId = groupIdObj.optString(JsonKeys.OBJECT_ID);
                         editor.putString(JsonKeys.GROUP_ID, groupId);
                     }
                     editor.commit();
-                    promise.onSuccess();
+                    return true;
 
                 } catch (JSONException e) {
                     Log.e(TAG, "login failure", e);
-                    promise.onFailure();
                 }
-            }
-        };
 
-        UrlTemplate template = UrlTemplateCreator.login(username, password);
-        new NetworkRequest(template, callback).execute();
-        return promise;
+                return false;
+            }
+        });
     }
 
     public static Promise logout() {
@@ -112,21 +105,24 @@ public class SyncUser {
         return promise;
     }
 
-    public static Promise signUp(String username, String password) {
+    public static Task<Boolean> signUpBolts(String username, String password) {
 
-        final Promise promise = new Promise();
+        Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
+        UrlTemplate template = UrlTemplateCreator.signUp(username, password);
+        NetworkRequestBolts networkRequestBolts = new NetworkRequestBolts(template, taskCompletionSource);
 
-        NetworkRequest.Callback callback = new NetworkRequest.Callback() {
+        return networkRequestBolts.runNetworkRequestBolts().continueWith(new Continuation<JSONObject, Boolean>() {
             @Override
-            public void done(@Nullable JSONObject jsonObject) {
-                if (jsonObject == null) {
-                    Log.e(TAG, "Error signing up user");
-                    promise.onFailure();
-                    return;
+            public Boolean then(Task<JSONObject> task) throws Exception {
+                JSONObject signUpJsonObj = task.getResult();
+
+                if (signUpJsonObj == null) {
+                    Log.e(TAG, "Error sign up");
+                    return null;
                 }
 
                 try {
-                    String sessionToken = jsonObject.getString(JsonKeys.SESSION_TOKEN);
+                    String sessionToken = signUpJsonObj.getString(JsonKeys.SESSION_TOKEN);
 
                     Context context = MyApplication.getContext();
                     SharedPreferences sharedPreferences = context
@@ -134,18 +130,14 @@ public class SyncUser {
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString(JsonKeys.SESSION_TOKEN, sessionToken);
                     editor.commit();
-
-                    promise.onSuccess();
+                    return true;
                 } catch (JSONException e) {
                     Log.e(TAG, "sign up failure", e);
-                    promise.onFailure();
                 }
-            }
-        };
 
-        UrlTemplate template = UrlTemplateCreator.signUp(username, password);
-        new NetworkRequest(template, callback).execute();
-        return promise;
+                return false;
+            }
+        });
     }
 
     public static Promise getAll() {
