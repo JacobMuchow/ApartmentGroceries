@@ -3,6 +3,7 @@ package com.quarkworks.apartmentgroceries.service;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.quarkworks.apartmentgroceries.MyApplication;
@@ -90,24 +91,25 @@ public class SyncUser {
         });
     }
 
-    public static Promise logout() {
-        final Promise promise = new Promise();
+    public static Task<Boolean> logout() {
 
-        NetworkRequest.Callback callback = new NetworkRequest.Callback() {
+        Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
+        UrlTemplate template = UrlTemplateCreator.logout();
+        NetworkRequestBolts networkRequestBolts = new NetworkRequestBolts(template, taskCompletionSource);
+
+        return networkRequestBolts.runNetworkRequestBolts().continueWith(new Continuation<JSONObject, Boolean>() {
             @Override
-            public void done(@Nullable JSONObject jsonObject) {
-                if (jsonObject == null) {
-                    promise.onSuccess();
+            public Boolean then(Task<JSONObject> task) throws Exception {
+                JSONObject logoutJsonObj = task.getResult();
+
+                if (logoutJsonObj != null && logoutJsonObj.toString().equals("{}")) {
+                    return true;
                 } else {
-                    Log.e(TAG, "Error login out");
-                    promise.onFailure();
+                    Log.e(TAG, "Error logout");
+                    return false;
                 }
             }
-        };
-
-        UrlTemplate template = UrlTemplateCreator.logout();
-        new NetworkRequest(template, callback).execute();
-        return promise;
+        });
     }
 
     public static Task<Boolean> signUpBolts(String username, String password) {
@@ -145,26 +147,27 @@ public class SyncUser {
         });
     }
 
-    public static Promise getAll() {
+    public static Task<Void> getAll(){
 
-        final Promise promise = new Promise();
+        Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
+        UrlTemplate template = UrlTemplateCreator.getAllUsers();
+        NetworkRequestBolts networkRequestBolts = new NetworkRequestBolts(template, taskCompletionSource);
 
-        NetworkRequest.Callback callback = new NetworkRequest.Callback() {
+        return networkRequestBolts.runNetworkRequestBolts().continueWith(new Continuation<JSONObject, Void>() {
             @Override
-            public void done(@Nullable JSONObject jsonObject) {
+            public Void then(Task<JSONObject> task) throws Exception {
+                JSONObject jsonObject = task.getResult();
                 if (jsonObject == null) {
                     Log.e(TAG, "Error getting users from server");
-                    promise.onFailure();
-                    return;
+                    return null;
                 }
 
-                Realm realm = DataStore.getInstance().getRealm();
+                Realm realm = Realm.getInstance(MyApplication.getContext());
                 realm.beginTransaction();
                 realm.clear(RUser.class);
 
                 try {
                     JSONArray userJsonArray = jsonObject.getJSONArray(JsonKeys.RESULTS);
-
                     for (int i = 0; i < userJsonArray.length(); i++) {
                         RUser rUser = realm.createObject(RUser.class);
                         try {
@@ -191,31 +194,29 @@ public class SyncUser {
                     }
 
                     realm.commitTransaction();
-                    promise.onSuccess();
                 } catch(JSONException e) {
                     Log.e(TAG, "Error get user object from server", e);
                     realm.cancelTransaction();
-                    promise.onFailure();
                 }
-            }
-        };
 
-        UrlTemplate template = UrlTemplateCreator.getAllUsers();
-        new NetworkRequest(template, callback).execute();
-        return promise;
+                return null;
+            }
+        });
     }
 
-    public static Promise joinGroup(String userId, String groupId) {
+    public static Task<Boolean> joinGroup(String userId, String groupId) {
 
-        final Promise promise = new Promise();
+        Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
+        UrlTemplate template = UrlTemplateCreator.joinGroup(userId, groupId);
+        NetworkRequestBolts networkRequestBolts = new NetworkRequestBolts(template, taskCompletionSource);
 
-        NetworkRequest.Callback callback = new NetworkRequest.Callback() {
+        return networkRequestBolts.runNetworkRequestBolts().continueWith(new Continuation<JSONObject, Boolean>() {
             @Override
-            public void done(@Nullable JSONObject jsonObject) {
+            public Boolean then(Task<JSONObject> task) throws Exception {
+                JSONObject jsonObject = task.getResult();
                 if (jsonObject == null) {
                     Log.e(TAG, "Error getting joining group response json");
-                    promise.onFailure();
-                    return;
+                    return false;
                 }
 
                 try {
@@ -223,18 +224,17 @@ public class SyncUser {
                     // {"updatedAt":"2015-10-20T05:49:21.524Z"}
                     Log.d(TAG, jsonObject.toString());
                     String groupId = jsonObject.getString(JsonKeys.UPDATED_AT);
-                    // TODO: do something
-                    promise.onSuccess();
+                    if (!TextUtils.isEmpty(groupId)) {
+                        return true;
+                    } else {
+                        return false;
+                    }
                 } catch (JSONException e) {
                     Log.e(TAG, "joining group failure", e);
-                    promise.onFailure();
+                    return false;
                 }
             }
-        };
-
-        UrlTemplate template = UrlTemplateCreator.joinGroup(userId, groupId);
-        new NetworkRequest(template, callback).execute();
-        return promise;
+        });
     }
 
     public static Task<JSONObject> updateProfilePhoto(String photoName, byte[] data) {
@@ -269,6 +269,7 @@ public class SyncUser {
     }
 
     public static Task<JSONObject> uploadPhoto(String photoName, byte[] data) {
+
         Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
         UrlTemplate template = UrlTemplateCreator.uploadProfilePhoto(photoName, data);
         NetworkRequestBolts networkRequestBolts = new NetworkRequestBolts(template, taskCompletionSource);
@@ -297,6 +298,7 @@ public class SyncUser {
     }
 
     public static Task<RUser> getById(String userId) {
+
         Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
         UrlTemplate template = UrlTemplateCreator.getSingleUser(userId);
         NetworkRequestBolts networkRequestBolts = new NetworkRequestBolts(template, taskCompletionSource);

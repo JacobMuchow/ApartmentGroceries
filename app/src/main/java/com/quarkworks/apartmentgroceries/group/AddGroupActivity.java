@@ -12,9 +12,11 @@ import android.widget.Toast;
 
 import com.quarkworks.apartmentgroceries.MyApplication;
 import com.quarkworks.apartmentgroceries.R;
-import com.quarkworks.apartmentgroceries.service.Promise;
 import com.quarkworks.apartmentgroceries.service.SyncGroup;
 import com.quarkworks.apartmentgroceries.service.models.RGroup;
+
+import bolts.Continuation;
+import bolts.Task;
 
 public class AddGroupActivity extends AppCompatActivity {
     private static final String TAG = AddGroupActivity.class.getSimpleName();
@@ -56,31 +58,26 @@ public class AddGroupActivity extends AppCompatActivity {
 
                     RGroup groupItem = new RGroup();
                     groupItem.setName(groupItemName);
-                    SyncGroup.add(groupItem)
-                            .setCallbacks(addSuccessCallback, addFailureCallback);
+                    SyncGroup.add(groupItem).onSuccess(new Continuation<Boolean, Void>() {
+                        @Override
+                        public Void then(Task<Boolean> task) throws Exception {
+                            if (task.getResult()) {
+                                Intent intent = new Intent(MyApplication.getContext(), GroupActivity.class);
+                                startActivity(intent);
+                                Toast.makeText(getApplicationContext(), getString(R.string.add_group_success),
+                                        Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(getApplicationContext(),
+                                        getString(R.string.add_group_failure), Toast.LENGTH_SHORT).show();
+                            }
+                            return null;
+                        }
+                    });
                 } else {
                     Toast.makeText(getApplicationContext(),
-                            getString(R.string.grocery_item_name_empty), Toast.LENGTH_LONG).show();
+                            getString(R.string.grocery_item_name_empty), Toast.LENGTH_SHORT).show();
                 }
             }
         });
     }
-
-    private Promise.Success addSuccessCallback = new Promise.Success() {
-        @Override
-        public void onSuccess() {
-            Intent intent = new Intent(MyApplication.getContext(), GroupActivity.class);
-            startActivity(intent);
-            Toast.makeText(getApplicationContext(), getString(R.string.add_group_success),
-                    Toast.LENGTH_LONG).show();
-        }
-    };
-
-    private Promise.Failure addFailureCallback = new Promise.Failure() {
-        @Override
-        public void onFailure() {
-            Toast.makeText(getApplicationContext(),
-                    getString(R.string.add_group_failure), Toast.LENGTH_LONG).show();
-        }
-    };
 }

@@ -3,12 +3,17 @@ package com.quarkworks.apartmentgroceries.service;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.quarkworks.apartmentgroceries.MyApplication;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.concurrent.Callable;
+
+import bolts.Continuation;
+import bolts.Task;
 import io.realm.Realm;
 
 /**
@@ -28,20 +33,23 @@ public class SyncGroceryItem {
         private static final String CREATED_AT ="createdAt";
     }
 
-    public static Promise getAll() {
+    public static Task<Void> getAll() {
 
-        final Promise promise = new Promise();
+        Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
+        UrlTemplate template = UrlTemplateCreator.getAllGroceryItems();
+        NetworkRequestBolts networkRequestBolts = new NetworkRequestBolts(template, taskCompletionSource);
 
-        NetworkRequest.Callback callback = new NetworkRequest.Callback() {
+        return networkRequestBolts.runNetworkRequestBolts().onSuccess(new Continuation<JSONObject, Void>() {
             @Override
-            public void done(@Nullable JSONObject jsonObject) {
+            public Void then(Task<JSONObject> task) throws Exception {
+                JSONObject jsonObject = task.getResult();
+
                 if (jsonObject == null) {
                     Log.e(TAG, "Error getting grocery items from server");
-                    promise.onFailure();
-                    return;
+                    return null;
                 }
 
-                Realm realm = DataStore.getInstance().getRealm();
+                Realm realm = Realm.getInstance(MyApplication.getContext());
                 realm.beginTransaction();
                 realm.clear(RGroceryItem.class);
                 Log.d(TAG, jsonObject.toString());
@@ -72,49 +80,43 @@ public class SyncGroceryItem {
                     }
 
                     realm.commitTransaction();
-                    promise.onSuccess();
                 } catch(JSONException e) {
                     Log.e(TAG, "Error getting grocery object from server", e);
                     realm.cancelTransaction();
-                    promise.onFailure();
                 }
+                return null;
             }
-        };
-
-        UrlTemplate template = UrlTemplateCreator.getAllGroceryItems();
-        new NetworkRequest(template, callback).execute();
-        return promise;
+        });
     }
 
-    public static Promise add(RGroceryItem rGroceryItem) {
+    public static Task<Boolean> add(RGroceryItem rGroceryItem) {
 
-        final Promise promise = new Promise();
+        Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
+        UrlTemplate template = UrlTemplateCreator.addGroceryItem(rGroceryItem);
+        NetworkRequestBolts networkRequestBolts = new NetworkRequestBolts(template, taskCompletionSource);
 
-        NetworkRequest.Callback callback = new NetworkRequest.Callback() {
+        return networkRequestBolts.runNetworkRequestBolts().continueWith(new Continuation<JSONObject, Boolean>() {
             @Override
-            public void done(@Nullable JSONObject jsonObject) {
+            public Boolean then(Task<JSONObject> task) throws Exception {
+                JSONObject jsonObject = task.getResult();
+
                 if (jsonObject == null) {
                     Log.e(TAG, "Error adding grocery object");
-                    promise.onFailure();
-                    return;
+                    return false;
                 }
 
                 try {
                     String groceryId = jsonObject.getString(JsonKeys.OBJECT_ID);
                     if (!groceryId.isEmpty()) {
-                        promise.onSuccess();
+                        return true;
                     } else {
-                        promise.onFailure();
+                        return false;
                     }
                 } catch (JSONException e) {
                     Log.e(TAG, "adding grocery failed", e);
-                    promise.onFailure();
+                    return false;
                 }
             }
-        };
-
-        UrlTemplate template = UrlTemplateCreator.addGroceryItem(rGroceryItem);
-        new NetworkRequest(template, callback).execute();
-        return promise;
+        });
     }
 }

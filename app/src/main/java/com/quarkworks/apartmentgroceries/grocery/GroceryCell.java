@@ -90,9 +90,8 @@ public class GroceryCell extends RelativeLayout {
                     .centerCrop()
                     .crossFade()
                     .into(photoImageView);
-        } else {
-            SyncUser.getById(rUser.getUserId());
         }
+
         nameTextView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {

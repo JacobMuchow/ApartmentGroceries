@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,6 +23,8 @@ import com.quarkworks.apartmentgroceries.service.SyncUser;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
 import com.quarkworks.apartmentgroceries.user.UserActivity;
 
+import bolts.Continuation;
+import bolts.Task;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 
@@ -98,12 +99,17 @@ public class HomeActivity extends AppCompatActivity {
                 startActivity(intent);
                 return true;
             case R.id.action_logout:
-                SyncUser.logout();
-                SharedPreferences sharedPreferences =
-                        this.getSharedPreferences(getApplication().getString(R.string.login_or_sign_up_session), 0);
-                sharedPreferences.edit().clear().commit();
-                intent = new Intent(this, LoginActivity.class);
-                startActivity(intent);
+                SyncUser.logout().continueWith(new Continuation<Boolean, Void>() {
+                    @Override
+                    public Void then(Task<Boolean> task) throws Exception {
+                        SharedPreferences sharedPreferences =
+                                getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
+                        sharedPreferences.edit().clear().commit();
+                        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                        startActivity(intent);
+                        return null;
+                    }
+                });
                 return true;
         }
 
