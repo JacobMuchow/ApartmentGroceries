@@ -4,10 +4,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.quarkworks.apartmentgroceries.MyApplication;
@@ -25,9 +27,11 @@ public class SignUpActivity extends AppCompatActivity {
     /*
         References
      */
+    private Toolbar toolbar;
+    private TextView titleTextView;
     private EditText usernameEditText;
     private EditText passwordEditText;
-    private EditText secondPasswordEditText;
+    private EditText confirmPasswordEditText;
     private Button signUpButton;
 
     @Override
@@ -35,17 +39,27 @@ public class SignUpActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sign_up_activity);
 
+        /**
+         * Get view references
+         */
+        toolbar = (Toolbar) findViewById(R.id.main_toolbar_id);
+        titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
         usernameEditText = (EditText) findViewById(R.id.sign_up_username_id);
         passwordEditText = (EditText) findViewById(R.id.sign_up_password_id);
-        secondPasswordEditText = (EditText) findViewById(R.id.sign_up_second_password_id);
+        confirmPasswordEditText = (EditText) findViewById(R.id.sign_up_confirm_password_id);
         signUpButton = (Button) findViewById(R.id.sign_up_submit_button_id);
+
+        /**
+         * Set view data
+         */
+        titleTextView.setText(getString(R.string.title_activity_signup));
 
         signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 username = usernameEditText.getText().toString();
                 password = passwordEditText.getText().toString();
-                String secondPassword = secondPasswordEditText.getText().toString();
+                String secondPassword = confirmPasswordEditText.getText().toString();
 
                 if (!username.isEmpty() && !password.isEmpty() && !secondPassword.isEmpty()) {
                     if (password.equals(secondPassword)) {

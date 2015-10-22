@@ -11,15 +11,18 @@ import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.TextUtils;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.quarkworks.apartmentgroceries.R;
+import com.quarkworks.apartmentgroceries.service.DataStore;
 import com.quarkworks.apartmentgroceries.service.SyncUser;
+import com.quarkworks.apartmentgroceries.service.models.RUser;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -31,12 +34,20 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import bolts.Continuation;
+import bolts.Task;
+
 public class PhotoActivity extends AppCompatActivity {
     private static final String TAG = PhotoActivity.class.getSimpleName();
 
     private static final int SELECT_PICTURE_REQUEST_CODE = 1;
     private Uri outputFileUri;
 
+    /*
+        References
+     */
+    private Toolbar toolbar;
+    private TextView titleTextView;
     private Button addPhotoButton;
     private ImageView photoImageView;
 
@@ -45,9 +56,21 @@ public class PhotoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.photo_activity);
 
+        /**
+         * Get view references
+         */
+        toolbar = (Toolbar) findViewById(R.id.main_toolbar_id);
+        titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
         photoImageView = (ImageView) findViewById(R.id.photo_image_view_id);
         addPhotoButton = (Button) findViewById(R.id.photo_add_button_id);
 
+        /**
+         * Set view data
+         */
+        titleTextView.setText(getString(R.string.title_activity_user_detail));
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        
         addPhotoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -56,16 +79,17 @@ public class PhotoActivity extends AppCompatActivity {
         });
 
         SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
-        String photoUrl = sharedPreferences.getString(SyncUser.JsonKeys.URL, null);
+        String userId = sharedPreferences.getString(SyncUser.JsonKeys.USER_ID, null);
 
-        if (!TextUtils.isEmpty(photoUrl)) {
-            Glide.with(this)
-                    .load(photoUrl)
-                    .centerCrop()
-                    .crossFade()
-                    .into(photoImageView);
-        }
+        final RUser rUser = DataStore.getInstance().getRealm().where(RUser.class)
+                .equalTo(SyncUser.JsonKeys.USER_ID, userId).findFirst();
 
+        Glide.with(this)
+                .load(rUser.getUrl())
+                .placeholder(R.drawable.ic_launcher)
+                .centerCrop()
+                .crossFade()
+                .into(photoImageView);
     }
 
     private void openImageIntent() {
@@ -133,7 +157,7 @@ public class PhotoActivity extends AppCompatActivity {
                     try {
                         String photoName = dateToString(new Date(), getString(R.string.photo_date_format_string));
                         inputData = getBytes(inputStream);
-                        SyncUser.uploadProfilePhoto(photoName + ".jpg", inputData);
+                        SyncUser.updateProfilePhoto(photoName + ".jpg", inputData);
                     } catch (IOException e) {
                         Log.e(TAG, "Error reading image byte data from uri");
                     }

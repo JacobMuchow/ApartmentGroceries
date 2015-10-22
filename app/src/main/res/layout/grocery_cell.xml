@@ -1,51 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto">
+    android:layout_height="100dp"
+    android:layout_marginTop="@dimen/grocery_cell_margin"
+    android:layout_marginLeft="@dimen/grocery_cell_margin"
+    android:layout_marginRight="@dimen/grocery_cell_margin"
+    android:layout_marginBottom="1dp">
+
+    <!-- photo -->
+    <ImageView
+        android:id="@+id/grocery_cell_created_by_image_view_id"
+        android:layout_width="@dimen/grocery_cell_photo_width_height"
+        android:layout_height="@dimen/grocery_cell_photo_width_height"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:padding="1dp"/>
+
+    <!-- photo mask -->
+    <View
+        android:layout_width="@dimen/grocery_cell_photo_width_height"
+        android:layout_height="@dimen/grocery_cell_photo_width_height"
+        android:layout_alignLeft="@+id/grocery_cell_created_by_image_view_id"
+        android:layout_alignTop="@+id/grocery_cell_created_by_image_view_id"
+        android:layout_margin="0dp"
+        android:background="@drawable/photo_mask"/>
 
     <!-- created by -->
     <TextView
         android:id="@+id/grocery_cell_created_by_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"/>
+        android:padding="@dimen/margin_padding_medium"
+        android:layout_toRightOf="@+id/grocery_cell_created_by_image_view_id"
+        android:layout_toEndOf="@+id/grocery_cell_created_by_image_view_id" />
 
-    <android.support.v7.widget.CardView
-        android:id="@+id/grocery_card_view_id"
+    <!-- created at -->
+    <TextView
+        android:id="@+id/grocery_cell_created_at_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/grocery_cell_created_by_id"
+        android:layout_alignParentRight="true"/>
+
+    <!-- grocery name -->
+    <TextView
+        android:id="@+id/grocery_cell_grocery_name_id"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/grocery_cell_created_by_id"
+        android:padding="@dimen/margin_padding_medium"
+        android:layout_marginTop="@dimen/margin_padding_tiny"
+        android:layout_below="@+id/grocery_cell_created_by_image_view_id"
         android:layout_gravity="center"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="10dp"
+        android:background="@drawable/rectangle_border"/>
 
-        card_view:cardCornerRadius="4dp"
-        card_view:cardElevation="0dp">
+    <!-- status -->
+    <TextView
+        android:id="@+id/grocery_cell_grocery_status_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/grocery_cell_grocery_name_id"/>
 
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <!-- grocery name -->
-            <TextView
-                android:id="@+id/grocery_cell_grocery_name_id"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:layout_weight="1"/>
-
-            <!-- purchased by -->
-            <TextView
-                android:id="@+id/grocery_cell_purchased_by_id"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:layout_weight="1"
-                android:gravity="right"/>
-
-        </LinearLayout>
-    </android.support.v7.widget.CardView>
+    <!-- purchased by -->
+    <TextView
+        android:id="@+id/grocery_cell_purchased_by_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/grocery_cell_grocery_status_id"
+        android:layout_alignParentRight="true"/>
 
 </RelativeLayout>

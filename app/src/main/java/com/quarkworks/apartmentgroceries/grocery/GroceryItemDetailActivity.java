@@ -26,6 +26,9 @@ public class GroceryItemDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.grocery_item_detail_activity);
 
+        /**
+         * Get view references
+         */
         createdByTextView = (TextView) findViewById(R.id.grocery_item_detail_created_id);
         groceryItemNameTextView = (TextView) findViewById(R.id.grocery_item_detail_name_id);
         groupNameTextView = (TextView) findViewById(R.id.grocery_item_detail_group_id);
@@ -34,6 +37,9 @@ public class GroceryItemDetailActivity extends AppCompatActivity {
         RGroceryItem groceryItem = DataStore.getInstance().getRealm()
                 .where(RGroceryItem.class).equalTo("groceryId", groceryId).findFirst();
 
+        /**
+         * Set view data
+         */
         createdByTextView.setText(groceryItem.getCreatedBy());
         groceryItemNameTextView.setText(groceryItem.getName());
         groupNameTextView.setText(groceryItem.getGroupName());

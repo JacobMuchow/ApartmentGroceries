@@ -182,4 +182,10 @@ public class UrlTemplateCreator {
 
         return new UrlTemplate(POST, url, null, params, false);
     }
+
+    public static UrlTemplate getSingleUser(String userId) {
+        String url = baseUrl + "users" + "/" + userId;
+
+        return new UrlTemplate(GET, url, null);
+    }
 }

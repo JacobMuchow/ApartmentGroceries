@@ -3,9 +3,11 @@ package com.quarkworks.apartmentgroceries.group;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.quarkworks.apartmentgroceries.MyApplication;
@@ -17,6 +19,11 @@ import com.quarkworks.apartmentgroceries.service.models.RGroup;
 public class AddGroupActivity extends AppCompatActivity {
     private static final String TAG = AddGroupActivity.class.getSimpleName();
 
+    /*
+        References
+     */
+    private Toolbar toolbar;
+    private TextView titleTextView;
     private EditText groupNameEditText;
     private Button addGroupButton;
 
@@ -24,8 +31,21 @@ public class AddGroupActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_group_activity);
+
+        /**
+         * Get view references
+         */
+        toolbar = (Toolbar) findViewById(R.id.main_toolbar_id);
+        titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
         groupNameEditText = (EditText) findViewById(R.id.add_group_name_id);
         addGroupButton = (Button) findViewById(R.id.add_group_add_button_id);
+
+        /**
+         * Set view data
+         */
+        titleTextView.setText(getString(R.string.title_activity_add_group));
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         addGroupButton.setOnClickListener(new View.OnClickListener() {
             @Override
