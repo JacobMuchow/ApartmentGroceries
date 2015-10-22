@@ -15,9 +15,11 @@ import android.widget.Toast;
 import com.quarkworks.apartmentgroceries.MyApplication;
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.main.HomeActivity;
-import com.quarkworks.apartmentgroceries.service.Promise;
 import com.quarkworks.apartmentgroceries.service.SyncUser;
 import com.quarkworks.apartmentgroceries.service.models.RGroup;
+
+import bolts.Continuation;
+import bolts.Task;
 
 /**
  * Created by zz on 10/16/15.
@@ -74,29 +76,24 @@ public class GroupCell extends RelativeLayout{
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString(SyncUser.JsonKeys.GROUP_ID, group.getGroupId());
                 editor.commit();
-                SyncUser.joinGroup(userId, group.getGroupId())
-                        .setCallbacks(joinGroupSuccessCallback, joinGroupFailureCallback);
+                SyncUser.joinGroup(userId, group.getGroupId()).onSuccess(new Continuation<Boolean, Void>() {
+                    @Override
+                    public Void then(Task<Boolean> task) throws Exception {
+                        if (task.getResult()) {
+                            Intent intent = new Intent(getContext(), HomeActivity.class);
+                            getContext().startActivity(intent);
+                            Toast.makeText(MyApplication.getContext(),
+                                    MyApplication.getContext().getString(R.string.join_group_success),
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(MyApplication.getContext(),
+                                    MyApplication.getContext().getString(R.string.join_group_failure),
+                                    Toast.LENGTH_LONG).show();
+                        }
+                        return null;
+                    }
+                }, Task.UI_THREAD_EXECUTOR);
             }
         });
     }
-
-    private Promise.Success joinGroupSuccessCallback = new Promise.Success() {
-        @Override
-        public void onSuccess() {
-            Intent intent = new Intent(getContext(), HomeActivity.class);
-            getContext().startActivity(intent);
-            Toast.makeText(MyApplication.getContext(),
-                    MyApplication.getContext().getString(R.string.join_group_success),
-                    Toast.LENGTH_SHORT).show();
-        }
-    };
-
-    private Promise.Failure joinGroupFailureCallback = new Promise.Failure() {
-        @Override
-        public void onFailure() {
-            Toast.makeText(MyApplication.getContext(),
-                    MyApplication.getContext().getString(R.string.join_group_failure),
-                    Toast.LENGTH_LONG).show();
-        }
-    };
 }

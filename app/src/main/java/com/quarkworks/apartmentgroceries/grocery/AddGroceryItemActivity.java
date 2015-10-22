@@ -14,10 +14,12 @@ import android.widget.Toast;
 import com.quarkworks.apartmentgroceries.MyApplication;
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.main.HomeActivity;
-import com.quarkworks.apartmentgroceries.service.Promise;
 import com.quarkworks.apartmentgroceries.service.SyncGroceryItem;
 import com.quarkworks.apartmentgroceries.service.SyncUser;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
+
+import bolts.Continuation;
+import bolts.Task;
 
 public class AddGroceryItemActivity extends AppCompatActivity {
     private static final String TAG = AddGroceryItemActivity.class.getSimpleName();
@@ -67,32 +69,27 @@ public class AddGroceryItemActivity extends AppCompatActivity {
                     rGroceryItem.setName(groceryItemName);
                     rGroceryItem.setGroupId(groupId);
                     rGroceryItem.setCreatedBy(userId);
-                    SyncGroceryItem.add(rGroceryItem)
-                            .setCallbacks(addSuccesCallback, addFailureCallback);
+                    SyncGroceryItem.add(rGroceryItem).onSuccess(new Continuation<Boolean, Void>() {
+                        @Override
+                        public Void then(Task<Boolean> task) throws Exception {
+                            if (task.getResult()) {
+                                Intent intent = new Intent(MyApplication.getContext(), HomeActivity.class);
+                                startActivity(intent);
+                                Toast.makeText(getApplicationContext(), getString(R.string.add_grocery_item_success),
+                                        Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(getApplicationContext(),
+                                        getString(R.string.add_grocery_item_failure), Toast.LENGTH_SHORT).show();
+                            }
+                            return null;
+                        }
+                    }, Task.UI_THREAD_EXECUTOR);
                 } else {
                     Toast.makeText(getApplicationContext(),
-                            getString(R.string.grocery_item_name_empty), Toast.LENGTH_LONG).show();
+                            getString(R.string.grocery_item_name_empty), Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
     }
-
-    private Promise.Success addSuccesCallback = new Promise.Success() {
-        @Override
-        public void onSuccess() {
-            Intent intent = new Intent(MyApplication.getContext(), HomeActivity.class);
-            startActivity(intent);
-            Toast.makeText(getApplicationContext(), getString(R.string.add_grocery_item_success),
-                    Toast.LENGTH_LONG).show();
-        }
-    };
-
-    private Promise.Failure addFailureCallback = new Promise.Failure() {
-        @Override
-        public void onFailure() {
-            Toast.makeText(getApplicationContext(),
-                    getString(R.string.add_grocery_item_failure), Toast.LENGTH_LONG).show();
-        }
-    };
 }
