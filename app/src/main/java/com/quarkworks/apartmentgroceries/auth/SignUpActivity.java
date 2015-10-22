@@ -6,9 +6,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,8 +18,10 @@ import com.quarkworks.apartmentgroceries.MyApplication;
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.group.GroupActivity;
 import com.quarkworks.apartmentgroceries.main.HomeActivity;
-import com.quarkworks.apartmentgroceries.service.Promise;
 import com.quarkworks.apartmentgroceries.service.SyncUser;
+
+import bolts.Continuation;
+import bolts.Task;
 
 public class SignUpActivity extends AppCompatActivity {
     private static final String TAG = SignUpActivity.class.getSimpleName();
@@ -33,6 +37,7 @@ public class SignUpActivity extends AppCompatActivity {
     private EditText passwordEditText;
     private EditText confirmPasswordEditText;
     private Button signUpButton;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +53,7 @@ public class SignUpActivity extends AppCompatActivity {
         passwordEditText = (EditText) findViewById(R.id.sign_up_password_id);
         confirmPasswordEditText = (EditText) findViewById(R.id.sign_up_confirm_password_id);
         signUpButton = (Button) findViewById(R.id.sign_up_submit_button_id);
+        progressBar = (ProgressBar) findViewById(R.id.sign_up_activity_progress_bar_id);
 
         /**
          * Set view data
@@ -63,8 +69,47 @@ public class SignUpActivity extends AppCompatActivity {
 
                 if (!username.isEmpty() && !password.isEmpty() && !secondPassword.isEmpty()) {
                     if (password.equals(secondPassword)) {
-                        SyncUser.signUp(username, password)
-                                .setCallbacks(signUpSuccessCallback, signUpFailureCallback);
+                        progressBar.setVisibility(View.VISIBLE);
+                        SyncUser.signUpBolts(username, password).onSuccess(new Continuation<Boolean, Void>() {
+                            @Override
+                            public Void then(Task<Boolean> task) {
+                                if (task.getResult()) {
+                                    SyncUser.loginBolts(username, password).onSuccess(new Continuation<Boolean, Object>() {
+                                        @Override
+                                        public Void then(Task<Boolean> task) {
+                                            if (task.getResult()) {
+                                                progressBar.setVisibility(View.GONE);
+                                                SharedPreferences sharedPreferences = getApplication()
+                                                        .getSharedPreferences(getApplication().getString(R.string.login_or_sign_up_session), 0);
+                                                String groupId = sharedPreferences.getString(SyncUser.JsonKeys.GROUP_ID, null);
+                                                Intent intent;
+                                                if (TextUtils.isEmpty(groupId)) {
+                                                    intent = new Intent(MyApplication.getContext(), GroupActivity.class);
+                                                    startActivity(intent);
+                                                    Toast.makeText(getApplicationContext(), getString(R.string.login_success_message),
+                                                            Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(getApplicationContext(), getString(R.string.choose_group_message),
+                                                            Toast.LENGTH_SHORT).show();
+                                                } else {
+                                                    intent = new Intent(MyApplication.getContext(), HomeActivity.class);
+                                                    startActivity(intent);
+                                                    Toast.makeText(getApplicationContext(), getString(R.string.login_success_message),
+                                                            Toast.LENGTH_SHORT).show();
+                                                }
+                                            } else {
+                                                Log.e(TAG, "Error login in after sign up");
+                                            }
+                                            return null;
+                                        }
+                                    }, Task.UI_THREAD_EXECUTOR);
+                                } else {
+                                    progressBar.setVisibility(View.GONE);
+                                    Toast.makeText(MyApplication.getContext(),
+                                            getString(R.string.sign_up_failure_message), Toast.LENGTH_SHORT).show();
+                                }
+                                return null;
+                            }
+                        }, Task.UI_THREAD_EXECUTOR);
                     } else {
                         Toast.makeText(getApplicationContext(),
                                 getString(R.string.password_not_match),
@@ -78,43 +123,4 @@ public class SignUpActivity extends AppCompatActivity {
             }
         });
     }
-
-    private Promise.Success signUpSuccessCallback = new Promise.Success() {
-        @Override
-        public void onSuccess() {
-            SyncUser.login(username, password).setSuccessCallack(signUpLoginSuccessCallback);
-        }
-    };
-
-    private Promise.Failure signUpFailureCallback = new Promise.Failure() {
-        @Override
-        public void onFailure() {
-            Toast.makeText(MyApplication.getContext(),
-                    getString(R.string.sign_up_failure_message), Toast.LENGTH_SHORT).show();
-        }
-    };
-
-    private Promise.Success signUpLoginSuccessCallback = new Promise.Success() {
-        @Override
-        public void onSuccess() {
-            SharedPreferences sharedPreferences = getApplication()
-                    .getSharedPreferences(getApplication().getString(R.string.login_or_sign_up_session), 0);
-            String groupId = sharedPreferences.getString(SyncUser.JsonKeys.GROUP_ID, null);
-            Intent intent;
-            if (TextUtils.isEmpty(groupId)) {
-                intent = new Intent(MyApplication.getContext(), GroupActivity.class);
-                startActivity(intent);
-                Toast.makeText(getApplicationContext(), getString(R.string.login_success_message),
-                        Toast.LENGTH_SHORT).show();
-                Toast.makeText(getApplicationContext(), getString(R.string.choose_group_message),
-                        Toast.LENGTH_SHORT).show();
-            } else {
-                intent = new Intent(MyApplication.getContext(), HomeActivity.class);
-                startActivity(intent);
-                Toast.makeText(getApplicationContext(), getString(R.string.login_success_message),
-                        Toast.LENGTH_SHORT).show();
-            }
-
-        }
-    };
 }
