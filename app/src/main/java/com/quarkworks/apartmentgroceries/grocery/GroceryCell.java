@@ -81,14 +81,16 @@ public class GroceryCell extends RelativeLayout {
 
         final RUser rUser = DataStore.getInstance().getRealm().where(RUser.class)
                 .equalTo(SyncUser.JsonKeys.USER_ID, groceryItem.getCreatedBy()).findFirst();
-        createdByTextView.setText(rUser.getUsername());
+        if (rUser != null) {
+            createdByTextView.setText(rUser.getUsername());
 
-        Glide.with(getContext())
-                .load(rUser.getUrl())
-                .placeholder(R.drawable.ic_launcher)
-                .centerCrop()
-                .crossFade()
-                .into(photoImageView);
+            Glide.with(getContext())
+                    .load(rUser.getUrl())
+                    .placeholder(R.drawable.ic_launcher)
+                    .centerCrop()
+                    .crossFade()
+                    .into(photoImageView);
+        }
 
         nameTextView.setOnClickListener(new OnClickListener() {
             @Override
