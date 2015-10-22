@@ -3,7 +3,6 @@ package com.quarkworks.apartmentgroceries.service;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.quarkworks.apartmentgroceries.MyApplication;
@@ -14,15 +13,21 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
 import bolts.Continuation;
 import bolts.Task;
 import io.realm.Realm;
+import io.realm.RealmResults;
 
 /**
  * Created by zz on 10/15/15.
  */
 public class SyncUser {
     private static final String TAG = SyncUser.class.getSimpleName();
+
+    public static final Executor DISK_EXECUTOR = Executors.newCachedThreadPool();
 
     public static final class JsonKeys {
         public static final String GROUP_ID = "groupId";
@@ -233,13 +238,44 @@ public class SyncUser {
     }
 
     public static Task<JSONObject> updateProfilePhoto(String photoName, byte[] data) {
+
+        SharedPreferences sharedPreferences =
+                MyApplication.getContext().getSharedPreferences(
+                        MyApplication.getContext()
+                                .getString(R.string.login_or_sign_up_session), 0);
+        final String userId = sharedPreferences.getString(SyncUser.JsonKeys.USER_ID, null);
+
+        final Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
+
+        uploadPhoto(photoName, data).onSuccess(new Continuation<JSONObject, JSONObject>() {
+            @Override
+            public JSONObject then(Task<JSONObject> task) throws Exception {
+                if (task.isCancelled()) {
+                    return null;
+                } else if (task.isFaulted()) {
+                    throw task.getError();
+                } else {
+                    String photoName = task.getResult().optString("name");
+                    Log.d(TAG, "get new photo name:" + photoName);
+                    final UrlTemplate template = UrlTemplateCreator.updateProfilePhoto(userId, photoName);
+                    new NetworkRequestBolts(template, taskCompletionSource).runNetworkRequestBolts();
+                }
+
+                return null;
+            }
+        });
+
+        return taskCompletionSource.getTask();
+    }
+
+    public static Task<JSONObject> uploadPhoto(String photoName, byte[] data) {
         Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
         UrlTemplate template = UrlTemplateCreator.uploadProfilePhoto(photoName, data);
         NetworkRequestBolts networkRequestBolts = new NetworkRequestBolts(template, taskCompletionSource);
 
-        return networkRequestBolts.runNetworkRequestBolts().continueWith(new Continuation<JSONObject, Task<JSONObject>>() {
+        return networkRequestBolts.runNetworkRequestBolts().onSuccess(new Continuation<JSONObject, JSONObject>() {
             @Override
-            public Task<JSONObject> then(Task<JSONObject> task) throws Exception {
+            public JSONObject then(Task<JSONObject> task) throws Exception {
 
                 if (task.getResult() == null) {
                     Log.e(TAG, "Error getting uploading photo response json");
@@ -248,34 +284,8 @@ public class SyncUser {
 
                 try {
                     String photoName = task.getResult().getString("name");
-                    Log.d(TAG, "first:" + task.getResult().toString());
-                    SharedPreferences sharedPreferences =
-                            MyApplication.getContext().getSharedPreferences(
-                                    MyApplication.getContext()
-                                            .getString(R.string.login_or_sign_up_session), 0);
-                    String userId = sharedPreferences.getString(SyncUser.JsonKeys.USER_ID, null);
-
-                    Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
-                    UrlTemplate template = UrlTemplateCreator.updateProfilePhoto(userId, photoName);
-                    NetworkRequestBolts networkRequestBolts = new NetworkRequestBolts(template, taskCompletionSource);
-
-                    return networkRequestBolts.runNetworkRequestBolts().onSuccess(new Continuation<JSONObject, Void>() {
-                        public Void then(Task<JSONObject> task) throws Exception {
-                            if (task.getResult() == null) {
-                                Log.e(TAG, "Error getting updating photo response json");
-                            }
-
-                            try {
-                                String updatedAt = task.getResult().getString(SyncUser.JsonKeys.UPDATED_AT);
-                                if (!TextUtils.isEmpty(updatedAt)) {
-                                    // on success
-                                }
-                            } catch (JSONException e) {
-                                Log.e(TAG, "Error parsing updating user photo response json", e);
-                            }
-                            return null;
-                        }
-                    });
+                    Log.d(TAG, "uploaded photo name:" + photoName);
+                    return task.getResult();
 
                 } catch (JSONException e) {
                     Log.e(TAG, "uploading photo failure", e);
@@ -287,29 +297,60 @@ public class SyncUser {
     }
 
     public static Task<RUser> getById(String userId) {
-
         Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
         UrlTemplate template = UrlTemplateCreator.getSingleUser(userId);
         NetworkRequestBolts networkRequestBolts = new NetworkRequestBolts(template, taskCompletionSource);
 
         return networkRequestBolts.runNetworkRequestBolts().continueWith(new Continuation<JSONObject, RUser>() {
             @Override
-            public RUser then(Task task) throws Exception {
+            public RUser then(Task<JSONObject> task) throws Exception {
 
-                Log.d(TAG, "jsonString:" + task.getResult().toString());
+                try {
+                    JSONObject userJsonObj = new JSONObject(task.getResult().toString());
 
-                JSONObject userJsonObj = new JSONObject(task.getResult().toString());
-                String userId = userJsonObj.getString(JsonKeys.OBJECT_ID);
-                String username = userJsonObj.getString(JsonKeys.USERNAME);
-                String url = userJsonObj.getJSONObject(JsonKeys.PHOTO).getString(JsonKeys.URL);
+                    RUser rUser = new RUser();
+                    rUser.setUserId(userJsonObj.getString(JsonKeys.OBJECT_ID));
+                    rUser.setUsername(userJsonObj.getString(JsonKeys.USERNAME));
+                    rUser.setEmail(userJsonObj.optString(JsonKeys.EMAIL));
+                    rUser.setPhone(userJsonObj.optString(JsonKeys.PHONE));
 
-                RUser rUser = new RUser();
-                rUser.setUserId(userId);
-                rUser.setUsername(username);
-                rUser.setUrl(url);
+                    JSONObject groupIdObj = userJsonObj.optJSONObject(JsonKeys.GROUP_ID);
+                    if (groupIdObj != null) {
+                        rUser.setGroupId(groupIdObj.getString(JsonKeys.OBJECT_ID));
+                    }
+                    rUser.setPhone(userJsonObj.optString(JsonKeys.PHONE));
+                    JSONObject photoJsonObj = userJsonObj.optJSONObject(JsonKeys.PHOTO);
+                    if (photoJsonObj != null) {
+                        rUser.setUrl(photoJsonObj.getString(JsonKeys.URL));
+                    }
 
-                return rUser;
+                    String userId = rUser.getUserId();
+                    Realm realm = Realm.getInstance(MyApplication.getContext());
+                    RealmResults<RUser> rUsers = realm.where(RUser.class)
+                            .equalTo(SyncUser.JsonKeys.USER_ID, userId).findAll();
+                    if (rUsers != null) {
+                        Realm realmDelete = Realm.getInstance(MyApplication.getContext());
+                        realmDelete.beginTransaction();
+                        for(int i = 0; i < rUsers.size(); i++) {
+                            rUsers.get(i).removeFromRealm();
+                        }
+                        rUsers.clear();
+                        realmDelete.commitTransaction();
+                    }
+
+                    Realm realmInsert = Realm.getInstance(MyApplication.getContext());
+                    realmInsert.beginTransaction();
+                    realmInsert.copyToRealm(rUser);
+                    realmInsert.commitTransaction();
+
+                    return rUser;
+
+                } catch (JSONException e) {
+                    Log.e(TAG, "Error parsing user object", e);
+                }
+
+                return null;
             }
-        });
+        },DISK_EXECUTOR);
     }
 }

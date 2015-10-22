@@ -39,7 +39,7 @@ public class NetworkRequestBolts {
         this.taskCompletionSource = taskCompletionSource;
     }
 
-    public Task runNetworkRequestBolts() {
+    public Task<JSONObject> runNetworkRequestBolts() {
         Task.call(new Callable<Void>() {
             public Void call() {
                 String url = template.getUrl();
@@ -90,7 +90,6 @@ public class NetworkRequestBolts {
                         }
                     }
                     jsonBuilder.append("}");
-                    Log.d(TAG, "jsonBuilder:" + jsonBuilder);
                     MediaType ContentTypeJSON = MediaType.parse("application/json; charset=utf-8");
                     requestBody = RequestBody.create(ContentTypeJSON, jsonBuilder.toString());
                 }
