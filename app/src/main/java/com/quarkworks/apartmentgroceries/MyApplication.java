@@ -21,8 +21,7 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         context = this;
-        RealmConfiguration config = new RealmConfiguration.Builder(context).build();
-        config.shouldDeleteRealmIfMigrationNeeded();
+        RealmConfiguration config = new RealmConfiguration.Builder(context).deleteRealmIfMigrationNeeded().build();
         Realm.setDefaultConfiguration(config);
     }
 
