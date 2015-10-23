@@ -12,17 +12,22 @@ import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.service.DataStore;
 import com.quarkworks.apartmentgroceries.service.SyncUser;
 import com.quarkworks.apartmentgroceries.service.models.RUser;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -70,7 +75,7 @@ public class PhotoActivity extends AppCompatActivity {
         titleTextView.setText(getString(R.string.title_activity_user_detail));
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        
+
         addPhotoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -81,15 +86,16 @@ public class PhotoActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
         String userId = sharedPreferences.getString(SyncUser.JsonKeys.USER_ID, null);
 
-        final RUser rUser = DataStore.getInstance().getRealm().where(RUser.class)
+        RUser rUser = DataStore.getInstance().getRealm().where(RUser.class)
                 .equalTo(SyncUser.JsonKeys.USER_ID, userId).findFirst();
-
         Glide.with(this)
                 .load(rUser.getUrl())
                 .placeholder(R.drawable.ic_launcher)
                 .centerCrop()
                 .crossFade()
                 .into(photoImageView);
+        SyncUser.getById(rUser.getUserId());
+
     }
 
     private void openImageIntent() {
@@ -98,8 +104,7 @@ public class PhotoActivity extends AppCompatActivity {
         Log.d(TAG, directoryName);
         final File root = new File(Environment.getExternalStorageDirectory() + File.separator + directoryName + File.separator);
         root.mkdirs();
-        final String photoName = directoryName;
-        final File sdImageMainDirectory = new File(root, photoName);
+        final File sdImageMainDirectory = new File(root, directoryName);
         outputFileUri = Uri.fromFile(sdImageMainDirectory);
 
         // camera
@@ -146,7 +151,7 @@ public class PhotoActivity extends AppCompatActivity {
                 if (isCamera) {
                     selectedImageUri = outputFileUri;
                 } else {
-                    selectedImageUri = data == null ? null : data.getData();
+                    selectedImageUri = data.getData();
                 }
 
                 InputStream inputStream;
@@ -157,7 +162,29 @@ public class PhotoActivity extends AppCompatActivity {
                     try {
                         String photoName = dateToString(new Date(), getString(R.string.photo_date_format_string));
                         inputData = getBytes(inputStream);
-                        SyncUser.updateProfilePhoto(photoName + ".jpg", inputData);
+                        SyncUser.updateProfilePhoto(photoName + ".jpg", inputData).onSuccess(new Continuation<JSONObject, Void>() {
+                            @Override
+                            public Void then(Task<JSONObject> task) {
+                                try {
+                                    String updatedAt = task.getResult().getString(SyncUser.JsonKeys.UPDATED_AT);
+                                    if (!TextUtils.isEmpty(updatedAt)) {
+                                        Toast.makeText(getApplicationContext(),
+                                                getString(R.string.photo_update_success), Toast.LENGTH_SHORT).show();
+                                        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
+                                        String userId = sharedPreferences.getString(SyncUser.JsonKeys.USER_ID, null);
+
+                                        SyncUser.getById(userId);
+
+                                    } else {
+                                        Toast.makeText(getApplicationContext(),
+                                                getString(R.string.photo_update_failure), Toast.LENGTH_SHORT).show();
+                                    }
+                                } catch (JSONException e) {
+                                    Log.e(TAG, "Error updating photo", e);
+                                }
+                                return null;
+                            }
+                        }, Task.UI_THREAD_EXECUTOR);
                     } catch (IOException e) {
                         Log.e(TAG, "Error reading image byte data from uri");
                     }
