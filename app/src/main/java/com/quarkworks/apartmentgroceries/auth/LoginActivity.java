@@ -64,7 +64,15 @@ public class LoginActivity extends AppCompatActivity {
          */
         titleTextView.setText(getString(R.string.title_activity_login));
 
-        loginButton.setOnClickListener(new View.OnClickListener() {
+        /**
+         * Set view on click
+         */
+        loginButton.setOnClickListener(loginButtonOnClick());
+        signUpTextView.setOnClickListener(signUpOnClick());
+    }
+
+    public View.OnClickListener loginButtonOnClick() {
+        return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String username = usernameEditText.getText().toString();
@@ -79,19 +87,22 @@ public class LoginActivity extends AppCompatActivity {
                             if(task.getResult()) {
                                 SharedPreferences sharedPreferences = getApplication()
                                         .getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
+                                String sessionToken = sharedPreferences.getString(RUser.JsonKeys.SESSION_TOKEN, null);
+                                String userId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
                                 String groupId = sharedPreferences.getString(RUser.JsonKeys.GROUP_ID, null);
-                                Intent intent;
+                                ((MyApplication) MyApplication.getContext()).setSessionToken(sessionToken);
+                                ((MyApplication) MyApplication.getContext()).setUserId(userId);
+                                ((MyApplication) MyApplication.getContext()).setGroupId(groupId);
+
                                 if (TextUtils.isEmpty(groupId)) {
-                                    intent = new Intent(MyApplication.getContext(), GroupActivity.class);
-                                    startActivity(intent);
+                                    GroupActivity.newIntent(LoginActivity.this);
                                     progressBar.setVisibility(View.GONE);
                                     Toast.makeText(getApplicationContext(), getString(R.string.login_success_message),
                                             Toast.LENGTH_SHORT).show();
                                     Toast.makeText(getApplicationContext(), getString(R.string.choose_group_message),
                                             Toast.LENGTH_SHORT).show();
                                 } else {
-                                    intent = new Intent(MyApplication.getContext(), HomeActivity.class);
-                                    startActivity(intent);
+                                    HomeActivity.newIntent(LoginActivity.this);
                                     Toast.makeText(getApplicationContext(), getString(R.string.login_success_message),
                                             Toast.LENGTH_SHORT).show();
                                 }
@@ -112,15 +123,17 @@ public class LoginActivity extends AppCompatActivity {
                             Toast.LENGTH_LONG).show();
                 }
             }
-        });
+        };
+    }
 
-        signUpTextView.setOnClickListener(new View.OnClickListener() {
+    public View.OnClickListener signUpOnClick() {
+        return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
                 startActivity(intent);
             }
-        });
+        };
     }
 
     @Override

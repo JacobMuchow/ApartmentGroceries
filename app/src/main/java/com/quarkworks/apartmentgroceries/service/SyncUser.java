@@ -46,7 +46,6 @@ public class SyncUser {
                 try {
 
                     String sessionToken = loginJsonObj.getString(JsonKeys.SESSION_TOKEN);
-                    String username = loginJsonObj.getString(JsonKeys.USERNAME);
                     String userId = loginJsonObj.getString(JsonKeys.OBJECT_ID);
 
                     Context context = MyApplication.getContext();
@@ -54,13 +53,16 @@ public class SyncUser {
                             .getSharedPreferences(context.getString(R.string.login_or_sign_up_session), 0);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString(JsonKeys.SESSION_TOKEN, sessionToken);
-                    editor.putString(JsonKeys.USERNAME, username);
                     editor.putString(JsonKeys.USER_ID, userId);
+                    editor.putString(JsonKeys.USER_ID, userId);
+                    ((MyApplication) MyApplication.getContext()).setSessionToken(sessionToken);
+                    ((MyApplication) MyApplication.getContext()).setUserId(userId);
 
                     JSONObject groupIdObj = loginJsonObj.optJSONObject(JsonKeys.GROUP_ID);
                     if (groupIdObj != null) {
                         String groupId = groupIdObj.optString(JsonKeys.OBJECT_ID);
                         editor.putString(JsonKeys.GROUP_ID, groupId);
+                        ((MyApplication) MyApplication.getContext()).setGroupId(groupId);
                     }
                     editor.apply();
                     return true;

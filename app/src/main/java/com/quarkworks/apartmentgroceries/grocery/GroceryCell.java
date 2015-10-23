@@ -1,7 +1,6 @@
 package com.quarkworks.apartmentgroceries.grocery;
 
 import android.content.Context;
-import android.content.Intent;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;

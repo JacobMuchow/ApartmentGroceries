@@ -27,7 +27,7 @@ public class SyncGroceryItem {
         UrlTemplate template = UrlTemplateCreator.getAllGroceryItems();
         NetworkRequest networkRequest = new NetworkRequest(template, taskCompletionSource);
 
-        Continuation addGroceryItemsToRealm = new Continuation<JSONObject, Void>() {
+        Continuation<JSONObject, Void> addGroceryItemsToRealm = new Continuation<JSONObject, Void>() {
             @Override
             public Void then(Task<JSONObject> task) throws Exception {
 
@@ -91,7 +91,7 @@ public class SyncGroceryItem {
         UrlTemplate template = UrlTemplateCreator.addGroceryItem(rGroceryItem);
         NetworkRequest networkRequest = new NetworkRequest(template, taskCompletionSource);
 
-        Continuation continuation = new Continuation<JSONObject, Boolean>() {
+        Continuation<JSONObject, Boolean> continuation = new Continuation<JSONObject, Boolean>() {
             @Override
             public Boolean then(Task<JSONObject> task) throws Exception {
                 JSONObject jsonObject = task.getResult();
@@ -103,11 +103,7 @@ public class SyncGroceryItem {
 
                 try {
                     String groceryId = jsonObject.getString(JsonKeys.OBJECT_ID);
-                    if (!groceryId.isEmpty()) {
-                        return true;
-                    } else {
-                        return false;
-                    }
+                    return  !groceryId.isEmpty();
                 } catch (JSONException e) {
                     Log.e(TAG, "adding grocery failed", e);
                     return false;

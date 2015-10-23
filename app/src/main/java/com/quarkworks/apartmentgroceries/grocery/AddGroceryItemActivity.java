@@ -16,7 +16,6 @@ import com.quarkworks.apartmentgroceries.MyApplication;
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.main.HomeActivity;
 import com.quarkworks.apartmentgroceries.service.SyncGroceryItem;
-import com.quarkworks.apartmentgroceries.service.SyncUser;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
 import com.quarkworks.apartmentgroceries.service.models.RUser;
 
@@ -73,14 +72,10 @@ public class AddGroceryItemActivity extends AppCompatActivity {
                 String groceryItemName = groceryItemNameEditText.getText().toString();
 
                 if (!groceryItemName.isEmpty()) {
-                    SharedPreferences sharedPreferences = getApplication()
-                            .getSharedPreferences(getApplication().getString(R.string.login_or_sign_up_session), 0);
-                    String groupId = sharedPreferences.getString("groupId", null);
-                    String userId = sharedPreferences.getString("userId", null);
+                    String groupId = ((MyApplication)MyApplication.getContext()).getGroupId();
+                    String userId = ((MyApplication)MyApplication.getContext()).getUserId();
 
                     RGroceryItem rGroceryItem = new RGroceryItem();
-                    rGroceryItem.setCreatedBy(sharedPreferences.getString(RUser.JsonKeys.USER_ID, null));
-                    rGroceryItem.setGroupId(sharedPreferences.getString(RUser.JsonKeys.GROUP_ID, null));
                     rGroceryItem.setName(groceryItemName);
                     rGroceryItem.setGroupId(groupId);
                     rGroceryItem.setCreatedBy(userId);
@@ -89,8 +84,7 @@ public class AddGroceryItemActivity extends AppCompatActivity {
                         @Override
                         public Void then(Task<Boolean> task) throws Exception {
                             if (task.getResult()) {
-                                Intent intent = new Intent(MyApplication.getContext(), HomeActivity.class);
-                                startActivity(intent);
+                                HomeActivity.newIntent(AddGroceryItemActivity.this);
                                 Toast.makeText(getApplicationContext(), getString(R.string.add_grocery_item_success),
                                         Toast.LENGTH_SHORT).show();
                             } else {

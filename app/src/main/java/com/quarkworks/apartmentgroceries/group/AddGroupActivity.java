@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.quarkworks.apartmentgroceries.MyApplication;
 import com.quarkworks.apartmentgroceries.R;
+import com.quarkworks.apartmentgroceries.main.HomeActivity;
 import com.quarkworks.apartmentgroceries.service.SyncGroup;
 import com.quarkworks.apartmentgroceries.service.models.RGroup;
 
@@ -70,8 +71,7 @@ public class AddGroupActivity extends AppCompatActivity {
                         @Override
                         public Void then(Task<Boolean> task) throws Exception {
                             if (task.getResult()) {
-                                Intent intent = new Intent(MyApplication.getContext(), GroupActivity.class);
-                                startActivity(intent);
+                                HomeActivity.newIntent(AddGroupActivity.this);
                                 Toast.makeText(getApplicationContext(), getString(R.string.add_group_success),
                                         Toast.LENGTH_SHORT).show();
                             } else {

@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -98,7 +97,6 @@ public class PhotoActivity extends AppCompatActivity {
                 .crossFade()
                 .into(photoImageView);
         SyncUser.getById(rUser.getUserId());
-
     }
 
     private void openImageIntent() {

@@ -77,19 +77,19 @@ public class GroupCell extends RelativeLayout{
             @Override
             public void onClick(View v) {
                 SharedPreferences sharedPreferences =
-                        MyApplication.getContext().getSharedPreferences(
-                                MyApplication.getContext()
+                        getContext().getSharedPreferences(getContext()
                                         .getString(R.string.login_or_sign_up_session), 0);
                 String userId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString(RUser.JsonKeys.GROUP_ID, groupId);
                 editor.apply();
+                ((MyApplication)MyApplication.getContext()).setGroupId(groupId);
+
                 Continuation<Boolean, Void> checkJoiningGroup = new Continuation<Boolean, Void>() {
                     @Override
                     public Void then(Task<Boolean> task) throws Exception {
                         if (task.getResult()) {
-                            Intent intent = new Intent(getContext(), HomeActivity.class);
-                            getContext().startActivity(intent);
+                            HomeActivity.newIntent(getContext());
                             Toast.makeText(MyApplication.getContext(),
                                     MyApplication.getContext().getString(R.string.join_group_success),
                                     Toast.LENGTH_SHORT).show();
