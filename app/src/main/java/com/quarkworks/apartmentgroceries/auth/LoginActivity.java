@@ -90,7 +90,7 @@ public class LoginActivity extends AppCompatActivity {
                                     Toast.makeText(getApplicationContext(), getString(R.string.choose_group_message),
                                             Toast.LENGTH_SHORT).show();
                                 } else {
-                                    intent = new Intent(MyApplication.getContext(), GroupActivity.class);
+                                    intent = new Intent(MyApplication.getContext(), HomeActivity.class);
                                     startActivity(intent);
                                     Toast.makeText(getApplicationContext(), getString(R.string.login_success_message),
                                             Toast.LENGTH_SHORT).show();
