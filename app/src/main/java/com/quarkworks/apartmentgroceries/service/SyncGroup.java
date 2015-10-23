@@ -36,7 +36,7 @@ public class SyncGroup {
             @Override
             public Void then(Task<JSONObject> task) throws Exception {
                 if (task.isFaulted()) {
-                    throw task.getError();
+                    Log.e(TAG, "Error in getAll: " + task.getError());
                 } else {
                     JSONObject jsonObject = task.getResult();
                     if (jsonObject == null) {
@@ -67,6 +67,7 @@ public class SyncGroup {
                         Log.e(TAG, "Error parsing group object", e);
                         realm.cancelTransaction();
                     }
+                    realm.close();
                 }
 
                 return null;
@@ -86,6 +87,7 @@ public class SyncGroup {
             @Override
             public Boolean then(Task<JSONObject> task) throws Exception {
                 if (task.isFaulted()) {
+                    Log.e(TAG, "Error in add: " + task.getError());
                     return false;
                 } else {
                     JSONObject jsonObject = task.getResult();

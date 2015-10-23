@@ -32,7 +32,7 @@ public class SyncGroceryItem {
             public Void then(Task<JSONObject> task) throws Exception {
 
                 if (task.isFaulted()) {
-                    throw task.getError();
+                    Log.e(TAG, "Error in getAll: " + task.getError());
                 } else {
 
                     JSONObject jsonObject = task.getResult();
@@ -77,8 +77,10 @@ public class SyncGroceryItem {
                         Log.e(TAG, "Error getting grocery object from server", e);
                         realm.cancelTransaction();
                     }
-                    return null;
+                    realm.close();
                 }
+
+                return null;
             }
         };
 

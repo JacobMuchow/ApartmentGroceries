@@ -1,6 +1,7 @@
 package com.quarkworks.apartmentgroceries.service.models;
 
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 /**
  * Created by zz on 10/14/15.
@@ -17,6 +18,7 @@ public class RGroceryItem extends RealmObject {
         public static final String CREATED_AT ="createdAt";
     }
 
+    @PrimaryKey
     private String groceryId;
     private String name;
     private String groupId;

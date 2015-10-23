@@ -16,10 +16,8 @@ import org.json.JSONObject;
 import bolts.Continuation;
 import bolts.Task;
 import io.realm.Realm;
-import io.realm.RealmResults;
 
 import com.quarkworks.apartmentgroceries.service.models.RUser.JsonKeys;
-import com.quarkworks.apartmentgroceries.service.models.RUser.RealmKeys;
 
 /**
  * Created by zz on 10/15/15.
@@ -111,7 +109,7 @@ public class SyncUser {
             @Override
             public Boolean then(Task<JSONObject> task) throws Exception {
                 if (task.isFaulted()) {
-                    throw task.getError();
+                    Log.e(TAG, "Error in signUp: " + task.getError());
                 } else {
                     JSONObject signUpJsonObj = task.getResult();
 
@@ -132,9 +130,10 @@ public class SyncUser {
                         return true;
                     } catch (JSONException e) {
                         Log.e(TAG, "sign up failure", e);
-                        return false;
                     }
                 }
+
+                return false;
             }
         };
 
@@ -151,7 +150,7 @@ public class SyncUser {
             @Override
             public Void then(Task<JSONObject> task) throws Exception {
                 if (task.isFaulted()) {
-                    throw task.getError();
+                    Log.e(TAG, "Error in getAll: " + task.getError());
                 } else {
                     JSONObject jsonObject = task.getResult();
                     if (jsonObject == null) {
@@ -195,6 +194,7 @@ public class SyncUser {
                         Log.e(TAG, "Error get user object from server", e);
                         realm.cancelTransaction();
                     }
+                    realm.close();
                 }
 
                 return null;
@@ -214,7 +214,7 @@ public class SyncUser {
             @Override
             public Boolean then(Task<JSONObject> task) throws Exception {
                 if (task.isFaulted()) {
-                    throw task.getError();
+                    Log.e(TAG, "Error in joinGroup: " + task.getError());
                 } else {
                     JSONObject jsonObject = task.getResult();
                     if (jsonObject == null) {
@@ -226,9 +226,10 @@ public class SyncUser {
                         return !TextUtils.isEmpty(jsonObject.getString(JsonKeys.UPDATED_AT));
                     } catch (JSONException e) {
                         Log.e(TAG, "joining group failure", e);
-                        return false;
                     }
                 }
+
+                return false;
             }
         };
 
@@ -249,7 +250,7 @@ public class SyncUser {
             @Override
             public JSONObject then(Task<JSONObject> task) throws Exception {
                 if (task.isFaulted()) {
-                    throw task.getError();
+                    Log.e(TAG, "Error in updateProfilePhoto: " + task.getError());
                 } else {
                     String photoName = task.getResult().optString("name");
                     Log.d(TAG, "get new photo name:" + photoName);
@@ -275,19 +276,23 @@ public class SyncUser {
         Continuation<JSONObject, JSONObject> uploadingPhoto = new Continuation<JSONObject, JSONObject>() {
             @Override
             public JSONObject then(Task<JSONObject> task) throws Exception {
+                if (task.isFaulted()) {
+                    Log.e(TAG, "Error in uploadPhoto: " + task.getError());
+                } else {
 
-                if (task.getResult() == null) {
-                    Log.e(TAG, "Error getting uploading photo response json");
-                    return null;
-                }
+                    if (task.getResult() == null) {
+                        Log.e(TAG, "Error getting uploading photo response json");
+                        return null;
+                    }
 
-                try {
-                    String photoName = task.getResult().getString("name");
-                    Log.d(TAG, "uploaded photo name:" + photoName);
-                    return task.getResult();
+                    try {
+                        String photoName = task.getResult().getString("name");
+                        Log.d(TAG, "uploaded photo name:" + photoName);
+                        return task.getResult();
 
-                } catch (JSONException e) {
-                    Log.e(TAG, "uploading photo failure", e);
+                    } catch (JSONException e) {
+                        Log.e(TAG, "uploading photo failure", e);
+                    }
                 }
 
                 return null;
@@ -334,23 +339,11 @@ public class SyncUser {
                             rUser.setUrl(photoJsonObj.getString(JsonKeys.URL));
                         }
 
-                        Realm realm = Realm.getInstance(MyApplication.getContext());
-                        RealmResults<RUser> rUsers = realm.where(RUser.class)
-                                .equalTo(RealmKeys.USER_ID, rUser.getUserId()).findAll();
-                        if (rUsers != null) {
-                            Realm realmDelete = Realm.getInstance(MyApplication.getContext());
-                            realmDelete.beginTransaction();
-                            for (int i = 0; i < rUsers.size(); i++) {
-                                rUsers.get(i).removeFromRealm();
-                            }
-                            rUsers.clear();
-                            realmDelete.commitTransaction();
-                        }
-
                         Realm realmInsert = Realm.getInstance(MyApplication.getContext());
                         realmInsert.beginTransaction();
-                        realmInsert.copyToRealm(rUser);
+                        realmInsert.copyToRealmOrUpdate(rUser);
                         realmInsert.commitTransaction();
+                        realmInsert.close();
 
                         return rUser;
 

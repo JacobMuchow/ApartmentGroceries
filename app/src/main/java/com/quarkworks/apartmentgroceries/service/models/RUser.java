@@ -1,6 +1,7 @@
 package com.quarkworks.apartmentgroceries.service.models;
 
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 /**
  * Created by zz on 10/15/15.
@@ -25,6 +26,7 @@ public class RUser extends RealmObject {
         public static final String USER_ID = "userId";
     }
 
+    @PrimaryKey
     private String userId;
     private String groupId;
     private String username;
