@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.Parcelable;
@@ -140,11 +143,7 @@ public class PhotoActivity extends AppCompatActivity {
                     isCamera = true;
                 } else {
                     final String action = data.getAction();
-                    if (action == null) {
-                        isCamera = false;
-                    } else {
-                        isCamera = action.equals(MediaStore.ACTION_IMAGE_CAPTURE);
-                    }
+                    isCamera = action != null && action.equals(MediaStore.ACTION_IMAGE_CAPTURE);
                 }
 
                 Uri selectedImageUri;
@@ -155,14 +154,20 @@ public class PhotoActivity extends AppCompatActivity {
                 }
 
                 InputStream inputStream;
+                byte[] inputData = null;
                 try {
                     inputStream = getContentResolver().openInputStream(selectedImageUri);
 
-                    byte[] inputData;
+
                     try {
                         String photoName = dateToString(new Date(), getString(R.string.photo_date_format_string));
                         inputData = getBytes(inputStream);
-                        SyncUser.updateProfilePhoto(photoName + ".jpg", inputData).onSuccess(new Continuation<JSONObject, Void>() {
+                        Bitmap bitmap = decodeSampledBitmapFromByteArray(inputData, 0, 400, 400);
+                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                        byte[] sampledInputData = stream.toByteArray();
+
+                        Continuation<JSONObject, Void> checkUpdatingPhoto = new Continuation<JSONObject, Void>() {
                             @Override
                             public Void then(Task<JSONObject> task) {
                                 try {
@@ -170,7 +175,8 @@ public class PhotoActivity extends AppCompatActivity {
                                     if (!TextUtils.isEmpty(updatedAt)) {
                                         Toast.makeText(getApplicationContext(),
                                                 getString(R.string.photo_update_success), Toast.LENGTH_SHORT).show();
-                                        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
+                                        SharedPreferences sharedPreferences =
+                                                getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
                                         String userId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
 
                                         SyncUser.getById(userId);
@@ -184,7 +190,10 @@ public class PhotoActivity extends AppCompatActivity {
                                 }
                                 return null;
                             }
-                        }, Task.UI_THREAD_EXECUTOR);
+                        };
+
+                        SyncUser.updateProfilePhoto(photoName + ".jpg", sampledInputData)
+                                .continueWith(checkUpdatingPhoto, Task.UI_THREAD_EXECUTOR);
                     } catch (IOException e) {
                         Log.e(TAG, "Error reading image byte data from uri");
                     }
@@ -193,7 +202,7 @@ public class PhotoActivity extends AppCompatActivity {
                     Log.e(TAG, "Error file with uri " + selectedImageUri + " not found", e);
                 }
 
-                photoImageView.setImageURI(selectedImageUri);
+                photoImageView.setImageBitmap(decodeSampledBitmapFromByteArray(inputData, 0, 400, 400));
             }
         }
     }
@@ -213,5 +222,37 @@ public class PhotoActivity extends AppCompatActivity {
     private String dateToString (Date date, String format) {
         SimpleDateFormat dateFormat = new SimpleDateFormat(format);
         return dateFormat.format(date);
+    }
+
+    public static Bitmap decodeSampledBitmapFromByteArray(byte[] inputData, int offset,
+                                                         int width, int height) {
+
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeByteArray(inputData, 0, inputData.length, options);
+        options.inSampleSize = calculateInSampleSize(options, width, height);
+        options.inJustDecodeBounds = false;
+
+        return BitmapFactory.decodeByteArray(inputData, 0, inputData.length, options);
+    }
+
+    public static int calculateInSampleSize(
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            while ((halfHeight / inSampleSize) > reqHeight
+                    && (halfWidth / inSampleSize) > reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
     }
 }
