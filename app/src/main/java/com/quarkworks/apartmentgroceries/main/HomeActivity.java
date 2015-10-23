@@ -95,25 +95,13 @@ public class HomeActivity extends AppCompatActivity {
             case R.id.action_add_grocery:
                 AddGroceryItemActivity.newIntent(this);
                 return true;
-            case R.id.action_list_group:
-                GroupActivity.newIntent(this);
-                return true;
             case R.id.action_user:
                 UserActivity.newIntent(this);
                 return true;
-            case R.id.action_logout:
-                Continuation<Boolean, Void> logoutOnSuccess = new Continuation<Boolean, Void>() {
-                    @Override
-                    public Void then(Task<Boolean> task) throws Exception {
-                        SharedPreferences sharedPreferences =
-                                getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
-                        sharedPreferences.edit().clear().apply();
-                        LoginActivity.newIntent(HomeActivity.this);
-                        return null;
-                    }
-                };
-                SyncUser.logout().continueWith(logoutOnSuccess);
+            case R.id.action_settings:
+                SettingActivity.newIntent(HomeActivity.this);
                 return true;
+
         }
 
         return super.onOptionsItemSelected(item);

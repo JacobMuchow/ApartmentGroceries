@@ -1,0 +1,46 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.quarkworks.apartmentgroceries.main.SettingActivity">
+
+    <!-- toolbar -->
+    <include layout="@layout/main_toolbar" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/main_toolbar_id"
+        android:padding="@dimen/margin_padding_medium">
+
+        <!-- group -->
+        <TextView
+            android:id="@+id/setting_group_text_view_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_padding_medium"
+            android:text="@string/title_activity_group"
+            style="@android:style/TextAppearance.Large"/>
+        <View
+            android:id="@+id/setting_group_divider_view_id"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/setting_group_text_view_id"
+            android:background="@android:color/darker_gray"/>
+
+        <!-- logout -->
+        <TextView
+            android:id="@+id/setting_logout_text_view_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/setting_group_divider_view_id"
+            android:layout_margin="@dimen/margin_padding_medium"
+            android:text="@string/action_logout"
+            style="@android:style/TextAppearance.Large"/>
+        <View
+            android:id="@+id/setting_logout_divider_view_id"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/setting_logout_text_view_id"
+            android:background="@android:color/darker_gray"/>
+    </RelativeLayout>
+</RelativeLayout>

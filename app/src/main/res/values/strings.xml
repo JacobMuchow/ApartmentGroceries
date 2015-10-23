@@ -12,9 +12,9 @@
     <string name="action_user">User</string>
     <string name="action_add_grocery">Add grocery</string>
     <string name="action_add_group">Add group</string>
-    <string name="action_list_group">Group</string>
     <string name="action_logout">Logout</string>
     <string name="action_edit_photo">Edit Photo</string>
+    <string name="action_settings">Settings</string>
 
     <!-- activity title -->
     <string name="title_activity_login">Login</string>
@@ -28,6 +28,7 @@
     <string name="title_activity_add_group">Add Group</string>
     <string name="title_activity_user_detail">User Detail</string>
     <string name="title_activity_photo">Photo</string>
+    <string name="title_activity_setting">Setting</string>
 
     <!-- login or sign up-->
     <string name="empty_username_or_password">Please input username and password.</string>
@@ -52,6 +53,7 @@
     <string name="join_group_failure">Joined a group failed</string>
     <string name="photo_update_success">updated photo successfully</string>
     <string name="photo_update_failure">updated photo failed</string>
+
     <!-- photo -->
     <string name="photo_date_format_string">yyyyMMddHHmmss</string>
     <string name="photo_select_source">select source</string>
