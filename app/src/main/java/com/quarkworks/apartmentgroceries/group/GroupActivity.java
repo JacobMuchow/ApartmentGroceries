@@ -1,5 +1,6 @@
 package com.quarkworks.apartmentgroceries.group;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -28,6 +29,11 @@ public class GroupActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private TextView titleTextView;
     public static RealmBaseAdapter<RGroup> groupRealmBaseAdapter;
+
+    public static void newIntent(Context context) {
+        Intent intent = new Intent(context, GroupActivity.class);
+        context.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

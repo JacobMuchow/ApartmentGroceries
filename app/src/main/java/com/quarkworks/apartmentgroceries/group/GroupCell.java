@@ -17,6 +17,7 @@ import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.main.HomeActivity;
 import com.quarkworks.apartmentgroceries.service.SyncUser;
 import com.quarkworks.apartmentgroceries.service.models.RGroup;
+import com.quarkworks.apartmentgroceries.service.models.RUser;
 
 import bolts.Continuation;
 import bolts.Task;
@@ -27,6 +28,8 @@ import bolts.Task;
 public class GroupCell extends RelativeLayout{
 
     private static final String TAG = GroupCell.class.getSimpleName();
+
+    private String groupId;
 
     private TextView nameTextView;
     private Button joinGroupButton;
@@ -53,30 +56,35 @@ public class GroupCell extends RelativeLayout{
     }
 
     public void setViewData(final RGroup group){
+        groupId = group.getGroupId();
         nameTextView.setText(group.getName());
         SharedPreferences sharedPreferences =
                 MyApplication.getContext().getSharedPreferences(
                         MyApplication.getContext()
                                 .getString(R.string.login_or_sign_up_session), 0);
-        final String groupId = sharedPreferences.getString(SyncUser.JsonKeys.GROUP_ID, null);
+        final String groupId = sharedPreferences.getString(RUser.JsonKeys.GROUP_ID, null);
         if (!TextUtils.isEmpty(groupId) && groupId.equals(group.getGroupId())) {
             joinGroupButton.setVisibility(GONE);
         } else {
             joinGroupButton.setVisibility(VISIBLE);
         }
 
-        joinGroupButton.setOnClickListener(new View.OnClickListener() {
+        joinGroupButton.setOnClickListener(joinGroupButtonOnClick());
+    }
+
+    public View.OnClickListener joinGroupButtonOnClick() {
+        return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 SharedPreferences sharedPreferences =
                         MyApplication.getContext().getSharedPreferences(
                                 MyApplication.getContext()
                                         .getString(R.string.login_or_sign_up_session), 0);
-                String userId = sharedPreferences.getString(SyncUser.JsonKeys.USER_ID, null);
+                String userId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString(SyncUser.JsonKeys.GROUP_ID, group.getGroupId());
-                editor.commit();
-                SyncUser.joinGroup(userId, group.getGroupId()).onSuccess(new Continuation<Boolean, Void>() {
+                editor.putString(RUser.JsonKeys.GROUP_ID, groupId);
+                editor.apply();
+                Continuation<Boolean, Void> checkJoiningGroup = new Continuation<Boolean, Void>() {
                     @Override
                     public Void then(Task<Boolean> task) throws Exception {
                         if (task.getResult()) {
@@ -92,8 +100,10 @@ public class GroupCell extends RelativeLayout{
                         }
                         return null;
                     }
-                }, Task.UI_THREAD_EXECUTOR);
+                };
+
+                SyncUser.joinGroup(userId, groupId).onSuccess(checkJoiningGroup, Task.UI_THREAD_EXECUTOR);
             }
-        });
+        };
     }
 }

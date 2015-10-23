@@ -84,10 +84,10 @@ public class PhotoActivity extends AppCompatActivity {
         });
 
         SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
-        String userId = sharedPreferences.getString(SyncUser.JsonKeys.USER_ID, null);
+        String userId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
 
         RUser rUser = DataStore.getInstance().getRealm().where(RUser.class)
-                .equalTo(SyncUser.JsonKeys.USER_ID, userId).findFirst();
+                .equalTo(RUser.RealmKeys.USER_ID, userId).findFirst();
         Glide.with(this)
                 .load(rUser.getUrl())
                 .placeholder(R.drawable.ic_launcher)
@@ -166,12 +166,12 @@ public class PhotoActivity extends AppCompatActivity {
                             @Override
                             public Void then(Task<JSONObject> task) {
                                 try {
-                                    String updatedAt = task.getResult().getString(SyncUser.JsonKeys.UPDATED_AT);
+                                    String updatedAt = task.getResult().getString(RUser.JsonKeys.UPDATED_AT);
                                     if (!TextUtils.isEmpty(updatedAt)) {
                                         Toast.makeText(getApplicationContext(),
                                                 getString(R.string.photo_update_success), Toast.LENGTH_SHORT).show();
                                         SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
-                                        String userId = sharedPreferences.getString(SyncUser.JsonKeys.USER_ID, null);
+                                        String userId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
 
                                         SyncUser.getById(userId);
 

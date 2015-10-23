@@ -19,6 +19,7 @@ import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.group.GroupActivity;
 import com.quarkworks.apartmentgroceries.main.HomeActivity;
 import com.quarkworks.apartmentgroceries.service.SyncUser;
+import com.quarkworks.apartmentgroceries.service.models.RUser;
 
 import bolts.Continuation;
 import bolts.Task;
@@ -28,6 +29,7 @@ public class SignUpActivity extends AppCompatActivity {
 
     private String username;
     private String password;
+
     /*
         References
      */
@@ -60,7 +62,15 @@ public class SignUpActivity extends AppCompatActivity {
          */
         titleTextView.setText(getString(R.string.title_activity_signup));
 
-        signUpButton.setOnClickListener(new View.OnClickListener() {
+        /**
+         * Set view OnClickListener
+         */
+        signUpButton.setOnClickListener(signUpOnClick());
+    }
+
+    private View.OnClickListener signUpOnClick() {
+
+        return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 username = usernameEditText.getText().toString();
@@ -70,38 +80,40 @@ public class SignUpActivity extends AppCompatActivity {
                 if (!username.isEmpty() && !password.isEmpty() && !secondPassword.isEmpty()) {
                     if (password.equals(secondPassword)) {
                         progressBar.setVisibility(View.VISIBLE);
-                        SyncUser.signUpBolts(username, password).onSuccess(new Continuation<Boolean, Void>() {
+                        final Continuation<Boolean, Object> loginOnSuccess = new Continuation<Boolean, Object>() {
                             @Override
                             public Void then(Task<Boolean> task) {
                                 if (task.getResult()) {
-                                    SyncUser.loginBolts(username, password).onSuccess(new Continuation<Boolean, Object>() {
-                                        @Override
-                                        public Void then(Task<Boolean> task) {
-                                            if (task.getResult()) {
-                                                progressBar.setVisibility(View.GONE);
-                                                SharedPreferences sharedPreferences = getApplication()
-                                                        .getSharedPreferences(getApplication().getString(R.string.login_or_sign_up_session), 0);
-                                                String groupId = sharedPreferences.getString(SyncUser.JsonKeys.GROUP_ID, null);
-                                                Intent intent;
-                                                if (TextUtils.isEmpty(groupId)) {
-                                                    intent = new Intent(MyApplication.getContext(), GroupActivity.class);
-                                                    startActivity(intent);
-                                                    Toast.makeText(getApplicationContext(), getString(R.string.login_success_message),
-                                                            Toast.LENGTH_SHORT).show();
-                                                    Toast.makeText(getApplicationContext(), getString(R.string.choose_group_message),
-                                                            Toast.LENGTH_SHORT).show();
-                                                } else {
-                                                    intent = new Intent(MyApplication.getContext(), HomeActivity.class);
-                                                    startActivity(intent);
-                                                    Toast.makeText(getApplicationContext(), getString(R.string.login_success_message),
-                                                            Toast.LENGTH_SHORT).show();
-                                                }
-                                            } else {
-                                                Log.e(TAG, "Error login in after sign up");
-                                            }
-                                            return null;
-                                        }
-                                    }, Task.UI_THREAD_EXECUTOR);
+                                    progressBar.setVisibility(View.GONE);
+                                    SharedPreferences sharedPreferences = getApplication()
+                                            .getSharedPreferences(getApplication().getString(R.string.login_or_sign_up_session), 0);
+                                    String groupId = sharedPreferences.getString(RUser.JsonKeys.GROUP_ID, null);
+                                    Intent intent;
+                                    if (TextUtils.isEmpty(groupId)) {
+                                        intent = new Intent(MyApplication.getContext(), GroupActivity.class);
+                                        startActivity(intent);
+                                        Toast.makeText(getApplicationContext(), getString(R.string.login_success_message),
+                                                Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getApplicationContext(), getString(R.string.choose_group_message),
+                                                Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        intent = new Intent(MyApplication.getContext(), HomeActivity.class);
+                                        startActivity(intent);
+                                        Toast.makeText(getApplicationContext(), getString(R.string.login_success_message),
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                } else {
+                                    Log.e(TAG, "Error login in after sign up");
+                                }
+                                return null;
+                            }
+                        };
+
+                        Continuation<Boolean, Void> signUpOnSuccess = new Continuation<Boolean, Void>() {
+                            @Override
+                            public Void then(Task<Boolean> task) {
+                                if (task.getResult()) {
+                                    SyncUser.loginBolts(username, password).onSuccess(loginOnSuccess, Task.UI_THREAD_EXECUTOR);
                                 } else {
                                     progressBar.setVisibility(View.GONE);
                                     Toast.makeText(MyApplication.getContext(),
@@ -109,7 +121,9 @@ public class SignUpActivity extends AppCompatActivity {
                                 }
                                 return null;
                             }
-                        }, Task.UI_THREAD_EXECUTOR);
+                        };
+
+                        SyncUser.signUp(username, password).continueWith(signUpOnSuccess, Task.UI_THREAD_EXECUTOR);
                     } else {
                         Toast.makeText(getApplicationContext(),
                                 getString(R.string.password_not_match),
@@ -121,6 +135,6 @@ public class SignUpActivity extends AppCompatActivity {
                             Toast.LENGTH_LONG).show();
                 }
             }
-        });
+        };
     }
 }
