@@ -35,7 +35,8 @@ public class GroceryCardPagerFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         groceryId = getArguments().getString(GROCERY_ID);
-        rGroceryItem = DataStore.getInstance().getRealm().where(RGroceryItem.class).equalTo(GROCERY_ID, groceryId).findFirst();
+        rGroceryItem = DataStore.getInstance().getRealm().where(RGroceryItem.class)
+                .equalTo(GROCERY_ID, groceryId).findFirst();
     }
 
     @Override

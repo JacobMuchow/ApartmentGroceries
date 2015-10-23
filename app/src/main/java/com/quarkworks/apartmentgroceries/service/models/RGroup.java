@@ -7,6 +7,10 @@ import io.realm.RealmObject;
  */
 public class RGroup extends RealmObject {
 
+    public static final class JsonKeys {
+        public static final String GROUP_ID = "groupId";
+    }
+
     private String groupId;
     private String name;
 

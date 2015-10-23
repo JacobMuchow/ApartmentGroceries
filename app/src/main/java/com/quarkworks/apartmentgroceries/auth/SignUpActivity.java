@@ -1,7 +1,6 @@
 package com.quarkworks.apartmentgroceries.auth;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -19,7 +18,6 @@ import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.group.GroupActivity;
 import com.quarkworks.apartmentgroceries.main.HomeActivity;
 import com.quarkworks.apartmentgroceries.service.SyncUser;
-import com.quarkworks.apartmentgroceries.service.models.RUser;
 
 import bolts.Continuation;
 import bolts.Task;
@@ -85,20 +83,16 @@ public class SignUpActivity extends AppCompatActivity {
                             public Void then(Task<Boolean> task) {
                                 if (task.getResult()) {
                                     progressBar.setVisibility(View.GONE);
-                                    SharedPreferences sharedPreferences = getApplication()
-                                            .getSharedPreferences(getApplication().getString(R.string.login_or_sign_up_session), 0);
-                                    String groupId = sharedPreferences.getString(RUser.JsonKeys.GROUP_ID, null);
+                                    String groupId = ((MyApplication)getApplication()).getGroupId();
                                     Intent intent;
                                     if (TextUtils.isEmpty(groupId)) {
-                                        intent = new Intent(MyApplication.getContext(), GroupActivity.class);
-                                        startActivity(intent);
+                                        GroupActivity.newIntent(SignUpActivity.this);
                                         Toast.makeText(getApplicationContext(), getString(R.string.login_success_message),
                                                 Toast.LENGTH_SHORT).show();
                                         Toast.makeText(getApplicationContext(), getString(R.string.choose_group_message),
                                                 Toast.LENGTH_SHORT).show();
                                     } else {
-                                        intent = new Intent(MyApplication.getContext(), HomeActivity.class);
-                                        startActivity(intent);
+                                        HomeActivity.newIntent(SignUpActivity.this);
                                         Toast.makeText(getApplicationContext(), getString(R.string.login_success_message),
                                                 Toast.LENGTH_SHORT).show();
                                     }

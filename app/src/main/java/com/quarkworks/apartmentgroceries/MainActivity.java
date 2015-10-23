@@ -7,6 +7,7 @@ import android.text.TextUtils;
 
 import com.quarkworks.apartmentgroceries.auth.LoginActivity;
 import com.quarkworks.apartmentgroceries.main.HomeActivity;
+import com.quarkworks.apartmentgroceries.service.models.RGroup;
 import com.quarkworks.apartmentgroceries.service.models.RUser;
 
 public class MainActivity extends AppCompatActivity {
@@ -17,11 +18,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
         SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
-        String sessionToken = sharedPreferences.getString(RUser.JsonKeys.GROUP_ID, null);
+        String sessionToken = sharedPreferences.getString(RUser.JsonKeys.SESSION_TOKEN, null);
 
         if (TextUtils.isEmpty(sessionToken)) {
             LoginActivity.newIntent(this);
         } else {
+            ((MyApplication) MyApplication.getContext()).setSessionToken(sessionToken);
+            String userId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
+            String groupId = sharedPreferences.getString(RGroup.JsonKeys.GROUP_ID, null);
+            ((MyApplication) MyApplication.getContext()).setUserId(userId);
+            ((MyApplication) MyApplication.getContext()).setGroupId(groupId);
             HomeActivity.newIntent(this);
         }
     }

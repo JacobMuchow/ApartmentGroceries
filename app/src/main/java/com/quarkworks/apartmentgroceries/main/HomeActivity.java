@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.quarkworks.apartmentgroceries.MyApplication;
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.auth.LoginActivity;
 import com.quarkworks.apartmentgroceries.grocery.AddGroceryItemActivity;
@@ -105,9 +107,8 @@ public class HomeActivity extends AppCompatActivity {
                     public Void then(Task<Boolean> task) throws Exception {
                         SharedPreferences sharedPreferences =
                                 getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
-                        sharedPreferences.edit().clear().commit();
-                        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                        startActivity(intent);
+                        sharedPreferences.edit().clear().apply();
+                        LoginActivity.newIntent(HomeActivity.this);
                         return null;
                     }
                 };
