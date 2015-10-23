@@ -46,10 +46,18 @@ public class AddGroupActivity extends AppCompatActivity {
          * Set view data
          */
         titleTextView.setText(getString(R.string.title_activity_add_group));
+
+        /**
+         * Set view OnClickListener
+         */
+        addGroupButton.setOnClickListener(addGroupButtonOnClick());
+
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+    }
 
-        addGroupButton.setOnClickListener(new View.OnClickListener() {
+    public View.OnClickListener addGroupButtonOnClick() {
+        return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String groupItemName = groupNameEditText.getText().toString();
@@ -58,7 +66,7 @@ public class AddGroupActivity extends AppCompatActivity {
 
                     RGroup groupItem = new RGroup();
                     groupItem.setName(groupItemName);
-                    SyncGroup.add(groupItem).onSuccess(new Continuation<Boolean, Void>() {
+                    Continuation<Boolean, Void> checkAddingGroup = new Continuation<Boolean, Void>() {
                         @Override
                         public Void then(Task<Boolean> task) throws Exception {
                             if (task.getResult()) {
@@ -72,12 +80,14 @@ public class AddGroupActivity extends AppCompatActivity {
                             }
                             return null;
                         }
-                    });
+                    };
+
+                    SyncGroup.add(groupItem).onSuccess(checkAddingGroup, Task.UI_THREAD_EXECUTOR);
                 } else {
                     Toast.makeText(getApplicationContext(),
                             getString(R.string.grocery_item_name_empty), Toast.LENGTH_SHORT).show();
                 }
             }
-        });
+        };
     }
 }

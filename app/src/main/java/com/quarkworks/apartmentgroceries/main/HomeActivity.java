@@ -1,5 +1,6 @@
 package com.quarkworks.apartmentgroceries.main;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
@@ -38,6 +39,11 @@ public class HomeActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private TextView titleTextView;
 
+    public static void newIntent(Context context) {
+        Intent intent = new Intent(context, HomeActivity.class);
+        context.startActivity(intent);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +63,7 @@ public class HomeActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         SyncGroceryItem.getAll();
+        SyncUser.getAll();
 
         final RealmResults<RGroceryItem> groceries = DataStore.getInstance().getRealm().where(RGroceryItem.class).findAll();
 
@@ -82,24 +89,18 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
-        Intent intent;
-
         switch (item.getItemId()) {
             case R.id.action_add_grocery:
-                intent = new Intent(this, AddGroceryItemActivity.class);
-                startActivity(intent);
+                AddGroceryItemActivity.newIntent(this);
                 return true;
             case R.id.action_list_group:
-                intent = new Intent(this, GroupActivity.class);
-                startActivity(intent);
+                GroupActivity.newIntent(this);
                 return true;
             case R.id.action_user:
-                intent = new Intent(this, UserActivity.class);
-                startActivity(intent);
+                UserActivity.newIntent(this);
                 return true;
             case R.id.action_logout:
-                SyncUser.logout().continueWith(new Continuation<Boolean, Void>() {
+                Continuation<Boolean, Void> logoutOnSuccess = new Continuation<Boolean, Void>() {
                     @Override
                     public Void then(Task<Boolean> task) throws Exception {
                         SharedPreferences sharedPreferences =
@@ -109,10 +110,16 @@ public class HomeActivity extends AppCompatActivity {
                         startActivity(intent);
                         return null;
                     }
-                });
+                };
+                SyncUser.logout().continueWith(logoutOnSuccess);
                 return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
     }
 }

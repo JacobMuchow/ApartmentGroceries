@@ -1,5 +1,6 @@
 package com.quarkworks.apartmentgroceries.auth;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.group.GroupActivity;
 import com.quarkworks.apartmentgroceries.main.HomeActivity;
 import com.quarkworks.apartmentgroceries.service.SyncUser;
+import com.quarkworks.apartmentgroceries.service.models.RUser;
 
 import bolts.Continuation;
 import bolts.Task;
@@ -35,6 +37,11 @@ public class LoginActivity extends AppCompatActivity {
     private Button loginButton;
     private TextView signUpTextView;
     private ProgressBar progressBar;
+
+    public static void newIntent(Context context) {
+        Intent intent = new Intent(context, LoginActivity.class);
+        context.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,13 +72,14 @@ public class LoginActivity extends AppCompatActivity {
 
                 if (!username.isEmpty() && !password.isEmpty()) {
                     progressBar.setVisibility(View.VISIBLE);
-                    SyncUser.loginBolts(username, password).onSuccess(new Continuation<Boolean, Void>() {
+
+                    Continuation<Boolean, Void> loginOnSuccess = new Continuation<Boolean, Void>() {
                         @Override
                         public Void then(Task<Boolean> task) throws Exception {
                             if(task.getResult()) {
                                 SharedPreferences sharedPreferences = getApplication()
                                         .getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
-                                String groupId = sharedPreferences.getString(SyncUser.JsonKeys.GROUP_ID, null);
+                                String groupId = sharedPreferences.getString(RUser.JsonKeys.GROUP_ID, null);
                                 Intent intent;
                                 if (TextUtils.isEmpty(groupId)) {
                                     intent = new Intent(MyApplication.getContext(), GroupActivity.class);
@@ -82,7 +90,7 @@ public class LoginActivity extends AppCompatActivity {
                                     Toast.makeText(getApplicationContext(), getString(R.string.choose_group_message),
                                             Toast.LENGTH_SHORT).show();
                                 } else {
-                                    intent = new Intent(MyApplication.getContext(), HomeActivity.class);
+                                    intent = new Intent(MyApplication.getContext(), GroupActivity.class);
                                     startActivity(intent);
                                     Toast.makeText(getApplicationContext(), getString(R.string.login_success_message),
                                             Toast.LENGTH_SHORT).show();
@@ -94,7 +102,9 @@ public class LoginActivity extends AppCompatActivity {
                             }
                             return null;
                         }
-                    }, Task.UI_THREAD_EXECUTOR);
+                    };
+
+                    SyncUser.loginBolts(username, password).onSuccess(loginOnSuccess, Task.UI_THREAD_EXECUTOR);
                 } else {
                     progressBar.setVisibility(View.GONE);
                     Toast.makeText(getApplicationContext(),
@@ -111,5 +121,10 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
     }
 }

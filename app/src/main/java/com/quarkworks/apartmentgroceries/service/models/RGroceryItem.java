@@ -7,6 +7,16 @@ import io.realm.RealmObject;
  */
 public class RGroceryItem extends RealmObject {
 
+    public static final class JsonKeys {
+        public static final String GROUP_ID = "groupId";
+        public static final String NAME = "name";
+        public static final String OBJECT_ID = "objectId";
+        public static final String RESULTS = "results";
+        public static final String CREATED_BY = "createdBy";
+        public static final String PURCHASED_BY = "purchasedBy";
+        public static final String CREATED_AT ="createdAt";
+    }
+
     private String groceryId;
     private String name;
     private String groupId;

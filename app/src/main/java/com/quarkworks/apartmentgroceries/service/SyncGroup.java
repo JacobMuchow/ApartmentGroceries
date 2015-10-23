@@ -1,6 +1,5 @@
 package com.quarkworks.apartmentgroceries.service;
 
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -27,79 +26,85 @@ public class SyncGroup {
         private static final String RESULTS = "results";
     }
 
-    public static Task<Void> getAll() {
+    public static Task getAll() {
 
         Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
         UrlTemplate template = UrlTemplateCreator.getAllGroup();
-        NetworkRequestBolts networkRequestBolts = new NetworkRequestBolts(template, taskCompletionSource);
+        NetworkRequest networkRequest = new NetworkRequest(template, taskCompletionSource);
 
-        return networkRequestBolts.runNetworkRequestBolts().continueWith(new Continuation<JSONObject, Void>() {
+        Continuation addGroupsToRealm = new Continuation<JSONObject, Void>() {
             @Override
             public Void then(Task<JSONObject> task) throws Exception {
-                JSONObject jsonObject = task.getResult();
-                if (jsonObject == null) {
-                    Log.e(TAG, "Error getting group from server");
-                    return null;
-                }
-
-                Realm realm = Realm.getInstance(MyApplication.getContext());
-                realm.beginTransaction();
-                realm.clear(RGroup.class);
-
-                try {
-                    JSONArray groupJsonArray = jsonObject.getJSONArray(JsonKeys.RESULTS);
-
-                    for (int i = 0; i < groupJsonArray.length(); i++) {
-                        try {
-                            RGroup groupItem = realm.createObject(RGroup.class);
-                            JSONObject groupJsonObj = groupJsonArray.getJSONObject(i);
-                            groupItem.setGroupId(groupJsonObj.getString(JsonKeys.OBJECT_ID));
-                            groupItem.setName(groupJsonObj.getString(JsonKeys.NAME));
-                        } catch (JSONException e) {
-                            Log.e(TAG, "Error parsing group object", e);
-                        }
+                if (task.isFaulted()) {
+                    throw task.getError();
+                } else {
+                    JSONObject jsonObject = task.getResult();
+                    if (jsonObject == null) {
+                        Log.e(TAG, "Error getting group from server");
+                        return null;
                     }
 
-                    realm.commitTransaction();
-                } catch(JSONException e) {
-                    Log.e(TAG, "Error parsing group object", e);
-                    realm.cancelTransaction();
+                    Realm realm = Realm.getInstance(MyApplication.getContext());
+                    realm.beginTransaction();
+                    realm.clear(RGroup.class);
+
+                    try {
+                        JSONArray groupJsonArray = jsonObject.getJSONArray(JsonKeys.RESULTS);
+
+                        for (int i = 0; i < groupJsonArray.length(); i++) {
+                            try {
+                                RGroup groupItem = realm.createObject(RGroup.class);
+                                JSONObject groupJsonObj = groupJsonArray.getJSONObject(i);
+                                groupItem.setGroupId(groupJsonObj.getString(JsonKeys.OBJECT_ID));
+                                groupItem.setName(groupJsonObj.getString(JsonKeys.NAME));
+                            } catch (JSONException e) {
+                                Log.e(TAG, "Error parsing group object", e);
+                            }
+                        }
+
+                        realm.commitTransaction();
+                    } catch (JSONException e) {
+                        Log.e(TAG, "Error parsing group object", e);
+                        realm.cancelTransaction();
+                    }
                 }
 
                 return null;
             }
-        });
+        };
+
+        return networkRequest.runNetworkRequest().continueWith(addGroupsToRealm);
     }
 
     public static Task<Boolean> add(RGroup rRGroup) {
 
         Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
         UrlTemplate template = UrlTemplateCreator.addGroup(rRGroup);
-        NetworkRequestBolts networkRequestBolts = new NetworkRequestBolts(template, taskCompletionSource);
+        NetworkRequest networkRequest = new NetworkRequest(template, taskCompletionSource);
 
-
-        return networkRequestBolts.runNetworkRequestBolts().continueWith(new Continuation<JSONObject, Boolean>() {
+        Continuation<JSONObject, Boolean> checkAddGroup = new Continuation<JSONObject, Boolean>() {
             @Override
             public Boolean then(Task<JSONObject> task) throws Exception {
-                JSONObject jsonObject = task.getResult();
-
-                if (jsonObject == null) {
-                    Log.e(TAG, "Error adding group object");
+                if (task.isFaulted()) {
                     return false;
-                }
+                } else {
+                    JSONObject jsonObject = task.getResult();
 
-                try {
-                    String groupId = jsonObject.getString(JsonKeys.OBJECT_ID);
-                    if (!TextUtils.isEmpty(groupId)) {
-                        return true;
-                    } else {
+                    if (jsonObject == null) {
+                        Log.e(TAG, "Error adding group object");
                         return false;
                     }
-                } catch (JSONException e) {
-                    Log.e(TAG, "adding group failed", e);
-                    return false;
+
+                    try {
+                        return !TextUtils.isEmpty(jsonObject.getString(JsonKeys.OBJECT_ID));
+                    } catch (JSONException e) {
+                        Log.e(TAG, "adding group failed", e);
+                        return false;
+                    }
                 }
             }
-        });
+        };
+
+        return networkRequest.runNetworkRequest().continueWith(checkAddGroup);
     }
 }

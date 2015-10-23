@@ -26,20 +26,20 @@ import bolts.Task;
 /**
  * Created by zz on 10/21/15.
  */
-public class NetworkRequestBolts {
-    private static final String TAG = NetworkRequestBolts.class.getSimpleName();
+public class NetworkRequest {
+    private static final String TAG = NetworkRequest.class.getSimpleName();
 
     private static final Executor NETWORK_EXECUTOR = Executors.newCachedThreadPool();
 
     private UrlTemplate template;
     private Task<JSONObject>.TaskCompletionSource taskCompletionSource;
 
-    public NetworkRequestBolts(UrlTemplate template, Task<JSONObject>.TaskCompletionSource taskCompletionSource) {
+    public NetworkRequest(UrlTemplate template, Task<JSONObject>.TaskCompletionSource taskCompletionSource) {
         this.template = template;
         this.taskCompletionSource = taskCompletionSource;
     }
 
-    public Task<JSONObject> runNetworkRequestBolts() {
+    public Task<JSONObject> runNetworkRequest() {
         Task.call(new Callable<Void>() {
             public Void call() {
                 String url = template.getUrl();
@@ -63,7 +63,11 @@ public class NetworkRequestBolts {
 
                     if (paramsMap != null) {
                         for (Map.Entry entry : paramsMap.entrySet()) {
-                            urlStringBuilder.append(entry.getKey() + "=" + entry.getValue() + "&");
+                            // urlStringBuilder.append(entry.getKey() + "=" + entry.getValue() + "&");
+                            urlStringBuilder.append(entry.getKey());
+                            urlStringBuilder.append("=");
+                            urlStringBuilder.append(entry.getValue());
+                            urlStringBuilder.append("&");
                         }
                     }
                     url = urlStringBuilder.toString();
@@ -78,9 +82,18 @@ public class NetworkRequestBolts {
                         for (Map.Entry entry : paramsMap.entrySet()) {
                             String entryValue = entry.getValue().toString();
                             if(entryValue.charAt(0) == '{') {
-                                jsonBuilder.append("\"" + entry.getKey() + "\":" + entry.getValue() + "");
+                                // jsonBuilder.append("\"" + entry.getKey() + "\":" + entry.getValue() + "");
+                                jsonBuilder.append("\"");
+                                jsonBuilder.append(entry.getKey());
+                                jsonBuilder.append("\":");
+                                jsonBuilder.append(entry.getValue());
                             } else {
-                                jsonBuilder.append("\"" + entry.getKey() + "\":\"" + entry.getValue() + "\"");
+                                // jsonBuilder.append("\"" + entry.getKey() + "\":\"" + entry.getValue() + "\"");
+                                jsonBuilder.append("\"");
+                                jsonBuilder.append(entry.getKey());
+                                jsonBuilder.append("\":\"");
+                                jsonBuilder.append(entry.getValue());
+                                jsonBuilder.append("\"");
                             }
 
                             if (i < size - 1) {
@@ -101,8 +114,6 @@ public class NetworkRequestBolts {
                         .addHeader("X-Parse-Revocable-Session", "1")
                         .method(method, requestBody);
 
-
-                Log.d(TAG, builder.toString());
                 if(template.useToken()) {
                     Context context = MyApplication.getContext();
                     SharedPreferences sharedPreferences =
@@ -128,7 +139,7 @@ public class NetworkRequestBolts {
                         JSONObject jsonObject = new JSONObject(jsonString);
                         taskCompletionSource.setResult(jsonObject);
                     } catch (JSONException e) {
-
+                        Log.e(TAG, "Error parsing json object from json string in NetworkRequest", e);
                     }
 
                 } catch (IOException e) {
