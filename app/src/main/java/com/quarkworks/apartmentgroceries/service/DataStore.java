@@ -14,7 +14,7 @@ public class DataStore {
     private Realm realm;
 
     private DataStore() {
-        realm = Realm.getInstance(MyApplication.getContext());
+        realm = Realm.getDefaultInstance();
     }
 
     public static DataStore getInstance(){

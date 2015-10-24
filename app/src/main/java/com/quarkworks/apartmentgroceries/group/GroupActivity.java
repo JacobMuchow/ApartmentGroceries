@@ -2,6 +2,7 @@ package com.quarkworks.apartmentgroceries.group;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Icon;
@@ -12,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -78,10 +80,6 @@ public class GroupActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.group_menu, menu);
-        int position = 0;
-        MenuItem item = menu.getItem(position);
-        Drawable addIcon = (Drawable)item.getIcon();
-        addIcon.setColorFilter(0xffff0000, PorterDuff.Mode.MULTIPLY );
         return true;
     }
 
