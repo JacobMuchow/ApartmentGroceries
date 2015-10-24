@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/margin_padding_medium"
             android:text="@string/title_activity_group"
-            style="@android:style/TextAppearance.Large"/>
+            android:textColor="@android:color/black"/>
         <View
             android:id="@+id/setting_group_divider_view_id"
             android:layout_width="match_parent"
@@ -35,7 +35,7 @@
             android:layout_below="@+id/setting_group_divider_view_id"
             android:layout_margin="@dimen/margin_padding_medium"
             android:text="@string/action_logout"
-            style="@android:style/TextAppearance.Large"/>
+            android:textColor="@android:color/black" />
         <View
             android:id="@+id/setting_logout_divider_view_id"
             android:layout_width="match_parent"

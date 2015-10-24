@@ -85,6 +85,25 @@ public class UrlTemplateCreator {
         return new UrlTemplate(GET, url, null);
     }
 
+    public static UrlTemplate getUsersByGroupId(String groupId) {
+        String url = baseUrl + "users";
+        Map<String, String> params = new HashMap<>();
+
+        JSONObject subGroupIdObj = new JSONObject();
+        JSONObject groupIdObj=new JSONObject();
+        try {
+            subGroupIdObj.put("__type", "Pointer");
+            subGroupIdObj.put("className", "Group");
+            subGroupIdObj.put("objectId", groupId);
+            groupIdObj.put("groupId", subGroupIdObj);
+        } catch (JSONException e) {
+            Log.d(TAG, "Error creating group id object for where in getGroceryItemsByGroupId", e);
+        }
+
+        params.put("where", Utilities.encodeURIComponent(groupIdObj.toString()));
+        return new UrlTemplate(GET, url, params);
+    }
+
     public static UrlTemplate getAllGroup() {
         String url = baseUrl + "classes/Group";
         return new UrlTemplate(GET, url, null);

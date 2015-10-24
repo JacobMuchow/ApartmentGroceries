@@ -89,7 +89,8 @@ public class GroupCell extends RelativeLayout{
                     @Override
                     public Void then(Task<Boolean> task) throws Exception {
                         if (task.getResult()) {
-                            HomeActivity.newIntent(getContext());
+                            SyncUser.getAll(groupId);
+//                            HomeActivity.newIntent(getContext());
                             Toast.makeText(MyApplication.getContext(),
                                     MyApplication.getContext().getString(R.string.join_group_success),
                                     Toast.LENGTH_SHORT).show();

@@ -2,6 +2,9 @@ package com.quarkworks.apartmentgroceries.group;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.Icon;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -52,6 +55,7 @@ public class GroupActivity extends AppCompatActivity {
         titleTextView.setText(getString(R.string.title_activity_group));
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         SyncGroup.getAll();
 
@@ -74,17 +78,19 @@ public class GroupActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.group_menu, menu);
+        int position = 0;
+        MenuItem item = menu.getItem(position);
+        Drawable addIcon = (Drawable)item.getIcon();
+        addIcon.setColorFilter(0xffff0000, PorterDuff.Mode.MULTIPLY );
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Intent intent;
 
         switch (item.getItemId()) {
             case R.id.action_add_group:
-                intent = new Intent(this, AddGroupActivity.class);
-                startActivity(intent);
+                AddGroupActivity.newIntent(GroupActivity.this);
                 return true;
         }
 

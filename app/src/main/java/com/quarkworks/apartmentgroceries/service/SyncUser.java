@@ -140,10 +140,15 @@ public class SyncUser {
         return networkRequest.runNetworkRequest().continueWith(saveCredential);
     }
 
-    public static Task getAll(){
+    public static Task getAll(String groupId){
 
         Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
-        UrlTemplate template = UrlTemplateCreator.getAllUsers();
+        UrlTemplate template;
+        if (TextUtils.isEmpty(groupId)) {
+            template = UrlTemplateCreator.getAllUsers();
+        } else {
+            template = UrlTemplateCreator.getUsersByGroupId(groupId);
+        }
         NetworkRequest networkRequest = new NetworkRequest(template, taskCompletionSource);
 
         Continuation<JSONObject, Void> addUsersToRealm = new Continuation<JSONObject, Void>() {
@@ -202,6 +207,10 @@ public class SyncUser {
         };
 
         return networkRequest.runNetworkRequest().continueWith(addUsersToRealm);
+    }
+
+    public static Task getAll() {
+        return getAll(null);
     }
 
     public static Task<Boolean> joinGroup(String userId, String groupId) {

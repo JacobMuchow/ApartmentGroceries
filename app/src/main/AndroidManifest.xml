@@ -50,7 +50,8 @@
         </activity>
         <activity
             android:name=".group.GroupActivity"
-            android:label="@string/title_activity_group" >
+            android:label="@string/title_activity_group"
+            android:parentActivityName=".main.SettingActivity">
         </activity>
         <activity
             android:name=".group.AddGroupActivity"

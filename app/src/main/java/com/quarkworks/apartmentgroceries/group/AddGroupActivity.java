@@ -1,5 +1,6 @@
 package com.quarkworks.apartmentgroceries.group;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -29,6 +30,11 @@ public class AddGroupActivity extends AppCompatActivity {
     private TextView titleTextView;
     private EditText groupNameEditText;
     private Button addGroupButton;
+
+    public static void newIntent(Context context) {
+        Intent intent = new Intent(context, AddGroupActivity.class);
+        context.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

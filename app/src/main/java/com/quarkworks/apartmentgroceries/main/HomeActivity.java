@@ -65,7 +65,7 @@ public class HomeActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         SyncGroceryItem.getAll();
-        SyncUser.getAll();
+        SyncUser.getAll(((MyApplication)MyApplication.getContext()).getGroupId());
 
         final RealmResults<RGroceryItem> groceries = DataStore.getInstance().getRealm().where(RGroceryItem.class).findAll();
 
