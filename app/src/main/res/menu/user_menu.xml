@@ -2,6 +2,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.quarkworks.apartmentgroceries.group.GroupActivity">
-    <item android:id="@+id/action_edit_photo" android:title="@string/action_edit_photo"
+    <item android:id="@+id/action_edit_photo" android:title="@string/edit_photo"
         android:orderInCategory="100" app:showAsAction="never" />
 </menu>

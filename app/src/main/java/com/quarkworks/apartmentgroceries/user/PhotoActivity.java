@@ -1,6 +1,7 @@
 package com.quarkworks.apartmentgroceries.user;
 
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -48,6 +49,7 @@ public class PhotoActivity extends AppCompatActivity {
     private static final String TAG = PhotoActivity.class.getSimpleName();
 
     private static final int SELECT_PICTURE_REQUEST_CODE = 1;
+    private static final String USER_ID = "userId";
     private Uri outputFileUri;
 
     /*
@@ -57,6 +59,12 @@ public class PhotoActivity extends AppCompatActivity {
     private TextView titleTextView;
     private Button addPhotoButton;
     private ImageView photoImageView;
+
+    public static void newIntent(Context context, String userId) {
+        Intent intent = new Intent(context, PhotoActivity.class);
+        intent.putExtra(USER_ID, userId);
+        context.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

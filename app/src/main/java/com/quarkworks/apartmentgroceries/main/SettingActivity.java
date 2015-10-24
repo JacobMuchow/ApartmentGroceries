@@ -9,10 +9,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 
+import com.quarkworks.apartmentgroceries.MyApplication;
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.auth.LoginActivity;
 import com.quarkworks.apartmentgroceries.group.GroupActivity;
 import com.quarkworks.apartmentgroceries.service.SyncUser;
+import com.quarkworks.apartmentgroceries.user.UserDetailActivity;
 
 import bolts.Continuation;
 import bolts.Task;
@@ -27,6 +29,7 @@ public class SettingActivity extends AppCompatActivity {
     private TextView titleTextView;
     private TextView groupTextView;
     private TextView logoutTextView;
+    private TextView editProfileTextView;
 
     public static void newIntent(Context context) {
         Intent intent = new Intent(context, SettingActivity.class);
@@ -45,6 +48,7 @@ public class SettingActivity extends AppCompatActivity {
         titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
         groupTextView = (TextView) findViewById(R.id.setting_group_text_view_id);
         logoutTextView = (TextView) findViewById(R.id.setting_logout_text_view_id);
+        editProfileTextView = (TextView) findViewById(R.id.setting_profile_text_view_id);
 
         /**
          * Set view data
@@ -59,6 +63,7 @@ public class SettingActivity extends AppCompatActivity {
          */
         groupTextView.setOnClickListener(groupTextViewOnClick());
         logoutTextView.setOnClickListener(logoutTextViewOnClick());
+        editProfileTextView.setOnClickListener(editProfileTextViewOnClick());
     }
 
     public View.OnClickListener groupTextViewOnClick() {
@@ -85,6 +90,15 @@ public class SettingActivity extends AppCompatActivity {
                     }
                 };
                 SyncUser.logout().continueWith(logoutOnSuccess);
+            }
+        };
+    }
+
+    public View.OnClickListener editProfileTextViewOnClick() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UserDetailActivity.newIntent(SettingActivity.this, ((MyApplication)getApplication()).getUserId());
             }
         };
     }

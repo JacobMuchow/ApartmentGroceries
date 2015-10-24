@@ -13,7 +13,6 @@
     <string name="action_add_grocery">Add grocery</string>
     <string name="action_add_group">Add group</string>
     <string name="action_logout">Logout</string>
-    <string name="action_edit_photo">Edit Photo</string>
     <string name="action_settings">Settings</string>
 
     <!-- activity title -->
@@ -26,7 +25,7 @@
     <string name="title_activity_add_grocery_item">Add Grocery</string>
     <string name="title_activity_group">Group</string>
     <string name="title_activity_add_group">Add Group</string>
-    <string name="title_activity_user_detail">User Detail</string>
+    <string name="title_activity_user_detail">Profile</string>
     <string name="title_activity_photo">Photo</string>
     <string name="title_activity_setting">Setting</string>
 
@@ -61,4 +60,8 @@
     <!-- grocery cell -->
     <string name="grocery_cell_item_status_open">open</string>
     <string name="grocery_cell_item_status_closed">closed</string>
+
+    <!-- setting -->
+    <string name="setting_edit_profile">Edit Profile</string>
+    <string name="edit_photo">Edit Photo</string>
 </resources>

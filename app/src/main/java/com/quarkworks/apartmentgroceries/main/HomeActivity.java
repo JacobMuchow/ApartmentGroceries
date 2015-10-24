@@ -95,9 +95,6 @@ public class HomeActivity extends AppCompatActivity {
             case R.id.action_add_grocery:
                 AddGroceryItemActivity.newIntent(this);
                 return true;
-            case R.id.action_user:
-                UserActivity.newIntent(this);
-                return true;
             case R.id.action_settings:
                 SettingActivity.newIntent(HomeActivity.this);
                 return true;
