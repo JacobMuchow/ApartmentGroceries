@@ -271,45 +271,9 @@ public class SyncUser {
             }
         };
 
-        uploadPhoto(photoName, data).continueWith(updateUserPhoto);
+        SyncPhoto.uploadPhoto(photoName, data).continueWith(updateUserPhoto);
 
         return taskCompletionSource.getTask();
-    }
-
-    public static Task<JSONObject> uploadPhoto(String photoName, byte[] data) {
-
-        Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
-        UrlTemplate template = UrlTemplateCreator.uploadProfilePhoto(photoName, data);
-        NetworkRequest networkRequest = new NetworkRequest(template, taskCompletionSource);
-
-        Continuation<JSONObject, JSONObject> uploadingPhoto = new Continuation<JSONObject, JSONObject>() {
-            @Override
-            public JSONObject then(Task<JSONObject> task) throws Exception {
-                if (task.isFaulted()) {
-                    Log.e(TAG, "Error in uploadPhoto: " + task.getError());
-                } else {
-
-                    if (task.getResult() == null) {
-                        Log.e(TAG, "Error getting uploading photo response json");
-                        return null;
-                    }
-
-                    try {
-                        String photoName = task.getResult().getString("name");
-                        Log.d(TAG, "uploaded photo name:" + photoName);
-                        return task.getResult();
-
-                    } catch (JSONException e) {
-                        Log.e(TAG, "uploading photo failure", e);
-                    }
-                }
-
-                return null;
-            }
-        };
-
-        return networkRequest.runNetworkRequest().onSuccess(uploadingPhoto);
-
     }
 
     public static Task getById(String userId) {

@@ -9,7 +9,7 @@
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme" >
@@ -55,7 +55,8 @@
         </activity>
         <activity
             android:name=".group.AddGroupActivity"
-            android:label="@string/title_activity_add_group" >
+            android:label="@string/title_activity_add_group"
+            android:parentActivityName=".group.GroupActivity">
         </activity>
         <activity
             android:name=".user.UserDetailActivity"
@@ -63,8 +64,9 @@
         </activity>
         <activity
             android:name=".user.PhotoActivity"
-            android:label="@string/title_activity_photo" >
-        </activity>
+            android:label="@string/title_activity_photo"
+            android:parentActivityName=".user.UserDetailActivity">
+        </activity>abel="@string/title_activity_profile">
         <activity
             android:name=".main.SettingActivity"
             android:label="@string/title_activity_setting"

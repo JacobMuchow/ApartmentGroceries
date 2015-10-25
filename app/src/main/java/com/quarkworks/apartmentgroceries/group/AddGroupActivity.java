@@ -61,6 +61,7 @@ public class AddGroupActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     public View.OnClickListener addGroupButtonOnClick() {
