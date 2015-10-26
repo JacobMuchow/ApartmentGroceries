@@ -11,9 +11,10 @@
         android:layout_width="@dimen/login_sign_up_username_password_width"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/login_sign_up_margin_top"
-        android:padding="@dimen/login_sign_up_username_password_padding"
         android:layout_below="@+id/main_toolbar_id"
-        android:layout_centerInParent="true">
+        android:layout_centerInParent="true"
+
+        android:padding="@dimen/login_sign_up_username_password_padding">
 
         <!-- username -->
         <EditText
@@ -21,8 +22,9 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/login_sign_up_username_password_height"
             android:layout_margin="@dimen/login_sign_up_username_password_margin"
-            android:padding="@dimen/login_sign_up_username_password_padding"
             android:layout_centerHorizontal="true"
+
+            android:padding="@dimen/login_sign_up_username_password_padding"
             android:inputType="textPersonName"
             android:hint="@string/login_sign_up_hint_username"
             android:textAlignment="center"
@@ -34,9 +36,10 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/login_sign_up_username_password_height"
             android:layout_margin="@dimen/login_sign_up_username_password_margin"
-            android:padding="@dimen/login_sign_up_username_password_padding"
             android:layout_below="@+id/sign_up_username_id"
             android:layout_centerHorizontal="true"
+
+            android:padding="@dimen/login_sign_up_username_password_padding"
             android:inputType="textPassword"
             android:hint="@string/login_sign_up_hint_password"
             android:textAlignment="center"
@@ -51,9 +54,10 @@
             android:layout_marginLeft="@dimen/login_sign_up_username_password_margin"
             android:layout_marginRight="@dimen/login_sign_up_username_password_margin"
             android:layout_marginBottom="@dimen/login_sign_up_password_margin_bottom"
-            android:padding="@dimen/login_sign_up_username_password_padding"
             android:layout_below="@+id/sign_up_password_id"
             android:layout_centerHorizontal="true"
+
+            android:padding="@dimen/login_sign_up_username_password_padding"
             android:inputType="textPassword"
             android:hint="@string/login_sign_up_hint_confirm_password"
             android:textAlignment="center"
@@ -65,9 +69,10 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/login_sign_up_username_password_height"
             android:layout_margin="@dimen/login_sign_up_username_password_margin"
-            android:padding="@dimen/login_sign_up_username_password_padding"
             android:layout_below="@+id/sign_up_confirm_password_id"
             android:layout_centerHorizontal="true"
+
+            android:padding="@dimen/login_sign_up_username_password_padding"
             android:text="@string/sign_up_button"
             android:textColor="@android:color/white"
             android:textAllCaps="false"
@@ -81,6 +86,7 @@
             android:layout_margin="@dimen/login_sign_up_username_password_margin"
             android:layout_below="@+id/sign_up_submit_button_id"
             android:layout_centerHorizontal="true"
+
             android:gravity="center"
             android:text="@string/sign_up_terms"
             android:textColor="@android:color/black"
@@ -96,6 +102,7 @@
         android:layout_centerInParent="true"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
+
         android:visibility="invisible"
         android:indeterminate="true"
         android:indeterminateTintMode="src_atop"

@@ -52,7 +52,6 @@ public class SyncUser {
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString(JsonKeys.SESSION_TOKEN, sessionToken);
                     editor.putString(JsonKeys.USER_ID, userId);
-                    editor.putString(JsonKeys.USER_ID, userId);
 
                     JSONObject groupIdObj = loginJsonObj.optJSONObject(JsonKeys.GROUP_ID);
                     if (groupIdObj != null) {

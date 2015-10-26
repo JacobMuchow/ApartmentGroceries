@@ -14,6 +14,7 @@
         android:layout_height="@dimen/grocery_cell_photo_width_height"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
+
         android:padding="1dp"/>
 
     <!-- photo mask -->
@@ -23,6 +24,7 @@
         android:layout_alignLeft="@+id/grocery_cell_created_by_image_view_id"
         android:layout_alignTop="@+id/grocery_cell_created_by_image_view_id"
         android:layout_margin="0dp"
+
         android:background="@drawable/photo_mask"/>
 
     <!-- created by -->
@@ -30,9 +32,10 @@
         android:id="@+id/grocery_cell_created_by_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="@dimen/margin_padding_medium"
         android:layout_toRightOf="@+id/grocery_cell_created_by_image_view_id"
-        android:layout_toEndOf="@+id/grocery_cell_created_by_image_view_id" />
+        android:layout_toEndOf="@+id/grocery_cell_created_by_image_view_id"
+
+        android:padding="@dimen/margin_padding_medium" />
 
     <!-- created at -->
     <TextView
@@ -47,9 +50,10 @@
         android:id="@+id/grocery_cell_grocery_name_id"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/margin_padding_medium"
         android:layout_marginTop="@dimen/margin_padding_tiny"
         android:layout_below="@+id/grocery_cell_created_by_image_view_id"
+
+        android:padding="@dimen/margin_padding_medium"
         android:layout_gravity="center"
         android:background="@drawable/rectangle_border"/>
 

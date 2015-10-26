@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/main_toolbar_id">
+
         <!-- group name -->
         <EditText
             android:id="@+id/add_group_name_id"
@@ -19,6 +20,7 @@
             android:layout_marginTop="118dp"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
+
             android:hint="group name"
             android:ems="10" />
 
@@ -30,6 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/add_group_name_id"
             android:layout_centerHorizontal="true"
+
             android:text="@string/add_button"/>
     </RelativeLayout>
 </RelativeLayout>
