@@ -1,8 +1,12 @@
 package com.quarkworks.apartmentgroceries.service;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.quarkworks.apartmentgroceries.MyApplication;
+import com.quarkworks.apartmentgroceries.R;
+import com.quarkworks.apartmentgroceries.service.models.RUser;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -112,7 +116,11 @@ public class NetworkRequest {
                         .method(method, requestBody);
 
                 if(template.useToken()) {
-                    String sessionToken = ((MyApplication)MyApplication.getContext()).getSessionToken();
+                    Context context = MyApplication.getContext();
+                    SharedPreferences sharedPreferences = context.getSharedPreferences(
+                            context.getString(R.string.login_or_sign_up_session), 0);
+                    String sessionToken = sharedPreferences.getString(RUser.JsonKeys.SESSION_TOKEN, null);
+
                     if (sessionToken == null) {
                         Log.e(TAG, "Error getting session token.");
                         return null;

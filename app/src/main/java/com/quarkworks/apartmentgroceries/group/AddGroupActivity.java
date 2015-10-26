@@ -57,44 +57,43 @@ public class AddGroupActivity extends AppCompatActivity {
         /**
          * Set view OnClickListener
          */
-        addGroupButton.setOnClickListener(addGroupButtonOnClick());
+        addGroupButton.setOnClickListener(addGroupButtonOnClick);
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
-    public View.OnClickListener addGroupButtonOnClick() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String groupItemName = groupNameEditText.getText().toString();
+    public View.OnClickListener addGroupButtonOnClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            String groupItemName = groupNameEditText.getText().toString();
 
-                if (!groupItemName.isEmpty()) {
+            if (!groupItemName.isEmpty()) {
 
-                    RGroup groupItem = new RGroup();
-                    groupItem.setName(groupItemName);
-                    Continuation<Boolean, Void> checkAddingGroup = new Continuation<Boolean, Void>() {
-                        @Override
-                        public Void then(Task<Boolean> task) throws Exception {
-                            if (task.getResult()) {
-                                HomeActivity.newIntent(AddGroupActivity.this);
-                                Toast.makeText(getApplicationContext(), getString(R.string.add_group_success),
-                                        Toast.LENGTH_SHORT).show();
-                            } else {
-                                Toast.makeText(getApplicationContext(),
-                                        getString(R.string.add_group_failure), Toast.LENGTH_SHORT).show();
-                            }
-                            return null;
-                        }
-                    };
+                RGroup groupItem = new RGroup();
+                groupItem.setName(groupItemName);
 
-                    SyncGroup.add(groupItem).onSuccess(checkAddingGroup, Task.UI_THREAD_EXECUTOR);
-                } else {
-                    Toast.makeText(getApplicationContext(),
-                            getString(R.string.grocery_item_name_empty), Toast.LENGTH_SHORT).show();
-                }
+                SyncGroup.add(groupItem).onSuccess(checkAddingGroup, Task.UI_THREAD_EXECUTOR);
+            } else {
+                Toast.makeText(getApplicationContext(),
+                        getString(R.string.grocery_item_name_empty), Toast.LENGTH_SHORT).show();
             }
-        };
-    }
+        }
+    };
+
+    private Continuation<Boolean, Void> checkAddingGroup = new Continuation<Boolean, Void>() {
+        @Override
+        public Void then(Task<Boolean> task) throws Exception {
+            if (task.getResult()) {
+                HomeActivity.newIntent(AddGroupActivity.this);
+                Toast.makeText(getApplicationContext(), getString(R.string.add_group_success),
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getApplicationContext(),
+                        getString(R.string.add_group_failure), Toast.LENGTH_SHORT).show();
+            }
+            return null;
+        }
+    };
 }

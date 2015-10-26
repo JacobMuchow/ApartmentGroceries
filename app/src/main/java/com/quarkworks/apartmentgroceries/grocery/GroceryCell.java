@@ -98,35 +98,30 @@ public class GroceryCell extends RelativeLayout {
         /**
          * set view OnClickListener
          */
-        nameTextView.setOnClickListener(groceryNameOnClick());
-        createdByTextView.setOnClickListener(createdByOnClick());
-        purchasedByTextView.setOnClickListener(purchasedByOnClick());
+        nameTextView.setOnClickListener(groceryNameOnClick);
+        createdByTextView.setOnClickListener(createdByOnClick);
+        purchasedByTextView.setOnClickListener(purchasedByOnClick);
     }
 
-    public View.OnClickListener groceryNameOnClick() {
-        return new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                GroceryCardPagerActivity.newIntent(getContext(), position);
-            }
-        };
-    }
+    public View.OnClickListener groceryNameOnClick = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            GroceryCardPagerActivity.newIntent(getContext(), position);
+        }
+    };
 
-    public View.OnClickListener createdByOnClick() {
-        return new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                UserDetailActivity.newIntent(getContext(), rGroceryItem.getCreatedBy());
-            }
-        };
-    }
 
-    public View.OnClickListener purchasedByOnClick() {
-        return new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                UserDetailActivity.newIntent(getContext(), rGroceryItem.getPurchasedBy());
-            }
-        };
-    }
+    public View.OnClickListener createdByOnClick = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            UserDetailActivity.newIntent(getContext(), rGroceryItem.getCreatedBy());
+        }
+    };
+
+    public View.OnClickListener purchasedByOnClick = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            UserDetailActivity.newIntent(getContext(), rGroceryItem.getPurchasedBy());
+        }
+    };
 }

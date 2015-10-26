@@ -69,42 +69,39 @@ public class GroupCell extends RelativeLayout{
             joinGroupButton.setVisibility(VISIBLE);
         }
 
-        joinGroupButton.setOnClickListener(joinGroupButtonOnClick());
+        joinGroupButton.setOnClickListener(joinGroupButtonOnClick);
     }
 
-    public View.OnClickListener joinGroupButtonOnClick() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SharedPreferences sharedPreferences =
-                        getContext().getSharedPreferences(getContext()
-                                        .getString(R.string.login_or_sign_up_session), 0);
-                String userId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString(RUser.JsonKeys.GROUP_ID, groupId);
-                editor.apply();
-                ((MyApplication)MyApplication.getContext()).setGroupId(groupId);
+    public View.OnClickListener joinGroupButtonOnClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            SharedPreferences sharedPreferences =
+                    getContext().getSharedPreferences(getContext()
+                                    .getString(R.string.login_or_sign_up_session), 0);
+            String userId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString(RUser.JsonKeys.GROUP_ID, groupId);
+            editor.apply();
 
-                Continuation<Boolean, Void> checkJoiningGroup = new Continuation<Boolean, Void>() {
-                    @Override
-                    public Void then(Task<Boolean> task) throws Exception {
-                        if (task.getResult()) {
-                            SyncUser.getAll(groupId);
+            SyncUser.joinGroup(userId, groupId).onSuccess(checkJoiningGroup, Task.UI_THREAD_EXECUTOR);
+        }
+    };
+
+    private Continuation<Boolean, Void> checkJoiningGroup = new Continuation<Boolean, Void>() {
+        @Override
+        public Void then(Task<Boolean> task) throws Exception {
+            if (task.getResult()) {
+                SyncUser.getAll(groupId);
 //                            HomeActivity.newIntent(getContext());
-                            Toast.makeText(MyApplication.getContext(),
-                                    MyApplication.getContext().getString(R.string.join_group_success),
-                                    Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(MyApplication.getContext(),
-                                    MyApplication.getContext().getString(R.string.join_group_failure),
-                                    Toast.LENGTH_LONG).show();
-                        }
-                        return null;
-                    }
-                };
-
-                SyncUser.joinGroup(userId, groupId).onSuccess(checkJoiningGroup, Task.UI_THREAD_EXECUTOR);
+                Toast.makeText(MyApplication.getContext(),
+                        MyApplication.getContext().getString(R.string.join_group_success),
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(MyApplication.getContext(),
+                        MyApplication.getContext().getString(R.string.join_group_failure),
+                        Toast.LENGTH_LONG).show();
             }
-        };
-    }
+            return null;
+        }
+    };
 }

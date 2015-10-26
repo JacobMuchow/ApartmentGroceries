@@ -23,11 +23,6 @@ public class MainActivity extends AppCompatActivity {
         if (TextUtils.isEmpty(sessionToken)) {
             LoginActivity.newIntent(this);
         } else {
-            ((MyApplication) MyApplication.getContext()).setSessionToken(sessionToken);
-            String userId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
-            String groupId = sharedPreferences.getString(RGroup.JsonKeys.GROUP_ID, null);
-            ((MyApplication) MyApplication.getContext()).setUserId(userId);
-            ((MyApplication) MyApplication.getContext()).setGroupId(groupId);
             HomeActivity.newIntent(this);
         }
     }

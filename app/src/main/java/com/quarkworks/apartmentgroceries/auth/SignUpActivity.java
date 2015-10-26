@@ -1,5 +1,6 @@
 package com.quarkworks.apartmentgroceries.auth;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -38,6 +39,11 @@ public class SignUpActivity extends AppCompatActivity {
     private EditText confirmPasswordEditText;
     private Button signUpButton;
     private ProgressBar progressBar;
+
+    public static void newIntent(Context context) {
+        Intent intent = new Intent(context, SignUpActivity.class);
+        context.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,19 +89,12 @@ public class SignUpActivity extends AppCompatActivity {
                             public Void then(Task<Boolean> task) {
                                 if (task.getResult()) {
                                     progressBar.setVisibility(View.GONE);
-                                    String groupId = ((MyApplication)getApplication()).getGroupId();
-                                    Intent intent;
-                                    if (TextUtils.isEmpty(groupId)) {
-                                        GroupActivity.newIntent(SignUpActivity.this);
-                                        Toast.makeText(getApplicationContext(), getString(R.string.login_success_message),
-                                                Toast.LENGTH_SHORT).show();
-                                        Toast.makeText(getApplicationContext(), getString(R.string.choose_group_message),
-                                                Toast.LENGTH_SHORT).show();
-                                    } else {
-                                        HomeActivity.newIntent(SignUpActivity.this);
-                                        Toast.makeText(getApplicationContext(), getString(R.string.login_success_message),
-                                                Toast.LENGTH_SHORT).show();
-                                    }
+
+                                    GroupActivity.newIntent(SignUpActivity.this);
+                                    Toast.makeText(getApplicationContext(), getString(R.string.login_success_message),
+                                            Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getApplicationContext(), getString(R.string.choose_group_message),
+                                            Toast.LENGTH_SHORT).show();
                                 } else {
                                     Log.e(TAG, "Error login in after sign up");
                                 }

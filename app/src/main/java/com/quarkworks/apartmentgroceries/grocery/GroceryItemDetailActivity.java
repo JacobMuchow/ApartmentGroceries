@@ -58,16 +58,14 @@ public class GroceryItemDetailActivity extends AppCompatActivity {
         /**
          * Set view OnClickListener
          */
-        createdByTextView.setOnClickListener(createdByOnClickListener());
+        createdByTextView.setOnClickListener(createdByOnClickListener);
 
     }
 
-    public View.OnClickListener createdByOnClickListener() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                UserDetailActivity.newIntent(GroceryItemDetailActivity.this, groceryItem.getCreatedBy());
-            }
-        };
-    }
+    public View.OnClickListener createdByOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            UserDetailActivity.newIntent(GroceryItemDetailActivity.this, groceryItem.getCreatedBy());
+        }
+    };
 }

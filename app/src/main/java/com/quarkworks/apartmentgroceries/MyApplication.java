@@ -13,9 +13,6 @@ public class MyApplication extends Application {
     private static final String TAG = MyApplication.class.getSimpleName();
 
     private static Context context;
-    private String sessionToken;
-    private String userId;
-    private String groupId;
 
     @Override
     public void onCreate() {
@@ -29,27 +26,4 @@ public class MyApplication extends Application {
         return context;
     }
 
-    public String getSessionToken() {
-        return sessionToken;
-    }
-
-    public void setSessionToken(String sessionToken) {
-        this.sessionToken = sessionToken;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
-    }
 }

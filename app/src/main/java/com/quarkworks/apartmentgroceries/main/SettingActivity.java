@@ -9,11 +9,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 
-import com.quarkworks.apartmentgroceries.MyApplication;
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.auth.LoginActivity;
 import com.quarkworks.apartmentgroceries.group.GroupActivity;
 import com.quarkworks.apartmentgroceries.service.SyncUser;
+import com.quarkworks.apartmentgroceries.service.models.RUser;
 import com.quarkworks.apartmentgroceries.user.UserDetailActivity;
 
 import bolts.Continuation;
@@ -61,45 +61,42 @@ public class SettingActivity extends AppCompatActivity {
         /**
          * Set view on click
          */
-        groupTextView.setOnClickListener(groupTextViewOnClick());
-        logoutTextView.setOnClickListener(logoutTextViewOnClick());
-        editProfileTextView.setOnClickListener(editProfileTextViewOnClick());
+        groupTextView.setOnClickListener(groupTextViewOnClick);
+        logoutTextView.setOnClickListener(logoutTextViewOnClick);
+        editProfileTextView.setOnClickListener(editProfileTextViewOnClick);
     }
 
-    public View.OnClickListener groupTextViewOnClick() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                GroupActivity.newIntent(SettingActivity.this);
-            }
-        };
-    }
+    public View.OnClickListener groupTextViewOnClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            GroupActivity.newIntent(SettingActivity.this);
+        }
+    };
 
-    public View.OnClickListener logoutTextViewOnClick() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Continuation<Boolean, Void> logoutOnSuccess = new Continuation<Boolean, Void>() {
-                    @Override
-                    public Void then(Task<Boolean> task) throws Exception {
-                        SharedPreferences sharedPreferences =
-                                getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
-                        sharedPreferences.edit().clear().apply();
-                        LoginActivity.newIntent(SettingActivity.this);
-                        return null;
-                    }
-                };
-                SyncUser.logout().continueWith(logoutOnSuccess);
-            }
-        };
-    }
+    public View.OnClickListener logoutTextViewOnClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Continuation<Boolean, Void> logoutOnSuccess = new Continuation<Boolean, Void>() {
+                @Override
+                public Void then(Task<Boolean> task) throws Exception {
+                    SharedPreferences sharedPreferences =
+                            getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
+                    sharedPreferences.edit().clear().apply();
+                    LoginActivity.newIntent(SettingActivity.this);
+                    return null;
+                }
+            };
+            SyncUser.logout().continueWith(logoutOnSuccess);
+        }
+    };
 
-    public View.OnClickListener editProfileTextViewOnClick() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                UserDetailActivity.newIntent(SettingActivity.this, ((MyApplication)getApplication()).getUserId());
-            }
-        };
-    }
+    public View.OnClickListener editProfileTextViewOnClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            SharedPreferences sharedPreferences = getApplication()
+                    .getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
+            String userId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
+            UserDetailActivity.newIntent(SettingActivity.this, userId);
+        }
+    };
 }

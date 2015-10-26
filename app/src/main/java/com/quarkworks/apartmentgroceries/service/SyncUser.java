@@ -53,14 +53,11 @@ public class SyncUser {
                     editor.putString(JsonKeys.SESSION_TOKEN, sessionToken);
                     editor.putString(JsonKeys.USER_ID, userId);
                     editor.putString(JsonKeys.USER_ID, userId);
-                    ((MyApplication) MyApplication.getContext()).setSessionToken(sessionToken);
-                    ((MyApplication) MyApplication.getContext()).setUserId(userId);
 
                     JSONObject groupIdObj = loginJsonObj.optJSONObject(JsonKeys.GROUP_ID);
                     if (groupIdObj != null) {
                         String groupId = groupIdObj.optString(JsonKeys.OBJECT_ID);
                         editor.putString(JsonKeys.GROUP_ID, groupId);
-                        ((MyApplication) MyApplication.getContext()).setGroupId(groupId);
                     }
                     editor.apply();
                     return true;

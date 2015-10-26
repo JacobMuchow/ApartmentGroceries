@@ -59,41 +59,27 @@ public class AddGroceryItemActivity extends AppCompatActivity {
         /**
          * Set view OnClickListener
          */
-        addButton.setOnClickListener(addGroceryButtonOnClick());
+        addButton.setOnClickListener(addGroceryButtonOnClick);
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
     }
 
-    public View.OnClickListener addGroceryButtonOnClick() {
-        return new View.OnClickListener() {
+    public View.OnClickListener addGroceryButtonOnClick = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String groceryItemName = groceryItemNameEditText.getText().toString();
 
                 if (!groceryItemName.isEmpty()) {
-                    String groupId = ((MyApplication)MyApplication.getContext()).getGroupId();
-                    String userId = ((MyApplication)MyApplication.getContext()).getUserId();
+                    SharedPreferences sharedPreferences = getApplication()
+                            .getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
+                    String groupId = sharedPreferences.getString(RUser.JsonKeys.GROUP_ID, null);
+                    String userId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
 
                     RGroceryItem rGroceryItem = new RGroceryItem();
                     rGroceryItem.setName(groceryItemName);
                     rGroceryItem.setGroupId(groupId);
                     rGroceryItem.setCreatedBy(userId);
-
-                    Continuation<Boolean, Void> addGroceryItemOnSuccess = new Continuation<Boolean, Void>() {
-                        @Override
-                        public Void then(Task<Boolean> task) throws Exception {
-                            if (task.getResult()) {
-                                HomeActivity.newIntent(AddGroceryItemActivity.this);
-                                Toast.makeText(getApplicationContext(), getString(R.string.add_grocery_item_success),
-                                        Toast.LENGTH_SHORT).show();
-                            } else {
-                                Toast.makeText(getApplicationContext(),
-                                        getString(R.string.add_grocery_item_failure), Toast.LENGTH_SHORT).show();
-                            }
-                            return null;
-                        }
-                    };
 
                     SyncGroceryItem.add(rGroceryItem).onSuccess(addGroceryItemOnSuccess, Task.UI_THREAD_EXECUTOR);
                 } else {
@@ -102,5 +88,19 @@ public class AddGroceryItemActivity extends AppCompatActivity {
                 }
             }
         };
-    }
+
+    private Continuation<Boolean, Void> addGroceryItemOnSuccess = new Continuation<Boolean, Void>() {
+        @Override
+        public Void then(Task<Boolean> task) throws Exception {
+            if (task.getResult()) {
+                HomeActivity.newIntent(AddGroceryItemActivity.this);
+                Toast.makeText(getApplicationContext(), getString(R.string.add_grocery_item_success),
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getApplicationContext(),
+                        getString(R.string.add_grocery_item_failure), Toast.LENGTH_SHORT).show();
+            }
+            return null;
+        }
+    };
 }

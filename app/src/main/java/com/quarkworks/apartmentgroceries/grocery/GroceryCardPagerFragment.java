@@ -42,10 +42,11 @@ public class GroceryCardPagerFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+        View rootView = inflater.inflate(R.layout.grocery_card_pager_fragment, container, false);
+
         /**
          * Get view references
          */
-        View rootView = inflater.inflate(R.layout.grocery_card_pager_fragment, container, false);
         TextView nameTextView = (TextView)rootView.findViewById(R.id.grocery_card_pager_fragment_grocery_item_name_id);
         TextView createdByTextView = (TextView) rootView.findViewById(R.id.grocery_card_pager_fragment_grocery_item_created_by_id);
 
@@ -58,27 +59,23 @@ public class GroceryCardPagerFragment extends Fragment {
         /**
          * Set view OnClickListener
          */
-        nameTextView.setOnClickListener(groceryItemNameOnClick());
-        createdByTextView.setOnClickListener(createByOnClick());
+        nameTextView.setOnClickListener(groceryItemNameOnClick);
+        createdByTextView.setOnClickListener(createByOnClick);
 
         return rootView;
     }
 
-    public View.OnClickListener groceryItemNameOnClick() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                GroceryItemDetailActivity.newIntent(getContext(), groceryId);
-            }
-        };
-    }
+    public View.OnClickListener groceryItemNameOnClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            GroceryItemDetailActivity.newIntent(getContext(), groceryId);
+        }
+    };
 
-    public View.OnClickListener createByOnClick() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                UserDetailActivity.newIntent(getContext(), rGroceryItem.getCreatedBy());
-            }
-        };
-    }
+    public View.OnClickListener createByOnClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            UserDetailActivity.newIntent(getContext(), rGroceryItem.getCreatedBy());
+        }
+    };
 }

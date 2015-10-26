@@ -24,6 +24,7 @@ import com.quarkworks.apartmentgroceries.service.DataStore;
 import com.quarkworks.apartmentgroceries.service.SyncGroceryItem;
 import com.quarkworks.apartmentgroceries.service.SyncUser;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
+import com.quarkworks.apartmentgroceries.service.models.RUser;
 import com.quarkworks.apartmentgroceries.user.UserActivity;
 
 import bolts.Continuation;
@@ -65,7 +66,11 @@ public class HomeActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         SyncGroceryItem.getAll();
-        SyncUser.getAll(((MyApplication)MyApplication.getContext()).getGroupId());
+
+        SharedPreferences sharedPreferences = getApplication()
+                .getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
+        String groupId = sharedPreferences.getString(RUser.JsonKeys.GROUP_ID, null);
+        SyncUser.getAll(groupId);
 
         final RealmResults<RGroceryItem> groceries = DataStore.getInstance().getRealm().where(RGroceryItem.class).findAll();
 

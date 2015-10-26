@@ -87,12 +87,7 @@ public class LoginActivity extends AppCompatActivity {
                             if(task.getResult()) {
                                 SharedPreferences sharedPreferences = getApplication()
                                         .getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
-                                String sessionToken = sharedPreferences.getString(RUser.JsonKeys.SESSION_TOKEN, null);
-                                String userId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
                                 String groupId = sharedPreferences.getString(RUser.JsonKeys.GROUP_ID, null);
-                                ((MyApplication) MyApplication.getContext()).setSessionToken(sessionToken);
-                                ((MyApplication) MyApplication.getContext()).setUserId(userId);
-                                ((MyApplication) MyApplication.getContext()).setGroupId(groupId);
 
                                 if (TextUtils.isEmpty(groupId)) {
                                     GroupActivity.newIntent(LoginActivity.this);
@@ -130,8 +125,7 @@ public class LoginActivity extends AppCompatActivity {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
-                startActivity(intent);
+                SignUpActivity.newIntent(LoginActivity.this);
             }
         };
     }
