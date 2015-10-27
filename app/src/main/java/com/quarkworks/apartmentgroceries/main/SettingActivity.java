@@ -67,14 +67,14 @@ public class SettingActivity extends AppCompatActivity {
         editProfileTextView.setOnClickListener(editProfileTextViewOnClick);
     }
 
-    public View.OnClickListener groupTextViewOnClick = new View.OnClickListener() {
+    private View.OnClickListener groupTextViewOnClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             GroupActivity.newIntent(SettingActivity.this);
         }
     };
 
-    public View.OnClickListener logoutTextViewOnClick = new View.OnClickListener() {
+    private View.OnClickListener logoutTextViewOnClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             Continuation<Void, Void> logoutOnSuccess = new Continuation<Void, Void>() {
@@ -82,12 +82,14 @@ public class SettingActivity extends AppCompatActivity {
                 public Void then(Task<Void> task) throws Exception {
                     if (task.isFaulted()) {
                         Log.e(TAG, task.getError().toString());
-                    } else {
-                        SharedPreferences sharedPreferences =
-                                getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
-                        sharedPreferences.edit().clear().apply();
-                        LoginActivity.newIntent(SettingActivity.this);
+                        return null;
                     }
+
+                    SharedPreferences sharedPreferences =
+                            getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
+                    sharedPreferences.edit().clear().apply();
+                    LoginActivity.newIntent(SettingActivity.this);
+
                     return null;
                 }
             };
@@ -95,7 +97,7 @@ public class SettingActivity extends AppCompatActivity {
         }
     };
 
-    public View.OnClickListener editProfileTextViewOnClick = new View.OnClickListener() {
+    private View.OnClickListener editProfileTextViewOnClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             SharedPreferences sharedPreferences = getApplication()

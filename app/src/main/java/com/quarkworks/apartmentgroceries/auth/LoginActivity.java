@@ -89,29 +89,31 @@ public class LoginActivity extends AppCompatActivity {
                                 progressBar.setVisibility(View.GONE);
                                 Toast.makeText(getApplicationContext(),
                                         getString(R.string.login_failure_message), Toast.LENGTH_LONG).show();
-                            } else {
-                                SharedPreferences sharedPreferences = getApplication()
-                                        .getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
-                                String groupId = sharedPreferences.getString(RUser.JsonKeys.GROUP_ID, null);
-
-                                if (TextUtils.isEmpty(groupId)) {
-                                    GroupActivity.newIntent(LoginActivity.this);
-                                    progressBar.setVisibility(View.GONE);
-                                    Toast.makeText(getApplicationContext(), getString(R.string.login_success_message),
-                                            Toast.LENGTH_SHORT).show();
-                                    Toast.makeText(getApplicationContext(), getString(R.string.choose_group_message),
-                                            Toast.LENGTH_SHORT).show();
-                                } else {
-                                    HomeActivity.newIntent(LoginActivity.this);
-                                    Toast.makeText(getApplicationContext(), getString(R.string.login_success_message),
-                                            Toast.LENGTH_SHORT).show();
-                                }
+                                return null;
                             }
+
+                            SharedPreferences sharedPreferences = getApplication()
+                                    .getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
+                            String groupId = sharedPreferences.getString(RUser.JsonKeys.GROUP_ID, null);
+
+                            if (TextUtils.isEmpty(groupId)) {
+                                GroupActivity.newIntent(LoginActivity.this);
+                                progressBar.setVisibility(View.GONE);
+                                Toast.makeText(getApplicationContext(), getString(R.string.login_success_message),
+                                        Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), getString(R.string.choose_group_message),
+                                        Toast.LENGTH_SHORT).show();
+                            } else {
+                                HomeActivity.newIntent(LoginActivity.this);
+                                Toast.makeText(getApplicationContext(), getString(R.string.login_success_message),
+                                        Toast.LENGTH_SHORT).show();
+                            }
+
                             return null;
                         }
                     };
 
-                    SyncUser.loginBolts(username, password).continueWith(loginOnSuccess, Task.UI_THREAD_EXECUTOR);
+                    SyncUser.login(username, password).continueWith(loginOnSuccess, Task.UI_THREAD_EXECUTOR);
                 } else {
                     progressBar.setVisibility(View.GONE);
                     Toast.makeText(getApplicationContext(),

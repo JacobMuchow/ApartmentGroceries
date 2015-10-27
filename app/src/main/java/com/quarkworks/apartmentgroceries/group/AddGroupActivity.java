@@ -64,7 +64,7 @@ public class AddGroupActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
-    public View.OnClickListener addGroupButtonOnClick = new View.OnClickListener() {
+    private View.OnClickListener addGroupButtonOnClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             String groupItemName = groupNameEditText.getText().toString();
@@ -89,11 +89,13 @@ public class AddGroupActivity extends AppCompatActivity {
                 Log.e(TAG, "Adding group failure", task.getError());
                 Toast.makeText(getApplicationContext(),
                         getString(R.string.add_group_failure), Toast.LENGTH_SHORT).show();
-            } else {
-                HomeActivity.newIntent(AddGroupActivity.this);
-                Toast.makeText(getApplicationContext(), getString(R.string.add_group_success),
-                        Toast.LENGTH_SHORT).show();
+                return null;
             }
+
+            HomeActivity.newIntent(AddGroupActivity.this);
+            Toast.makeText(getApplicationContext(), getString(R.string.add_group_success),
+                    Toast.LENGTH_SHORT).show();
+
             return null;
         }
     };

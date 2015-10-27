@@ -26,7 +26,7 @@ public class SyncGroup {
         private static final String RESULTS = "results";
     }
 
-    public static Task getAll() {
+    public static Task<Void> getAll() {
 
         Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
         UrlTemplate template = UrlTemplateCreator.getAllGroup();
@@ -36,39 +36,40 @@ public class SyncGroup {
             @Override
             public Void then(Task<JSONObject> task) throws Exception {
                 if (task.isFaulted()) {
-                    Log.e(TAG, "Error in getAll: " + task.getError());
-                } else {
-                    JSONObject jsonObject = task.getResult();
-                    if (jsonObject == null) {
-                        Log.e(TAG, "Error getting group from server");
-                        return null;
-                    }
-
-                    Realm realm = Realm.getInstance(MyApplication.getContext());
-                    realm.beginTransaction();
-                    realm.clear(RGroup.class);
-
-                    try {
-                        JSONArray groupJsonArray = jsonObject.getJSONArray(JsonKeys.RESULTS);
-
-                        for (int i = 0; i < groupJsonArray.length(); i++) {
-                            try {
-                                RGroup groupItem = realm.createObject(RGroup.class);
-                                JSONObject groupJsonObj = groupJsonArray.getJSONObject(i);
-                                groupItem.setGroupId(groupJsonObj.getString(JsonKeys.OBJECT_ID));
-                                groupItem.setName(groupJsonObj.getString(JsonKeys.NAME));
-                            } catch (JSONException e) {
-                                Log.e(TAG, "Error parsing group object", e);
-                            }
-                        }
-
-                        realm.commitTransaction();
-                    } catch (JSONException e) {
-                        Log.e(TAG, "Error parsing group object", e);
-                        realm.cancelTransaction();
-                    }
-                    realm.close();
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in getAll", exception);
+                    throw exception;
                 }
+
+                JSONObject jsonObject = task.getResult();
+                if (jsonObject == null) {
+                    throw new InvalidResponseException("Empty response");
+                }
+
+                Realm realm = Realm.getInstance(MyApplication.getContext());
+                realm.beginTransaction();
+                realm.clear(RGroup.class);
+
+                try {
+                    JSONArray groupJsonArray = jsonObject.getJSONArray(JsonKeys.RESULTS);
+
+                    for (int i = 0; i < groupJsonArray.length(); i++) {
+                        try {
+                            RGroup groupItem = realm.createObject(RGroup.class);
+                            JSONObject groupJsonObj = groupJsonArray.getJSONObject(i);
+                            groupItem.setGroupId(groupJsonObj.getString(JsonKeys.OBJECT_ID));
+                            groupItem.setName(groupJsonObj.getString(JsonKeys.NAME));
+                        } catch (JSONException e) {
+                            Log.e(TAG, "Error parsing group object", e);
+                        }
+                    }
+
+                    realm.commitTransaction();
+                } catch (JSONException e) {
+                    Log.e(TAG, "Error parsing group object", e);
+                    realm.cancelTransaction();
+                }
+                realm.close();
 
                 return null;
             }
@@ -77,7 +78,7 @@ public class SyncGroup {
         return networkRequest.runNetworkRequest().continueWith(addGroupsToRealm);
     }
 
-    public static Task add(RGroup rRGroup) {
+    public static Task<Void> add(RGroup rRGroup) {
 
         Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
         UrlTemplate template = UrlTemplateCreator.addGroup(rRGroup);
@@ -87,23 +88,26 @@ public class SyncGroup {
             @Override
             public Void then(Task<JSONObject> task) throws Exception {
                 if (task.isFaulted()) {
-                    throw task.getError();
-                } else {
-                    JSONObject jsonObject = task.getResult();
-
-                    if (jsonObject == null) {
-                        throw new InvalidResponseException("Empty response");
-                    }
-
-                    try {
-                        if(TextUtils.isEmpty(jsonObject.getString(JsonKeys.OBJECT_ID))) {
-                            throw new InvalidResponseException("Incorrect response");
-                        }
-                    } catch (JSONException e) {
-                        Log.e(TAG, "Error parsing group object", e);
-                    }
-                    return null;
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in add", exception);
+                    throw exception;
                 }
+
+                JSONObject jsonObject = task.getResult();
+
+                if (jsonObject == null) {
+                    throw new InvalidResponseException("Empty response");
+                }
+
+                try {
+                    if(TextUtils.isEmpty(jsonObject.getString(JsonKeys.OBJECT_ID))) {
+                        throw new InvalidResponseException("Incorrect response");
+                    }
+                } catch (JSONException e) {
+                    Log.e(TAG, "Error parsing group object", e);
+                }
+
+                return null;
             }
         };
 

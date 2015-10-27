@@ -65,14 +65,14 @@ public class GroceryCardPagerFragment extends Fragment {
         return rootView;
     }
 
-    public View.OnClickListener groceryItemNameOnClick = new View.OnClickListener() {
+    private View.OnClickListener groceryItemNameOnClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             GroceryItemDetailActivity.newIntent(getContext(), groceryId);
         }
     };
 
-    public View.OnClickListener createByOnClick = new View.OnClickListener() {
+    private View.OnClickListener createByOnClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             UserDetailActivity.newIntent(getContext(), rGroceryItem.getCreatedBy());

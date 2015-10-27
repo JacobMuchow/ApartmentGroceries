@@ -65,7 +65,7 @@ public class AddGroceryItemActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
     }
 
-    public View.OnClickListener addGroceryButtonOnClick = new View.OnClickListener() {
+    private View.OnClickListener addGroceryButtonOnClick = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String groceryItemName = groceryItemNameEditText.getText().toString();
@@ -89,18 +89,20 @@ public class AddGroceryItemActivity extends AppCompatActivity {
             }
         };
 
-    private Continuation<Boolean, Void> addGroceryItemOnSuccess = new Continuation<Boolean, Void>() {
+    private Continuation<Void, Void> addGroceryItemOnSuccess = new Continuation<Void, Void>() {
         @Override
-        public Void then(Task<Boolean> task) throws Exception {
+        public Void then(Task<Void> task) throws Exception {
             if (task.isFaulted()) {
                 Log.e(TAG, "Failed to add grocery", task.getError());
                 Toast.makeText(getApplicationContext(),
                         getString(R.string.add_grocery_item_failure), Toast.LENGTH_SHORT).show();
-            } else {
-                HomeActivity.newIntent(AddGroceryItemActivity.this);
-                Toast.makeText(getApplicationContext(), getString(R.string.add_grocery_item_success),
-                        Toast.LENGTH_SHORT).show();
+                return null;
             }
+
+            HomeActivity.newIntent(AddGroceryItemActivity.this);
+            Toast.makeText(getApplicationContext(), getString(R.string.add_grocery_item_success),
+                    Toast.LENGTH_SHORT).show();
+
             return null;
         }
     };

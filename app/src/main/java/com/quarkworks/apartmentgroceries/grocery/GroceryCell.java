@@ -103,7 +103,7 @@ public class GroceryCell extends RelativeLayout {
         purchasedByTextView.setOnClickListener(purchasedByOnClick);
     }
 
-    public View.OnClickListener groceryNameOnClick = new OnClickListener() {
+    private View.OnClickListener groceryNameOnClick = new OnClickListener() {
         @Override
         public void onClick(View v) {
             GroceryCardPagerActivity.newIntent(getContext(), position);
@@ -111,14 +111,14 @@ public class GroceryCell extends RelativeLayout {
     };
 
 
-    public View.OnClickListener createdByOnClick = new OnClickListener() {
+    private View.OnClickListener createdByOnClick = new OnClickListener() {
         @Override
         public void onClick(View v) {
             UserDetailActivity.newIntent(getContext(), rGroceryItem.getCreatedBy());
         }
     };
 
-    public View.OnClickListener purchasedByOnClick = new OnClickListener() {
+    private View.OnClickListener purchasedByOnClick = new OnClickListener() {
         @Override
         public void onClick(View v) {
             UserDetailActivity.newIntent(getContext(), rGroceryItem.getPurchasedBy());

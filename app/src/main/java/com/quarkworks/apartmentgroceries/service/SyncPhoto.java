@@ -24,21 +24,22 @@ public class SyncPhoto {
             @Override
             public JSONObject then(Task<JSONObject> task) throws Exception {
                 if (task.isFaulted()) {
-                    Log.e(TAG, "Error in uploadPhoto: " + task.getError());
-                } else {
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in uploadPhoto", exception);
+                    throw exception;
+                }
 
-                    if (task.getResult() == null) {
-                        throw new InvalidResponseException("Empty response");
-                    }
+                if (task.getResult() == null) {
+                    throw new InvalidResponseException("Empty response");
+                }
 
-                    try {
-                        String photoName = task.getResult().getString("name");
-                        Log.d(TAG, "uploaded photo name:" + photoName);
-                        return task.getResult();
+                try {
+                    String photoName = task.getResult().getString("name");
+                    Log.d(TAG, "uploaded photo name:" + photoName);
+                    return task.getResult();
 
-                    } catch (JSONException e) {
-                        Log.e(TAG, "Error parsing photo object", e);
-                    }
+                } catch (JSONException e) {
+                    Log.e(TAG, "Error parsing photo object", e);
                 }
 
                 return null;

@@ -28,7 +28,7 @@ public class GroupActivity extends AppCompatActivity {
      */
     private Toolbar toolbar;
     private TextView titleTextView;
-    public static RealmBaseAdapter<RGroup> groupRealmBaseAdapter;
+    private static RealmBaseAdapter<RGroup> groupRealmBaseAdapter;
 
     public static void newIntent(Context context) {
         Intent intent = new Intent(context, GroupActivity.class);

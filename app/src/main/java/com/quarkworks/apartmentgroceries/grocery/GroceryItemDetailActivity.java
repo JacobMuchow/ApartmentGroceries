@@ -62,7 +62,7 @@ public class GroceryItemDetailActivity extends AppCompatActivity {
 
     }
 
-    public View.OnClickListener createdByOnClickListener = new View.OnClickListener() {
+    private View.OnClickListener createdByOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             UserDetailActivity.newIntent(GroceryItemDetailActivity.this, groceryItem.getCreatedBy());

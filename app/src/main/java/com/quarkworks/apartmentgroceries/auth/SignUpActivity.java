@@ -87,15 +87,17 @@ public class SignUpActivity extends AppCompatActivity {
                             public Void then(Task<Void> task) {
                                 if (task.isFaulted()) {
                                     Log.e(TAG, task.getError().toString());
-                                } else {
-                                    progressBar.setVisibility(View.GONE);
-
-                                    GroupActivity.newIntent(SignUpActivity.this);
-                                    Toast.makeText(getApplicationContext(), getString(R.string.login_success_message),
-                                            Toast.LENGTH_SHORT).show();
-                                    Toast.makeText(getApplicationContext(), getString(R.string.choose_group_message),
-                                            Toast.LENGTH_SHORT).show();
+                                    return null;
                                 }
+
+                                progressBar.setVisibility(View.GONE);
+
+                                GroupActivity.newIntent(SignUpActivity.this);
+                                Toast.makeText(getApplicationContext(), getString(R.string.login_success_message),
+                                        Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), getString(R.string.choose_group_message),
+                                        Toast.LENGTH_SHORT).show();
+
                                 return null;
                             }
                         };
@@ -108,9 +110,11 @@ public class SignUpActivity extends AppCompatActivity {
                                     progressBar.setVisibility(View.GONE);
                                     Toast.makeText(MyApplication.getContext(),
                                             getString(R.string.sign_up_failure_message), Toast.LENGTH_SHORT).show();
-                                } else {
-                                    SyncUser.loginBolts(username, password).onSuccess(loginOnSuccess, Task.UI_THREAD_EXECUTOR);
+                                    return null;
                                 }
+
+                                SyncUser.login(username, password).onSuccess(loginOnSuccess, Task.UI_THREAD_EXECUTOR);
+
                                 return null;
                             }
                         };

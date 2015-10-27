@@ -71,7 +71,7 @@ public class GroupCell extends RelativeLayout{
         joinGroupButton.setOnClickListener(joinGroupButtonOnClick);
     }
 
-    public View.OnClickListener joinGroupButtonOnClick = new View.OnClickListener() {
+    private View.OnClickListener joinGroupButtonOnClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             SharedPreferences sharedPreferences =
@@ -93,14 +93,15 @@ public class GroupCell extends RelativeLayout{
                 Toast.makeText(MyApplication.getContext(),
                         MyApplication.getContext().getString(R.string.join_group_failure),
                         Toast.LENGTH_LONG).show();
-
-            } else {
-                SyncUser.getAll(groupId);
-                HomeActivity.newIntent(getContext());
-                Toast.makeText(MyApplication.getContext(),
-                        MyApplication.getContext().getString(R.string.join_group_success),
-                        Toast.LENGTH_SHORT).show();
+                return null;
             }
+
+            SyncUser.getAll(groupId);
+            HomeActivity.newIntent(getContext());
+            Toast.makeText(MyApplication.getContext(),
+                    MyApplication.getContext().getString(R.string.join_group_success),
+                    Toast.LENGTH_SHORT).show();
+
             return null;
         }
     };

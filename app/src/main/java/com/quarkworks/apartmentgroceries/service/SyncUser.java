@@ -25,7 +25,7 @@ import com.quarkworks.apartmentgroceries.service.models.RUser.JsonKeys;
 public class SyncUser {
     private static final String TAG = SyncUser.class.getSimpleName();
 
-    public static Task loginBolts(String username, String password) {
+    public static Task<Void> login(String username, String password) {
 
         Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
         UrlTemplate template = UrlTemplateCreator.login(username, password);
@@ -35,49 +35,51 @@ public class SyncUser {
             @Override
             public Void then(Task<JSONObject> task) throws Exception {
                 if (task.isFaulted()) {
-                    throw task.getError();
-                } else {
-                    JSONObject loginJsonObj = task.getResult();
-
-                    if (loginJsonObj == null) {
-                        throw new InvalidResponseException("Empty response");
-                    }
-
-                    String sessionToken = loginJsonObj.optString(JsonKeys.SESSION_TOKEN);
-                    String userId = loginJsonObj.optString(JsonKeys.OBJECT_ID);
-
-                    if (!TextUtils.isEmpty(sessionToken)) {
-                        Context context = MyApplication.getContext();
-                        SharedPreferences sharedPreferences = context
-                                .getSharedPreferences(context.getString(R.string.login_or_sign_up_session), 0);
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putString(JsonKeys.SESSION_TOKEN, sessionToken);
-                        editor.putString(JsonKeys.USER_ID, userId);
-
-                        JSONObject groupIdObj = loginJsonObj.optJSONObject(JsonKeys.GROUP_ID);
-                        if (groupIdObj != null) {
-                            String groupId = groupIdObj.optString(JsonKeys.OBJECT_ID);
-                            editor.putString(JsonKeys.GROUP_ID, groupId);
-                        }
-                        editor.apply();
-                    } else {
-                        String error = loginJsonObj.optString(JsonKeys.ERROR);
-                        if (!TextUtils.isEmpty(error)) {
-                            throw new InvalidResponseException(error);
-                        } else {
-                            throw new InvalidResponseException("Incorrect login response");
-                        }
-
-                    }
-                    return null;
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in login", exception);
+                    throw exception;
                 }
+
+                JSONObject loginJsonObj = task.getResult();
+
+                if (loginJsonObj == null) {
+                    throw new InvalidResponseException("Empty response");
+                }
+
+                String sessionToken = loginJsonObj.optString(JsonKeys.SESSION_TOKEN);
+                String userId = loginJsonObj.optString(JsonKeys.OBJECT_ID);
+
+                if (!TextUtils.isEmpty(sessionToken)) {
+                    Context context = MyApplication.getContext();
+                    SharedPreferences sharedPreferences = context
+                            .getSharedPreferences(context.getString(R.string.login_or_sign_up_session), 0);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString(JsonKeys.SESSION_TOKEN, sessionToken);
+                    editor.putString(JsonKeys.USER_ID, userId);
+
+                    JSONObject groupIdObj = loginJsonObj.optJSONObject(JsonKeys.GROUP_ID);
+                    if (groupIdObj != null) {
+                        String groupId = groupIdObj.optString(JsonKeys.OBJECT_ID);
+                        editor.putString(JsonKeys.GROUP_ID, groupId);
+                    }
+                    editor.apply();
+                } else {
+                    String error = loginJsonObj.optString(JsonKeys.ERROR);
+                    if (!TextUtils.isEmpty(error)) {
+                        throw new InvalidResponseException(error);
+                    } else {
+                        throw new InvalidResponseException("Incorrect login response");
+                    }
+                }
+
+                return null;
             }
         };
 
         return networkRequest.runNetworkRequest().continueWith(saveLoginCredential);
     }
 
-    public static Task logout() {
+    public static Task<Void> logout() {
 
         Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
         UrlTemplate template = UrlTemplateCreator.logout();
@@ -87,16 +89,17 @@ public class SyncUser {
             @Override
             public Void then(Task<JSONObject> task) throws Exception {
                 if (task.isFaulted()) {
-                    throw task.getError();
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in logout", exception);
+                    throw exception;
+                }
+
+                JSONObject logoutJsonObj = task.getResult();
+
+                if (logoutJsonObj != null && logoutJsonObj.toString().equals("{}")) {
+                    return null;
                 } else {
-
-                    JSONObject logoutJsonObj = task.getResult();
-
-                    if (logoutJsonObj != null && logoutJsonObj.toString().equals("{}")) {
-                        return null;
-                    } else {
-                        throw new InvalidResponseException("Incorrect logout response");
-                    }
+                    throw new InvalidResponseException("Incorrect logout response");
                 }
             }
         };
@@ -104,7 +107,7 @@ public class SyncUser {
         return networkRequest.runNetworkRequest().continueWith(checkLogout);
     }
 
-    public static Task signUp(String username, String password) {
+    public static Task<Void> signUp(String username, String password) {
 
         Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
         UrlTemplate template = UrlTemplateCreator.signUp(username, password);
@@ -114,26 +117,28 @@ public class SyncUser {
             @Override
             public Void then(Task<JSONObject> task) throws Exception {
                 if (task.isFaulted()) {
-                    throw task.getError();
-                } else {
-                    JSONObject signUpJsonObj = task.getResult();
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in signUp", exception);
+                    throw exception;
+                }
 
-                    if (signUpJsonObj == null) {
-                        throw new InvalidResponseException("Empty response");
-                    }
+                JSONObject signUpJsonObj = task.getResult();
 
-                    try {
-                        String sessionToken = signUpJsonObj.getString(JsonKeys.SESSION_TOKEN);
+                if (signUpJsonObj == null) {
+                    throw new InvalidResponseException("Empty response");
+                }
 
-                        Context context = MyApplication.getContext();
-                        SharedPreferences sharedPreferences = context
-                                .getSharedPreferences(context.getString(R.string.login_or_sign_up_session), 0);
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putString(JsonKeys.SESSION_TOKEN, sessionToken);
-                        editor.apply();
-                    } catch (JSONException e) {
-                        throw new InvalidResponseException("Incorrect sign up response");
-                    }
+                try {
+                    String sessionToken = signUpJsonObj.getString(JsonKeys.SESSION_TOKEN);
+
+                    Context context = MyApplication.getContext();
+                    SharedPreferences sharedPreferences = context
+                            .getSharedPreferences(context.getString(R.string.login_or_sign_up_session), 0);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString(JsonKeys.SESSION_TOKEN, sessionToken);
+                    editor.apply();
+                } catch (JSONException e) {
+                    throw new InvalidResponseException("Incorrect sign up response");
                 }
 
                 return null;
@@ -143,7 +148,7 @@ public class SyncUser {
         return networkRequest.runNetworkRequest().continueWith(saveCredential);
     }
 
-    public static Task getAll(String groupId){
+    public static Task<Void> getAll(String groupId){
 
         Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
         UrlTemplate template;
@@ -158,51 +163,53 @@ public class SyncUser {
             @Override
             public Void then(Task<JSONObject> task) throws Exception {
                 if (task.isFaulted()) {
-                    throw task.getError();
-                } else {
-                    JSONObject jsonObject = task.getResult();
-                    if (jsonObject == null) {
-                        throw new InvalidResponseException("Empty response");
-                    }
-
-                    Realm realm = Realm.getInstance(MyApplication.getContext());
-                    realm.beginTransaction();
-                    realm.clear(RUser.class);
-
-                    try {
-                        JSONArray userJsonArray = jsonObject.getJSONArray(JsonKeys.RESULTS);
-                        for (int i = 0; i < userJsonArray.length(); i++) {
-                            RUser rUser = realm.createObject(RUser.class);
-                            try {
-                                JSONObject userJsonObj = userJsonArray.getJSONObject(i);
-
-                                rUser.setUserId(userJsonObj.getString(JsonKeys.OBJECT_ID));
-                                rUser.setUsername(userJsonObj.getString(JsonKeys.USERNAME));
-                                rUser.setEmail(userJsonObj.optString(JsonKeys.EMAIL));
-                                rUser.setPhone(userJsonObj.optString(JsonKeys.PHONE));
-
-                                JSONObject groupIdObj = userJsonObj.optJSONObject(JsonKeys.GROUP_ID);
-                                if (groupIdObj != null) {
-                                    rUser.setGroupId(groupIdObj.getString(JsonKeys.OBJECT_ID));
-                                }
-                                rUser.setPhone(userJsonObj.optString(JsonKeys.PHONE));
-                                JSONObject photoJsonObj = userJsonObj.optJSONObject(JsonKeys.PHOTO);
-                                if (photoJsonObj != null) {
-                                    rUser.setUrl(photoJsonObj.getString(JsonKeys.URL));
-                                }
-
-                            } catch (JSONException e) {
-                                Log.e(TAG, "Error parsing user object", e);
-                            }
-                        }
-
-                        realm.commitTransaction();
-                    } catch (JSONException e) {
-                        Log.e(TAG, "Error get user object from server", e);
-                        realm.cancelTransaction();
-                    }
-                    realm.close();
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in getAll", exception);
+                    throw exception;
                 }
+
+                JSONObject jsonObject = task.getResult();
+                if (jsonObject == null) {
+                    throw new InvalidResponseException("Empty response");
+                }
+
+                Realm realm = Realm.getInstance(MyApplication.getContext());
+                realm.beginTransaction();
+                realm.clear(RUser.class);
+
+                try {
+                    JSONArray userJsonArray = jsonObject.getJSONArray(JsonKeys.RESULTS);
+                    for (int i = 0; i < userJsonArray.length(); i++) {
+                        RUser rUser = realm.createObject(RUser.class);
+                        try {
+                            JSONObject userJsonObj = userJsonArray.getJSONObject(i);
+
+                            rUser.setUserId(userJsonObj.getString(JsonKeys.OBJECT_ID));
+                            rUser.setUsername(userJsonObj.getString(JsonKeys.USERNAME));
+                            rUser.setEmail(userJsonObj.optString(JsonKeys.EMAIL));
+                            rUser.setPhone(userJsonObj.optString(JsonKeys.PHONE));
+
+                            JSONObject groupIdObj = userJsonObj.optJSONObject(JsonKeys.GROUP_ID);
+                            if (groupIdObj != null) {
+                                rUser.setGroupId(groupIdObj.getString(JsonKeys.OBJECT_ID));
+                            }
+                            rUser.setPhone(userJsonObj.optString(JsonKeys.PHONE));
+                            JSONObject photoJsonObj = userJsonObj.optJSONObject(JsonKeys.PHOTO);
+                            if (photoJsonObj != null) {
+                                rUser.setUrl(photoJsonObj.getString(JsonKeys.URL));
+                            }
+
+                        } catch (JSONException e) {
+                            Log.e(TAG, "Error parsing user object", e);
+                        }
+                    }
+
+                    realm.commitTransaction();
+                } catch (JSONException e) {
+                    Log.e(TAG, "Error get user object from server", e);
+                    realm.cancelTransaction();
+                }
+                realm.close();
 
                 return null;
             }
@@ -211,11 +218,11 @@ public class SyncUser {
         return networkRequest.runNetworkRequest().continueWith(addUsersToRealm);
     }
 
-    public static Task getAll() {
+    public static Task<Void> getAll() {
         return getAll(null);
     }
 
-    public static Task joinGroup(String userId, String groupId) {
+    public static Task<Void> joinGroup(String userId, String groupId) {
 
         Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
         UrlTemplate template = UrlTemplateCreator.joinGroup(userId, groupId);
@@ -225,20 +232,22 @@ public class SyncUser {
             @Override
             public Void then(Task<JSONObject> task) throws Exception {
                 if (task.isFaulted()) {
-                    throw task.getError();
-                } else {
-                    JSONObject jsonObject = task.getResult();
-                    if (jsonObject == null) {
-                        throw new InvalidResponseException("Empty response");
-                    }
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in joinGroup", exception);
+                    throw exception;
+                }
 
-                    try {
-                        if (TextUtils.isEmpty(jsonObject.getString(JsonKeys.UPDATED_AT))) {
-                            throw new InvalidResponseException("Invalid join group response");
-                        }
-                    } catch (JSONException e) {
-                        Log.e(TAG, "Error parsing joining group response", e);
+                JSONObject jsonObject = task.getResult();
+                if (jsonObject == null) {
+                    throw new InvalidResponseException("Empty response");
+                }
+
+                try {
+                    if (TextUtils.isEmpty(jsonObject.getString(JsonKeys.UPDATED_AT))) {
+                        throw new InvalidResponseException("Invalid join group response");
                     }
+                } catch (JSONException e) {
+                    Log.e(TAG, "Error parsing joining group response", e);
                 }
 
                 return null;
@@ -248,7 +257,7 @@ public class SyncUser {
         return networkRequest.runNetworkRequest().continueWith(checkJoiningGroup);
     }
 
-    public static Task updateProfilePhoto(String photoName, byte[] data) {
+    public static Task<JSONObject> updateProfilePhoto(String photoName, byte[] data) {
 
         SharedPreferences sharedPreferences =
                 MyApplication.getContext().getSharedPreferences(
@@ -262,37 +271,45 @@ public class SyncUser {
             @Override
             public Void then(Task<JSONObject> task) throws Exception {
                 if (task.isFaulted()) {
-                    throw task.getError();
-                } else {
-                    String photoName = task.getResult().optString("name");
-                    if (TextUtils.isEmpty(photoName)) {
-                        throw new InvalidResponseException("Empty response");
-                    }
-
-                    final UrlTemplate template = UrlTemplateCreator.updateProfilePhoto(userId, photoName);
-
-                    Continuation<JSONObject, Void> UpdatingPhoto = new Continuation<JSONObject, Void>() {
-                        @Override
-                        public Void then(Task<JSONObject> task) throws Exception{
-                            try {
-                                String updatedAt = task.getResult().getString(RUser.JsonKeys.UPDATED_AT);
-                                if (!TextUtils.isEmpty(updatedAt)) {
-                                    Context context = MyApplication.getContext();
-                                    SharedPreferences sharedPreferences = context.getSharedPreferences(
-                                            context.getString(R.string.login_or_sign_up_session), 0);
-                                    String userId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
-                                    SyncUser.getById(userId);
-                                } else {
-                                    throw new InvalidResponseException("Incorrect updating user's photo response");
-                                }
-                            } catch (JSONException e) {
-                                Log.e(TAG, "Error parsing updating photo response", e);
-                            }
-                            return null;
-                        }
-                    };
-                    new NetworkRequest(template, taskCompletionSource).runNetworkRequest().continueWith(UpdatingPhoto);
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in uploadPhoto", exception);
+                    throw exception;
                 }
+
+                String photoName = task.getResult().optString("name");
+                if (TextUtils.isEmpty(photoName)) {
+                    throw new InvalidResponseException("Empty response");
+                }
+
+                final UrlTemplate template = UrlTemplateCreator.updateProfilePhoto(userId, photoName);
+
+                Continuation<JSONObject, Void> UpdatingPhoto = new Continuation<JSONObject, Void>() {
+                    @Override
+                    public Void then(Task<JSONObject> task) throws Exception{
+                        if (task.isFaulted()) {
+                            Exception exception = task.getError();
+                            Log.e(TAG, "Error in UpdatingPhoto", exception);
+                            throw exception;
+                        }
+
+                        try {
+                            String updatedAt = task.getResult().getString(RUser.JsonKeys.UPDATED_AT);
+                            if (!TextUtils.isEmpty(updatedAt)) {
+                                Context context = MyApplication.getContext();
+                                SharedPreferences sharedPreferences = context.getSharedPreferences(
+                                        context.getString(R.string.login_or_sign_up_session), 0);
+                                String userId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
+                                SyncUser.getById(userId);
+                            } else {
+                                throw new InvalidResponseException("Incorrect updating user's photo response");
+                            }
+                        } catch (JSONException e) {
+                            Log.e(TAG, "Error parsing updating photo response", e);
+                        }
+                        return null;
+                    }
+                };
+                new NetworkRequest(template, taskCompletionSource).runNetworkRequest().continueWith(UpdatingPhoto);
 
                 return null;
             }
@@ -313,42 +330,44 @@ public class SyncUser {
             @Override
             public RUser then(Task<JSONObject> task) throws Exception {
                 if (task.isFaulted()) {
-                    throw task.getError();
-                } else {
-                    if (task.getResult() == null) {
-                        throw new InvalidResponseException("Empty response");
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in getById", exception);
+                    throw exception;
+                }
+
+                if (task.getResult() == null) {
+                    throw new InvalidResponseException("Empty response");
+                }
+
+                try {
+                    JSONObject userJsonObj = new JSONObject(task.getResult().toString());
+
+                    RUser rUser = new RUser();
+                    rUser.setUserId(userJsonObj.getString(JsonKeys.OBJECT_ID));
+                    rUser.setUsername(userJsonObj.getString(JsonKeys.USERNAME));
+                    rUser.setEmail(userJsonObj.optString(JsonKeys.EMAIL));
+                    rUser.setPhone(userJsonObj.optString(JsonKeys.PHONE));
+
+                    JSONObject groupIdObj = userJsonObj.optJSONObject(JsonKeys.GROUP_ID);
+                    if (groupIdObj != null) {
+                        rUser.setGroupId(groupIdObj.getString(JsonKeys.OBJECT_ID));
+                    }
+                    rUser.setPhone(userJsonObj.optString(JsonKeys.PHONE));
+                    JSONObject photoJsonObj = userJsonObj.optJSONObject(JsonKeys.PHOTO);
+                    if (photoJsonObj != null) {
+                        rUser.setUrl(photoJsonObj.getString(JsonKeys.URL));
                     }
 
-                    try {
-                        JSONObject userJsonObj = new JSONObject(task.getResult().toString());
+                    Realm realmInsert = Realm.getInstance(MyApplication.getContext());
+                    realmInsert.beginTransaction();
+                    realmInsert.copyToRealmOrUpdate(rUser);
+                    realmInsert.commitTransaction();
+                    realmInsert.close();
 
-                        RUser rUser = new RUser();
-                        rUser.setUserId(userJsonObj.getString(JsonKeys.OBJECT_ID));
-                        rUser.setUsername(userJsonObj.getString(JsonKeys.USERNAME));
-                        rUser.setEmail(userJsonObj.optString(JsonKeys.EMAIL));
-                        rUser.setPhone(userJsonObj.optString(JsonKeys.PHONE));
+                    return rUser;
 
-                        JSONObject groupIdObj = userJsonObj.optJSONObject(JsonKeys.GROUP_ID);
-                        if (groupIdObj != null) {
-                            rUser.setGroupId(groupIdObj.getString(JsonKeys.OBJECT_ID));
-                        }
-                        rUser.setPhone(userJsonObj.optString(JsonKeys.PHONE));
-                        JSONObject photoJsonObj = userJsonObj.optJSONObject(JsonKeys.PHOTO);
-                        if (photoJsonObj != null) {
-                            rUser.setUrl(photoJsonObj.getString(JsonKeys.URL));
-                        }
-
-                        Realm realmInsert = Realm.getInstance(MyApplication.getContext());
-                        realmInsert.beginTransaction();
-                        realmInsert.copyToRealmOrUpdate(rUser);
-                        realmInsert.commitTransaction();
-                        realmInsert.close();
-
-                        return rUser;
-
-                    } catch (JSONException e) {
-                        Log.e(TAG, "Error parsing user object", e);
-                    }
+                } catch (JSONException e) {
+                    Log.e(TAG, "Error parsing user object", e);
                 }
 
                 return null;

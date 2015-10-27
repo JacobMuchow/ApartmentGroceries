@@ -24,7 +24,7 @@ public class GroceryCardPagerActivity extends AppCompatActivity {
     private ViewPager viewPager;
     private GroceryCardPagerAdapter groceryCardPagerAdapter;
 
-    public static RealmResults<RGroceryItem> groceryItems;
+    private static RealmResults<RGroceryItem> groceryItems;
 
     public static void newIntent(Context context, int position) {
         Intent intent = new Intent(context, GroceryCardPagerActivity.class);
@@ -53,7 +53,7 @@ public class GroceryCardPagerActivity extends AppCompatActivity {
         viewPager.setCurrentItem(position);
     }
 
-    public static class GroceryCardPagerAdapter extends FragmentStatePagerAdapter {
+    private static class GroceryCardPagerAdapter extends FragmentStatePagerAdapter {
         public GroceryCardPagerAdapter(FragmentManager fragmentManager) {
             super(fragmentManager);
         }
@@ -70,7 +70,7 @@ public class GroceryCardPagerActivity extends AppCompatActivity {
         }
     }
 
-    public class zoomOutPageTransformer implements ViewPager.PageTransformer {
+    private class zoomOutPageTransformer implements ViewPager.PageTransformer {
         private static final float MIN_SCALE = 0.85f;
         private static final float MIN_ALPHA = 0.5f;
 

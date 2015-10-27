@@ -77,7 +77,7 @@ public class UserDetailActivity extends AppCompatActivity {
 
     }
 
-    public View.OnClickListener editPhotoTextViewOnClick() {
+    private View.OnClickListener editPhotoTextViewOnClick() {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -178,17 +178,17 @@ public class PhotoActivity extends AppCompatActivity {
                                     Log.e(TAG, "Failed updating photo", task.getError());
                                     Toast.makeText(getApplicationContext(),
                                             getString(R.string.photo_update_failure), Toast.LENGTH_SHORT).show();
-
-                                } else {
-
-                                    Toast.makeText(getApplicationContext(),
-                                            getString(R.string.photo_update_success), Toast.LENGTH_SHORT).show();
-                                    SharedPreferences sharedPreferences =
-                                            getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
-                                    String userId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
-
-                                    SyncUser.getById(userId);
+                                    return null;
                                 }
+
+                                Toast.makeText(getApplicationContext(),
+                                        getString(R.string.photo_update_success), Toast.LENGTH_SHORT).show();
+                                SharedPreferences sharedPreferences =
+                                        getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
+                                String userId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
+
+                                SyncUser.getById(userId);
+
                                 return null;
                             }
                         };
@@ -225,7 +225,7 @@ public class PhotoActivity extends AppCompatActivity {
         return dateFormat.format(date);
     }
 
-    public static Bitmap decodeSampledBitmapFromByteArray(byte[] inputData, int offset,
+    private static Bitmap decodeSampledBitmapFromByteArray(byte[] inputData, int offset,
                                                          int width, int height) {
 
         final BitmapFactory.Options options = new BitmapFactory.Options();
@@ -237,7 +237,7 @@ public class PhotoActivity extends AppCompatActivity {
         return BitmapFactory.decodeByteArray(inputData, 0, inputData.length, options);
     }
 
-    public static int calculateInSampleSize(
+    private static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
         final int height = options.outHeight;
         final int width = options.outWidth;
