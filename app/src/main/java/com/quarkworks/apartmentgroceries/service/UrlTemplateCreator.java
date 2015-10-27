@@ -4,8 +4,6 @@ import android.util.Log;
 
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
 import com.quarkworks.apartmentgroceries.service.models.RGroup;
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.RequestBody;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -85,6 +83,25 @@ public class UrlTemplateCreator {
         String url = baseUrl + "users";
 
         return new UrlTemplate(GET, url, null);
+    }
+
+    public static UrlTemplate getUsersByGroupId(String groupId) {
+        String url = baseUrl + "users";
+        Map<String, String> params = new HashMap<>();
+
+        JSONObject subGroupIdObj = new JSONObject();
+        JSONObject groupIdObj=new JSONObject();
+        try {
+            subGroupIdObj.put("__type", "Pointer");
+            subGroupIdObj.put("className", "Group");
+            subGroupIdObj.put("objectId", groupId);
+            groupIdObj.put("groupId", subGroupIdObj);
+        } catch (JSONException e) {
+            Log.d(TAG, "Error creating group id object for where in getGroceryItemsByGroupId", e);
+        }
+
+        params.put("where", Utilities.encodeURIComponent(groupIdObj.toString()));
+        return new UrlTemplate(GET, url, params);
     }
 
     public static UrlTemplate getAllGroup() {

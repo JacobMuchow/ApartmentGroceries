@@ -1,15 +1,20 @@
 package com.quarkworks.apartmentgroceries.service;
 
-import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 
+import com.quarkworks.apartmentgroceries.MyApplication;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import bolts.Continuation;
+import bolts.Task;
 import io.realm.Realm;
+
+import com.quarkworks.apartmentgroceries.service.models.RGroceryItem.JsonKeys;
 
 /**
  * Created by zz on 10/14/15.
@@ -17,31 +22,29 @@ import io.realm.Realm;
 public class SyncGroceryItem {
     private static final String TAG = SyncGroceryItem.class.getSimpleName();
 
-    private static final class JsonKeys {
-        private static final String GROUP_ID = "groupId";
-        private static final String NAME = "name";
-        private static final String OBJECT_ID = "objectId";
-        private static final String RESULTS = "results";
-        private static final String CREATED_BY = "createdBy";
-        private static final String PURCHASED_BY = "purchasedBy";
-        private static final String USERNAME = "username";
-        private static final String CREATED_AT ="createdAt";
-    }
+    public static Task<Void> getAll() {
 
-    public static Promise getAll() {
+        Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
+        UrlTemplate template = UrlTemplateCreator.getAllGroceryItems();
+        NetworkRequest networkRequest = new NetworkRequest(template, taskCompletionSource);
 
-        final Promise promise = new Promise();
-
-        NetworkRequest.Callback callback = new NetworkRequest.Callback() {
+        Continuation<JSONObject, Void> addGroceryItemsToRealm = new Continuation<JSONObject, Void>() {
             @Override
-            public void done(@Nullable JSONObject jsonObject) {
-                if (jsonObject == null) {
-                    Log.e(TAG, "Error getting grocery items from server");
-                    promise.onFailure();
-                    return;
+            public Void then(Task<JSONObject> task) throws Exception {
+
+                if (task.isFaulted()) {
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in getAll", exception);
+                    throw exception;
                 }
 
-                Realm realm = DataStore.getInstance().getRealm();
+                JSONObject jsonObject = task.getResult();
+
+                if (jsonObject == null) {
+                    throw new InvalidResponseException("Empty response");
+                }
+
+                Realm realm = Realm.getInstance(MyApplication.getContext());
                 realm.beginTransaction();
                 realm.clear(RGroceryItem.class);
                 Log.d(TAG, jsonObject.toString());
@@ -64,7 +67,7 @@ public class SyncGroceryItem {
                             groceryItem.setCreatedAt(groceryJsonObj.getString(JsonKeys.CREATED_AT));
                             JSONObject purchasedByObj = groceryJsonObj.optJSONObject(JsonKeys.PURCHASED_BY);
                             if (purchasedByObj != null) {
-                                groceryItem.setPurchasedBy(purchasedByObj.getString(JsonKeys.USERNAME));
+                                groceryItem.setPurchasedBy(purchasedByObj.getString(JsonKeys.OBJECT_ID));
                             }
                         } catch (JSONException e) {
                             Log.e(TAG, "Error parsing grocery object", e);
@@ -72,49 +75,53 @@ public class SyncGroceryItem {
                     }
 
                     realm.commitTransaction();
-                    promise.onSuccess();
-                } catch(JSONException e) {
-                    Log.e(TAG, "Error getting grocery object from server", e);
+                } catch (JSONException e) {
                     realm.cancelTransaction();
-                    promise.onFailure();
+                    throw new InvalidResponseException("Error getting grocery object from server");
                 }
+                realm.close();
+
+                return null;
             }
         };
 
-        UrlTemplate template = UrlTemplateCreator.getAllGroceryItems();
-        new NetworkRequest(template, callback).execute();
-        return promise;
+        return networkRequest.runNetworkRequest().onSuccess(addGroceryItemsToRealm);
     }
 
-    public static Promise add(RGroceryItem rGroceryItem) {
+    public static Task<Void> add(RGroceryItem rGroceryItem) {
 
-        final Promise promise = new Promise();
+        Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
+        UrlTemplate template = UrlTemplateCreator.addGroceryItem(rGroceryItem);
+        NetworkRequest networkRequest = new NetworkRequest(template, taskCompletionSource);
 
-        NetworkRequest.Callback callback = new NetworkRequest.Callback() {
+        Continuation<JSONObject, Void> continuation = new Continuation<JSONObject, Void>() {
             @Override
-            public void done(@Nullable JSONObject jsonObject) {
+            public Void then(Task<JSONObject> task) throws Exception {
+                if (task.isFaulted()) {
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in add", exception);
+                    throw exception;
+                }
+
+                JSONObject jsonObject = task.getResult();
+
                 if (jsonObject == null) {
-                    Log.e(TAG, "Error adding grocery object");
-                    promise.onFailure();
-                    return;
+                    throw new InvalidResponseException("Empty response");
                 }
 
                 try {
                     String groceryId = jsonObject.getString(JsonKeys.OBJECT_ID);
-                    if (!groceryId.isEmpty()) {
-                        promise.onSuccess();
-                    } else {
-                        promise.onFailure();
+                    if (TextUtils.isEmpty(groceryId)) {
+                        throw new InvalidResponseException("Incorrect response");
                     }
                 } catch (JSONException e) {
-                    Log.e(TAG, "adding grocery failed", e);
-                    promise.onFailure();
+                    Log.e(TAG, "Error parsing grocery object", e);
                 }
+
+                return null;
             }
         };
 
-        UrlTemplate template = UrlTemplateCreator.addGroceryItem(rGroceryItem);
-        new NetworkRequest(template, callback).execute();
-        return promise;
+        return networkRequest.runNetworkRequest().continueWith(continuation);
     }
 }

@@ -1,10 +1,13 @@
 package com.quarkworks.apartmentgroceries.user;
 
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.Parcelable;
@@ -12,17 +15,21 @@ import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.service.DataStore;
 import com.quarkworks.apartmentgroceries.service.SyncUser;
 import com.quarkworks.apartmentgroceries.service.models.RUser;
+
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -41,6 +48,7 @@ public class PhotoActivity extends AppCompatActivity {
     private static final String TAG = PhotoActivity.class.getSimpleName();
 
     private static final int SELECT_PICTURE_REQUEST_CODE = 1;
+    private static final String USER_ID = "userId";
     private Uri outputFileUri;
 
     /*
@@ -50,6 +58,12 @@ public class PhotoActivity extends AppCompatActivity {
     private TextView titleTextView;
     private Button addPhotoButton;
     private ImageView photoImageView;
+
+    public static void newIntent(Context context, String userId) {
+        Intent intent = new Intent(context, PhotoActivity.class);
+        intent.putExtra(USER_ID, userId);
+        context.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +84,7 @@ public class PhotoActivity extends AppCompatActivity {
         titleTextView.setText(getString(R.string.title_activity_user_detail));
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        
+
         addPhotoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -79,17 +93,17 @@ public class PhotoActivity extends AppCompatActivity {
         });
 
         SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
-        String userId = sharedPreferences.getString(SyncUser.JsonKeys.USER_ID, null);
+        String userId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
 
-        final RUser rUser = DataStore.getInstance().getRealm().where(RUser.class)
-                .equalTo(SyncUser.JsonKeys.USER_ID, userId).findFirst();
-
+        RUser rUser = DataStore.getInstance().getRealm().where(RUser.class)
+                .equalTo(RUser.RealmKeys.USER_ID, userId).findFirst();
         Glide.with(this)
                 .load(rUser.getUrl())
                 .placeholder(R.drawable.ic_launcher)
                 .centerCrop()
                 .crossFade()
                 .into(photoImageView);
+        SyncUser.getById(rUser.getUserId());
     }
 
     private void openImageIntent() {
@@ -98,8 +112,7 @@ public class PhotoActivity extends AppCompatActivity {
         Log.d(TAG, directoryName);
         final File root = new File(Environment.getExternalStorageDirectory() + File.separator + directoryName + File.separator);
         root.mkdirs();
-        final String photoName = directoryName;
-        final File sdImageMainDirectory = new File(root, photoName);
+        final File sdImageMainDirectory = new File(root, directoryName);
         outputFileUri = Uri.fromFile(sdImageMainDirectory);
 
         // camera
@@ -135,29 +148,53 @@ public class PhotoActivity extends AppCompatActivity {
                     isCamera = true;
                 } else {
                     final String action = data.getAction();
-                    if (action == null) {
-                        isCamera = false;
-                    } else {
-                        isCamera = action.equals(MediaStore.ACTION_IMAGE_CAPTURE);
-                    }
+                    isCamera = action != null && action.equals(MediaStore.ACTION_IMAGE_CAPTURE);
                 }
 
                 Uri selectedImageUri;
                 if (isCamera) {
                     selectedImageUri = outputFileUri;
                 } else {
-                    selectedImageUri = data == null ? null : data.getData();
+                    selectedImageUri = data.getData();
                 }
 
                 InputStream inputStream;
+                byte[] inputData = null;
                 try {
                     inputStream = getContentResolver().openInputStream(selectedImageUri);
 
-                    byte[] inputData;
                     try {
                         String photoName = dateToString(new Date(), getString(R.string.photo_date_format_string));
                         inputData = getBytes(inputStream);
-                        SyncUser.updateProfilePhoto(photoName + ".jpg", inputData);
+                        Bitmap bitmap = decodeSampledBitmapFromByteArray(inputData, 0, 400, 400);
+                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                        byte[] sampledInputData = stream.toByteArray();
+
+                        Continuation<JSONObject, Void> checkUpdatingPhoto = new Continuation<JSONObject, Void>() {
+                            @Override
+                            public Void then(Task<JSONObject> task) {
+                                if (task.isFaulted()) {
+                                    Log.e(TAG, "Failed updating photo", task.getError());
+                                    Toast.makeText(getApplicationContext(),
+                                            getString(R.string.photo_update_failure), Toast.LENGTH_SHORT).show();
+                                    return null;
+                                }
+
+                                Toast.makeText(getApplicationContext(),
+                                        getString(R.string.photo_update_success), Toast.LENGTH_SHORT).show();
+                                SharedPreferences sharedPreferences =
+                                        getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
+                                String userId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
+
+                                SyncUser.getById(userId);
+
+                                return null;
+                            }
+                        };
+
+                        SyncUser.updateProfilePhoto(photoName + ".jpg", sampledInputData)
+                                .continueWith(checkUpdatingPhoto, Task.UI_THREAD_EXECUTOR);
                     } catch (IOException e) {
                         Log.e(TAG, "Error reading image byte data from uri");
                     }
@@ -166,7 +203,7 @@ public class PhotoActivity extends AppCompatActivity {
                     Log.e(TAG, "Error file with uri " + selectedImageUri + " not found", e);
                 }
 
-                photoImageView.setImageURI(selectedImageUri);
+                photoImageView.setImageBitmap(decodeSampledBitmapFromByteArray(inputData, 0, 400, 400));
             }
         }
     }
@@ -186,5 +223,37 @@ public class PhotoActivity extends AppCompatActivity {
     private String dateToString (Date date, String format) {
         SimpleDateFormat dateFormat = new SimpleDateFormat(format);
         return dateFormat.format(date);
+    }
+
+    private static Bitmap decodeSampledBitmapFromByteArray(byte[] inputData, int offset,
+                                                         int width, int height) {
+
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeByteArray(inputData, 0, inputData.length, options);
+        options.inSampleSize = calculateInSampleSize(options, width, height);
+        options.inJustDecodeBounds = false;
+
+        return BitmapFactory.decodeByteArray(inputData, 0, inputData.length, options);
+    }
+
+    private static int calculateInSampleSize(
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            while ((halfHeight / inSampleSize) > reqHeight
+                    && (halfWidth / inSampleSize) > reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
     }
 }

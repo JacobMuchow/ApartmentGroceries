@@ -1,5 +1,6 @@
 package com.quarkworks.apartmentgroceries.user;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,9 +17,7 @@ import com.quarkworks.apartmentgroceries.service.DataStore;
 import com.quarkworks.apartmentgroceries.service.SyncUser;
 import com.quarkworks.apartmentgroceries.service.models.RUser;
 
-import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
-import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
 public class UserActivity extends AppCompatActivity {
@@ -30,6 +29,11 @@ public class UserActivity extends AppCompatActivity {
      */
     private Toolbar toolbar;
     private TextView titleTextView;
+
+    public static void newIntent(Context context) {
+        Intent intent = new Intent(context, UserActivity.class);
+        context.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

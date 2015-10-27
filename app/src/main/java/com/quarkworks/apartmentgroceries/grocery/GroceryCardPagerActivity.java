@@ -1,5 +1,6 @@
 package com.quarkworks.apartmentgroceries.grocery;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -7,27 +8,29 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.service.DataStore;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
-import com.quarkworks.apartmentgroceries.user.UserDetailActivity;
 
 import io.realm.RealmResults;
 
 public class GroceryCardPagerActivity extends AppCompatActivity {
     private static final String TAG = GroceryCardPagerActivity.class.getSimpleName();
 
-    public static final String GROCER_ITEM_ID = "groceryId";
+    public static final String POSITION = "position";
     private static int NUM_PAGES = 0;
     private ViewPager viewPager;
     private GroceryCardPagerAdapter groceryCardPagerAdapter;
 
-    public static RealmResults<RGroceryItem> groceryItems;
+    private static RealmResults<RGroceryItem> groceryItems;
+
+    public static void newIntent(Context context, int position) {
+        Intent intent = new Intent(context, GroceryCardPagerActivity.class);
+        intent.putExtra(POSITION, position);
+        context.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +41,7 @@ public class GroceryCardPagerActivity extends AppCompatActivity {
          * Get view references
          */
         viewPager = (ViewPager) findViewById(R.id.grocery_card_pager_view_pager_id);
+        viewPager.setPageTransformer(true, new zoomOutPageTransformer());
 
         groceryItems = DataStore.getInstance().getRealm().where(RGroceryItem.class).findAll();
         NUM_PAGES = groceryItems.size();
@@ -45,18 +49,19 @@ public class GroceryCardPagerActivity extends AppCompatActivity {
         groceryCardPagerAdapter = new GroceryCardPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(groceryCardPagerAdapter);
 
-        int position = getIntent().getExtras().getInt(GroceryCell.POSITION);
+        int position = getIntent().getIntExtra(POSITION, 0);
         viewPager.setCurrentItem(position);
     }
 
-    public static class GroceryCardPagerAdapter extends FragmentStatePagerAdapter {
+    private static class GroceryCardPagerAdapter extends FragmentStatePagerAdapter {
         public GroceryCardPagerAdapter(FragmentManager fragmentManager) {
             super(fragmentManager);
         }
 
         @Override
         public Fragment getItem(int position) {
-            return GroceryCardPagerFragment.newInstance(position);
+            String groceryId = groceryItems.get(position).getGroceryId();
+            return GroceryCardPagerFragment.newInstance(groceryId);
         }
 
         @Override
@@ -65,55 +70,39 @@ public class GroceryCardPagerActivity extends AppCompatActivity {
         }
     }
 
-    public static class GroceryCardPagerFragment extends Fragment {
-        private int fPosition;
-        private RealmResults<RGroceryItem> fGroceryItems;
+    private class zoomOutPageTransformer implements ViewPager.PageTransformer {
+        private static final float MIN_SCALE = 0.85f;
+        private static final float MIN_ALPHA = 0.5f;
 
-        static GroceryCardPagerFragment newInstance(int num) {
-            GroceryCardPagerFragment groceryCardPagerFragment = new GroceryCardPagerFragment();
-            Bundle args = new Bundle();
-            args.putInt("num", num);
-            groceryCardPagerFragment.setArguments(args);
+        public void transformPage(View view, float position) {
+            int pageWidth = view.getWidth();
+            int pageHeight = view.getHeight();
 
-            return groceryCardPagerFragment;
-        }
+            if (position < -1) {
+                // left most
+                view.setAlpha(0);
 
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            fGroceryItems = DataStore.getInstance().getRealm().where(RGroceryItem.class).findAll();
-            fPosition = getArguments() != null ? getArguments().getInt("num") : 0;
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-            View rootView = inflater.inflate(R.layout.grocery_card_pager_fragment, container, false);
-            TextView nameTextView = (TextView)rootView.findViewById(R.id.grocery_card_pager_fragment_grocery_item_name_id);
-            TextView createdByTextView = (TextView) rootView.findViewById(R.id.grocery_card_pager_fragment_grocery_item_created_by_id);
-            nameTextView.setText(fGroceryItems.get(fPosition).getName());
-            createdByTextView.setText(fGroceryItems.get(fPosition).getCreatedBy());
-
-            nameTextView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(getContext(), GroceryItemDetailActivity.class);
-                    intent.putExtra(GROCER_ITEM_ID, fGroceryItems.get(fPosition).getGroceryId());
-                    startActivity(intent);
+            } else if (position <= 1) {
+                float scaleFactor = Math.max(MIN_SCALE, 1 - Math.abs(position));
+                float verticalMargin = pageHeight * (1 - scaleFactor) / 2;
+                float horizontalMargin = pageWidth * (1 - scaleFactor) / 2;
+                if (position < 0) {
+                    view.setTranslationX(horizontalMargin - verticalMargin / 2);
+                } else {
+                    view.setTranslationX(-horizontalMargin + verticalMargin / 2);
                 }
-            });
 
-            createdByTextView.setOnClickListener(new View.OnClickListener() {
-                String username = fGroceryItems.get(fPosition).getCreatedBy();
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(getContext(), UserDetailActivity.class);
-                    intent.putExtra(GroceryCell.USERNAME, username);
-                    getContext().startActivity(intent);
-                }
-            });
+                view.setScaleX(scaleFactor);
+                view.setScaleY(scaleFactor);
 
-            return rootView;
+                view.setAlpha(MIN_ALPHA +
+                        (scaleFactor - MIN_SCALE) /
+                                (1 - MIN_SCALE) * (1 - MIN_ALPHA));
+
+            } else {
+                // right most
+                view.setAlpha(0);
+            }
         }
     }
 }

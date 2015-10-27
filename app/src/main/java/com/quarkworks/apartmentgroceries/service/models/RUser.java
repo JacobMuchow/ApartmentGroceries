@@ -1,11 +1,33 @@
 package com.quarkworks.apartmentgroceries.service.models;
 
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 /**
  * Created by zz on 10/15/15.
  */
 public class RUser extends RealmObject {
+
+    public static final class JsonKeys {
+        public static final String GROUP_ID = "groupId";
+        public static final String OBJECT_ID = "objectId";
+        public static final String RESULTS = "results";
+        public static final String SESSION_TOKEN = "sessionToken";
+        public static final String USERNAME = "username";
+        public static final String USER_ID = "userId";
+        public static final String UPDATED_AT = "updatedAt";
+        public static final String EMAIL = "email";
+        public static final String PHONE = "phone";
+        public static final String PHOTO = "photo";
+        public static final String URL = "url";
+        public static final String ERROR = "error";
+    }
+
+    public static final class RealmKeys {
+        public static final String USER_ID = "userId";
+    }
+
+    @PrimaryKey
     private String userId;
     private String groupId;
     private String username;

@@ -1,5 +1,6 @@
 package com.quarkworks.apartmentgroceries.main;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
@@ -14,15 +15,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.quarkworks.apartmentgroceries.R;
-import com.quarkworks.apartmentgroceries.auth.LoginActivity;
 import com.quarkworks.apartmentgroceries.grocery.AddGroceryItemActivity;
 import com.quarkworks.apartmentgroceries.grocery.GroceryCell;
-import com.quarkworks.apartmentgroceries.group.GroupActivity;
 import com.quarkworks.apartmentgroceries.service.DataStore;
 import com.quarkworks.apartmentgroceries.service.SyncGroceryItem;
 import com.quarkworks.apartmentgroceries.service.SyncUser;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
-import com.quarkworks.apartmentgroceries.user.UserActivity;
+import com.quarkworks.apartmentgroceries.service.models.RUser;
 
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
@@ -36,6 +35,11 @@ public class HomeActivity extends AppCompatActivity {
      */
     private Toolbar toolbar;
     private TextView titleTextView;
+
+    public static void newIntent(Context context) {
+        Intent intent = new Intent(context, HomeActivity.class);
+        context.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +60,11 @@ public class HomeActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         SyncGroceryItem.getAll();
+
+        SharedPreferences sharedPreferences = getApplication()
+                .getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
+        String groupId = sharedPreferences.getString(RUser.JsonKeys.GROUP_ID, null);
+        SyncUser.getAll(groupId);
 
         final RealmResults<RGroceryItem> groceries = DataStore.getInstance().getRealm().where(RGroceryItem.class).findAll();
 
@@ -81,32 +90,21 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
-        Intent intent;
-
         switch (item.getItemId()) {
             case R.id.action_add_grocery:
-                intent = new Intent(this, AddGroceryItemActivity.class);
-                startActivity(intent);
+                AddGroceryItemActivity.newIntent(this);
                 return true;
-            case R.id.action_list_group:
-                intent = new Intent(this, GroupActivity.class);
-                startActivity(intent);
+            case R.id.action_settings:
+                SettingActivity.newIntent(HomeActivity.this);
                 return true;
-            case R.id.action_user:
-                intent = new Intent(this, UserActivity.class);
-                startActivity(intent);
-                return true;
-            case R.id.action_logout:
-                SyncUser.logout();
-                SharedPreferences sharedPreferences =
-                        this.getSharedPreferences(getApplication().getString(R.string.login_or_sign_up_session), 0);
-                sharedPreferences.edit().clear().commit();
-                intent = new Intent(this, LoginActivity.class);
-                startActivity(intent);
-                return true;
+
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
     }
 }

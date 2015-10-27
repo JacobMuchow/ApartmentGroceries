@@ -1,15 +1,17 @@
 package com.quarkworks.apartmentgroceries.service;
 
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.quarkworks.apartmentgroceries.MyApplication;
 import com.quarkworks.apartmentgroceries.service.models.RGroup;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import bolts.Continuation;
+import bolts.Task;
 import io.realm.Realm;
 
 /**
@@ -24,20 +26,27 @@ public class SyncGroup {
         private static final String RESULTS = "results";
     }
 
-    public static Promise getAll() {
+    public static Task<Void> getAll() {
 
-        final Promise promise = new Promise();
+        Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
+        UrlTemplate template = UrlTemplateCreator.getAllGroup();
+        NetworkRequest networkRequest = new NetworkRequest(template, taskCompletionSource);
 
-        NetworkRequest.Callback callback = new NetworkRequest.Callback() {
+        Continuation addGroupsToRealm = new Continuation<JSONObject, Void>() {
             @Override
-            public void done(@Nullable JSONObject jsonObject) {
-                if (jsonObject == null) {
-                    Log.e(TAG, "Error getting group from server");
-                    promise.onFailure();
-                    return;
+            public Void then(Task<JSONObject> task) throws Exception {
+                if (task.isFaulted()) {
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in getAll", exception);
+                    throw exception;
                 }
 
-                Realm realm = DataStore.getInstance().getRealm();
+                JSONObject jsonObject = task.getResult();
+                if (jsonObject == null) {
+                    throw new InvalidResponseException("Empty response");
+                }
+
+                Realm realm = Realm.getInstance(MyApplication.getContext());
                 realm.beginTransaction();
                 realm.clear(RGroup.class);
 
@@ -56,49 +65,52 @@ public class SyncGroup {
                     }
 
                     realm.commitTransaction();
-                    promise.onSuccess();
-                } catch(JSONException e) {
+                } catch (JSONException e) {
                     Log.e(TAG, "Error parsing group object", e);
                     realm.cancelTransaction();
-                    promise.onFailure();
                 }
+                realm.close();
+
+                return null;
             }
         };
 
-        UrlTemplate template = UrlTemplateCreator.getAllGroup();
-        new NetworkRequest(template, callback).execute();
-        return promise;
+        return networkRequest.runNetworkRequest().continueWith(addGroupsToRealm);
     }
 
-    public static Promise add(RGroup rRGroup) {
+    public static Task<Void> add(RGroup rRGroup) {
 
-        final Promise promise = new Promise();
+        Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
+        UrlTemplate template = UrlTemplateCreator.addGroup(rRGroup);
+        NetworkRequest networkRequest = new NetworkRequest(template, taskCompletionSource);
 
-        NetworkRequest.Callback callback = new NetworkRequest.Callback() {
+        Continuation<JSONObject, Void> checkAddGroup = new Continuation<JSONObject, Void>() {
             @Override
-            public void done(@Nullable JSONObject jsonObject) {
+            public Void then(Task<JSONObject> task) throws Exception {
+                if (task.isFaulted()) {
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in add", exception);
+                    throw exception;
+                }
+
+                JSONObject jsonObject = task.getResult();
+
                 if (jsonObject == null) {
-                    Log.e(TAG, "Error adding group object");
-                    promise.onFailure();
-                    return;
+                    throw new InvalidResponseException("Empty response");
                 }
 
                 try {
-                    String groupId = jsonObject.getString(JsonKeys.OBJECT_ID);
-                    if (!TextUtils.isEmpty(groupId)) {
-                        promise.onSuccess();
-                    } else {
-                        promise.onFailure();
+                    if(TextUtils.isEmpty(jsonObject.getString(JsonKeys.OBJECT_ID))) {
+                        throw new InvalidResponseException("Incorrect response");
                     }
                 } catch (JSONException e) {
-                    Log.e(TAG, "adding group failed", e);
-                    promise.onFailure();
+                    Log.e(TAG, "Error parsing group object", e);
                 }
+
+                return null;
             }
         };
 
-        UrlTemplate template = UrlTemplateCreator.addGroup(rRGroup);
-        new NetworkRequest(template, callback).execute();
-        return promise;
+        return networkRequest.runNetworkRequest().continueWith(checkAddGroup);
     }
 }

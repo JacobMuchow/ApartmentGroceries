@@ -1,7 +1,6 @@
 package com.quarkworks.apartmentgroceries.group;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -15,9 +14,12 @@ import android.widget.Toast;
 import com.quarkworks.apartmentgroceries.MyApplication;
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.main.HomeActivity;
-import com.quarkworks.apartmentgroceries.service.Promise;
 import com.quarkworks.apartmentgroceries.service.SyncUser;
 import com.quarkworks.apartmentgroceries.service.models.RGroup;
+import com.quarkworks.apartmentgroceries.service.models.RUser;
+
+import bolts.Continuation;
+import bolts.Task;
 
 /**
  * Created by zz on 10/16/15.
@@ -25,6 +27,8 @@ import com.quarkworks.apartmentgroceries.service.models.RGroup;
 public class GroupCell extends RelativeLayout{
 
     private static final String TAG = GroupCell.class.getSimpleName();
+
+    private String groupId;
 
     private TextView nameTextView;
     private Button joinGroupButton;
@@ -51,52 +55,54 @@ public class GroupCell extends RelativeLayout{
     }
 
     public void setViewData(final RGroup group){
+        groupId = group.getGroupId();
         nameTextView.setText(group.getName());
         SharedPreferences sharedPreferences =
                 MyApplication.getContext().getSharedPreferences(
                         MyApplication.getContext()
                                 .getString(R.string.login_or_sign_up_session), 0);
-        final String groupId = sharedPreferences.getString(SyncUser.JsonKeys.GROUP_ID, null);
+        final String groupId = sharedPreferences.getString(RUser.JsonKeys.GROUP_ID, null);
         if (!TextUtils.isEmpty(groupId) && groupId.equals(group.getGroupId())) {
             joinGroupButton.setVisibility(GONE);
         } else {
             joinGroupButton.setVisibility(VISIBLE);
         }
 
-        joinGroupButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SharedPreferences sharedPreferences =
-                        MyApplication.getContext().getSharedPreferences(
-                                MyApplication.getContext()
-                                        .getString(R.string.login_or_sign_up_session), 0);
-                String userId = sharedPreferences.getString(SyncUser.JsonKeys.USER_ID, null);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString(SyncUser.JsonKeys.GROUP_ID, group.getGroupId());
-                editor.commit();
-                SyncUser.joinGroup(userId, group.getGroupId())
-                        .setCallbacks(joinGroupSuccessCallback, joinGroupFailureCallback);
-            }
-        });
+        joinGroupButton.setOnClickListener(joinGroupButtonOnClick);
     }
 
-    private Promise.Success joinGroupSuccessCallback = new Promise.Success() {
+    private View.OnClickListener joinGroupButtonOnClick = new View.OnClickListener() {
         @Override
-        public void onSuccess() {
-            Intent intent = new Intent(getContext(), HomeActivity.class);
-            getContext().startActivity(intent);
-            Toast.makeText(MyApplication.getContext(),
-                    MyApplication.getContext().getString(R.string.join_group_success),
-                    Toast.LENGTH_SHORT).show();
+        public void onClick(View v) {
+            SharedPreferences sharedPreferences =
+                    getContext().getSharedPreferences(getContext()
+                                    .getString(R.string.login_or_sign_up_session), 0);
+            String userId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString(RUser.JsonKeys.GROUP_ID, groupId);
+            editor.apply();
+
+            SyncUser.joinGroup(userId, groupId).continueWith(checkJoiningGroup, Task.UI_THREAD_EXECUTOR);
         }
     };
 
-    private Promise.Failure joinGroupFailureCallback = new Promise.Failure() {
+    private Continuation<Void, Void> checkJoiningGroup = new Continuation<Void, Void>() {
         @Override
-        public void onFailure() {
+        public Void then(Task<Void> task) throws Exception {
+            if (task.isFaulted()) {
+                Toast.makeText(MyApplication.getContext(),
+                        MyApplication.getContext().getString(R.string.join_group_failure),
+                        Toast.LENGTH_LONG).show();
+                return null;
+            }
+
+            SyncUser.getAll(groupId);
+            HomeActivity.newIntent(getContext());
             Toast.makeText(MyApplication.getContext(),
-                    MyApplication.getContext().getString(R.string.join_group_failure),
-                    Toast.LENGTH_LONG).show();
+                    MyApplication.getContext().getString(R.string.join_group_success),
+                    Toast.LENGTH_SHORT).show();
+
+            return null;
         }
     };
 }

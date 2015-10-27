@@ -1,6 +1,5 @@
 package com.quarkworks.apartmentgroceries;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -8,7 +7,7 @@ import android.text.TextUtils;
 
 import com.quarkworks.apartmentgroceries.auth.LoginActivity;
 import com.quarkworks.apartmentgroceries.main.HomeActivity;
-import com.quarkworks.apartmentgroceries.service.SyncUser;
+import com.quarkworks.apartmentgroceries.service.models.RUser;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -18,14 +17,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
         SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
-        String sessionToken = sharedPreferences.getString(SyncUser.JsonKeys.GROUP_ID, null);
+        String sessionToken = sharedPreferences.getString(RUser.JsonKeys.SESSION_TOKEN, null);
 
-        Intent intent;
         if (TextUtils.isEmpty(sessionToken)) {
-            intent = new Intent(MainActivity.this, LoginActivity.class);
+            LoginActivity.newIntent(this);
         } else {
-            intent = new Intent(MainActivity.this, HomeActivity.class);
+            HomeActivity.newIntent(this);
         }
-        startActivity(intent);
     }
 }

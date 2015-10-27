@@ -12,11 +12,15 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/main_toolbar_id">
 
+        <!-- add photo -->
         <Button
             android:id="@+id/photo_add_button_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+
             android:text="@string/add_photo_button"/>
+
+        <!-- image view -->
         <ImageView
             android:id="@+id/photo_image_view_id"
             android:layout_width="wrap_content"

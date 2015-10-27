@@ -1,12 +1,18 @@
 package com.quarkworks.apartmentgroceries.service.models;
 
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 /**
  * Created by zz on 10/14/15.
  */
 public class RGroup extends RealmObject {
 
+    public static final class JsonKeys {
+        public static final String GROUP_ID = "groupId";
+    }
+
+    @PrimaryKey
     private String groupId;
     private String name;
 

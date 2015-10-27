@@ -1,0 +1,69 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.quarkworks.apartmentgroceries.main.SettingActivity">
+
+    <!-- toolbar -->
+    <include layout="@layout/main_toolbar" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/main_toolbar_id"
+
+        android:padding="@dimen/margin_padding_medium">
+
+        <!-- Edit profile -->
+        <TextView
+            android:id="@+id/setting_profile_text_view_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_padding_medium"
+
+            android:text="@string/setting_edit_profile"
+            android:textColor="@android:color/black"/>
+        <View
+            android:id="@+id/setting_profile_divider_view_id"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/setting_profile_text_view_id"
+
+            android:background="@android:color/darker_gray"/>
+
+        <!-- group -->
+        <TextView
+            android:id="@+id/setting_group_text_view_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_padding_medium"
+            android:layout_below="@+id/setting_profile_divider_view_id"
+
+            android:text="@string/title_activity_group"
+            android:textColor="@android:color/black"/>
+        <View
+            android:id="@+id/setting_group_divider_view_id"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/setting_group_text_view_id"
+
+            android:background="@android:color/darker_gray"/>
+
+        <!-- logout -->
+        <TextView
+            android:id="@+id/setting_logout_text_view_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/setting_group_divider_view_id"
+            android:layout_margin="@dimen/margin_padding_medium"
+
+            android:text="@string/action_logout"
+            android:textColor="@android:color/black" />
+        <View
+            android:id="@+id/setting_logout_divider_view_id"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/setting_logout_text_view_id"
+
+            android:background="@android:color/darker_gray"/>
+    </RelativeLayout>
+</RelativeLayout>

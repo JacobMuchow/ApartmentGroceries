@@ -1,8 +1,8 @@
-<android.support.v7.widget.Toolbar
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/main_toolbar_id"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+
     android:background="@color/colorPrimary">
 
     <!-- title -->
@@ -10,6 +10,7 @@
         android:id="@+id/toolbar_title_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+
         android:textColor="@android:color/white"
         android:gravity="center"
         style="@android:style/TextAppearance.Large"/>

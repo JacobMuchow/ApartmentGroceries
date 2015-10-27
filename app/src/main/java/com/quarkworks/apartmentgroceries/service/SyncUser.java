@@ -2,7 +2,6 @@ package com.quarkworks.apartmentgroceries.service;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -18,156 +17,168 @@ import bolts.Continuation;
 import bolts.Task;
 import io.realm.Realm;
 
+import com.quarkworks.apartmentgroceries.service.models.RUser.JsonKeys;
+
 /**
  * Created by zz on 10/15/15.
  */
 public class SyncUser {
     private static final String TAG = SyncUser.class.getSimpleName();
 
-    public static final class JsonKeys {
-        public static final String GROUP_ID = "groupId";
-        private static final String OBJECT_ID = "objectId";
-        private static final String RESULTS = "results";
-        public static final String SESSION_TOKEN = "sessionToken";
-        public static final String USERNAME = "username";
-        public static final String USER_ID = "userId";
-        public static final String UPDATED_AT = "updatedAt";
-        public static final String EMAIL = "email";
-        public static final String PHONE = "phone";
-        public static final String PHOTO = "photo";
-        public static final String URL = "url";
-    }
+    public static Task<Void> login(String username, String password) {
 
-    public static Promise login(String username, String password) {
+        Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
+        UrlTemplate template = UrlTemplateCreator.login(username, password);
+        NetworkRequest networkRequest = new NetworkRequest(template, taskCompletionSource);
 
-        final Promise promise = new Promise();
-
-        NetworkRequest.Callback callback = new NetworkRequest.Callback() {
+        Continuation<JSONObject, Void> saveLoginCredential = new Continuation<JSONObject, Void>() {
             @Override
-            public void done(@Nullable JSONObject jsonObject) {
-                if (jsonObject == null) {
-                    Log.e(TAG, "Error getting user json object from server");
-                    promise.onFailure();
-                    return;
+            public Void then(Task<JSONObject> task) throws Exception {
+                if (task.isFaulted()) {
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in login", exception);
+                    throw exception;
                 }
 
-                try {
-                    String sessionToken = jsonObject.getString(JsonKeys.SESSION_TOKEN);
-                    String username = jsonObject.getString(JsonKeys.USERNAME);
-                    String userId = jsonObject.getString(JsonKeys.OBJECT_ID);
-                    JSONObject photoObj = jsonObject.optJSONObject(JsonKeys.PHOTO);
-                    String photoUrl = null;
-                    if (photoObj != null) {
-                        photoUrl = photoObj.getString(JsonKeys.URL);
-                    }
+                JSONObject loginJsonObj = task.getResult();
 
+                if (loginJsonObj == null) {
+                    throw new InvalidResponseException("Empty response");
+                }
+
+                String sessionToken = loginJsonObj.optString(JsonKeys.SESSION_TOKEN);
+                String userId = loginJsonObj.optString(JsonKeys.OBJECT_ID);
+
+                if (!TextUtils.isEmpty(sessionToken)) {
                     Context context = MyApplication.getContext();
                     SharedPreferences sharedPreferences = context
                             .getSharedPreferences(context.getString(R.string.login_or_sign_up_session), 0);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString(JsonKeys.SESSION_TOKEN, sessionToken);
-                    editor.putString(JsonKeys.USERNAME, username);
                     editor.putString(JsonKeys.USER_ID, userId);
-                    if (!TextUtils.isEmpty(photoUrl)) {
-                        editor.putString(JsonKeys.URL, photoUrl);
-                    }
 
-                    JSONObject groupIdObj = jsonObject.optJSONObject(JsonKeys.GROUP_ID);
+                    JSONObject groupIdObj = loginJsonObj.optJSONObject(JsonKeys.GROUP_ID);
                     if (groupIdObj != null) {
                         String groupId = groupIdObj.optString(JsonKeys.OBJECT_ID);
                         editor.putString(JsonKeys.GROUP_ID, groupId);
                     }
-                    editor.commit();
-                    promise.onSuccess();
-
-                } catch (JSONException e) {
-                    Log.e(TAG, "login failure", e);
-                    promise.onFailure();
-                }
-            }
-        };
-
-        UrlTemplate template = UrlTemplateCreator.login(username, password);
-        new NetworkRequest(template, callback).execute();
-        return promise;
-    }
-
-    public static Promise logout() {
-        final Promise promise = new Promise();
-
-        NetworkRequest.Callback callback = new NetworkRequest.Callback() {
-            @Override
-            public void done(@Nullable JSONObject jsonObject) {
-                if (jsonObject == null) {
-                    promise.onSuccess();
+                    editor.apply();
                 } else {
-                    Log.e(TAG, "Error login out");
-                    promise.onFailure();
+                    String error = loginJsonObj.optString(JsonKeys.ERROR);
+                    if (!TextUtils.isEmpty(error)) {
+                        throw new InvalidResponseException(error);
+                    } else {
+                        throw new InvalidResponseException("Incorrect login response");
+                    }
+                }
+
+                return null;
+            }
+        };
+
+        return networkRequest.runNetworkRequest().continueWith(saveLoginCredential);
+    }
+
+    public static Task<Void> logout() {
+
+        Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
+        UrlTemplate template = UrlTemplateCreator.logout();
+        NetworkRequest networkRequest = new NetworkRequest(template, taskCompletionSource);
+
+        Continuation<JSONObject, Void> checkLogout = new Continuation<JSONObject, Void>() {
+            @Override
+            public Void then(Task<JSONObject> task) throws Exception {
+                if (task.isFaulted()) {
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in logout", exception);
+                    throw exception;
+                }
+
+                JSONObject logoutJsonObj = task.getResult();
+
+                if (logoutJsonObj != null && logoutJsonObj.toString().equals("{}")) {
+                    return null;
+                } else {
+                    throw new InvalidResponseException("Incorrect logout response");
                 }
             }
         };
 
-        UrlTemplate template = UrlTemplateCreator.logout();
-        new NetworkRequest(template, callback).execute();
-        return promise;
+        return networkRequest.runNetworkRequest().continueWith(checkLogout);
     }
 
-    public static Promise signUp(String username, String password) {
+    public static Task<Void> signUp(String username, String password) {
 
-        final Promise promise = new Promise();
+        Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
+        UrlTemplate template = UrlTemplateCreator.signUp(username, password);
+        NetworkRequest networkRequest = new NetworkRequest(template, taskCompletionSource);
 
-        NetworkRequest.Callback callback = new NetworkRequest.Callback() {
+        Continuation<JSONObject, Void> saveCredential = new Continuation<JSONObject, Void>() {
             @Override
-            public void done(@Nullable JSONObject jsonObject) {
-                if (jsonObject == null) {
-                    Log.e(TAG, "Error signing up user");
-                    promise.onFailure();
-                    return;
+            public Void then(Task<JSONObject> task) throws Exception {
+                if (task.isFaulted()) {
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in signUp", exception);
+                    throw exception;
+                }
+
+                JSONObject signUpJsonObj = task.getResult();
+
+                if (signUpJsonObj == null) {
+                    throw new InvalidResponseException("Empty response");
                 }
 
                 try {
-                    String sessionToken = jsonObject.getString(JsonKeys.SESSION_TOKEN);
+                    String sessionToken = signUpJsonObj.getString(JsonKeys.SESSION_TOKEN);
 
                     Context context = MyApplication.getContext();
                     SharedPreferences sharedPreferences = context
                             .getSharedPreferences(context.getString(R.string.login_or_sign_up_session), 0);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString(JsonKeys.SESSION_TOKEN, sessionToken);
-                    editor.commit();
-
-                    promise.onSuccess();
+                    editor.apply();
                 } catch (JSONException e) {
-                    Log.e(TAG, "sign up failure", e);
-                    promise.onFailure();
+                    throw new InvalidResponseException("Incorrect sign up response");
                 }
+
+                return null;
             }
         };
 
-        UrlTemplate template = UrlTemplateCreator.signUp(username, password);
-        new NetworkRequest(template, callback).execute();
-        return promise;
+        return networkRequest.runNetworkRequest().continueWith(saveCredential);
     }
 
-    public static Promise getAll() {
+    public static Task<Void> getAll(String groupId){
 
-        final Promise promise = new Promise();
+        Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
+        UrlTemplate template;
+        if (TextUtils.isEmpty(groupId)) {
+            template = UrlTemplateCreator.getAllUsers();
+        } else {
+            template = UrlTemplateCreator.getUsersByGroupId(groupId);
+        }
+        NetworkRequest networkRequest = new NetworkRequest(template, taskCompletionSource);
 
-        NetworkRequest.Callback callback = new NetworkRequest.Callback() {
+        Continuation<JSONObject, Void> addUsersToRealm = new Continuation<JSONObject, Void>() {
             @Override
-            public void done(@Nullable JSONObject jsonObject) {
-                if (jsonObject == null) {
-                    Log.e(TAG, "Error getting users from server");
-                    promise.onFailure();
-                    return;
+            public Void then(Task<JSONObject> task) throws Exception {
+                if (task.isFaulted()) {
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in getAll", exception);
+                    throw exception;
                 }
 
-                Realm realm = DataStore.getInstance().getRealm();
+                JSONObject jsonObject = task.getResult();
+                if (jsonObject == null) {
+                    throw new InvalidResponseException("Empty response");
+                }
+
+                Realm realm = Realm.getInstance(MyApplication.getContext());
                 realm.beginTransaction();
                 realm.clear(RUser.class);
 
                 try {
                     JSONArray userJsonArray = jsonObject.getJSONArray(JsonKeys.RESULTS);
-
                     for (int i = 0; i < userJsonArray.length(); i++) {
                         RUser rUser = realm.createObject(RUser.class);
                         try {
@@ -194,130 +205,175 @@ public class SyncUser {
                     }
 
                     realm.commitTransaction();
-                    promise.onSuccess();
-                } catch(JSONException e) {
+                } catch (JSONException e) {
                     Log.e(TAG, "Error get user object from server", e);
                     realm.cancelTransaction();
-                    promise.onFailure();
                 }
+                realm.close();
+
+                return null;
             }
         };
 
-        UrlTemplate template = UrlTemplateCreator.getAllUsers();
-        new NetworkRequest(template, callback).execute();
-        return promise;
+        return networkRequest.runNetworkRequest().continueWith(addUsersToRealm);
     }
 
-    public static Promise joinGroup(String userId, String groupId) {
-
-        final Promise promise = new Promise();
-
-        NetworkRequest.Callback callback = new NetworkRequest.Callback() {
-            @Override
-            public void done(@Nullable JSONObject jsonObject) {
-                if (jsonObject == null) {
-                    Log.e(TAG, "Error getting joining group response json");
-                    promise.onFailure();
-                    return;
-                }
-
-                try {
-                    // after joining group successfully, we will get something like
-                    // {"updatedAt":"2015-10-20T05:49:21.524Z"}
-                    Log.d(TAG, jsonObject.toString());
-                    String groupId = jsonObject.getString(JsonKeys.UPDATED_AT);
-                    // TODO: do something
-                    promise.onSuccess();
-                } catch (JSONException e) {
-                    Log.e(TAG, "joining group failure", e);
-                    promise.onFailure();
-                }
-            }
-        };
-
-        UrlTemplate template = UrlTemplateCreator.joinGroup(userId, groupId);
-        new NetworkRequest(template, callback).execute();
-        return promise;
+    public static Task<Void> getAll() {
+        return getAll(null);
     }
 
-    public static Task<JSONObject> updateProfilePhoto(String photoName, byte[] data) {
+    public static Task<Void> joinGroup(String userId, String groupId) {
+
         Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
-        UrlTemplate template = UrlTemplateCreator.uploadProfilePhoto(photoName, data);
-        NetworkRequestBolts networkRequestBolts = new NetworkRequestBolts(template, taskCompletionSource);
+        UrlTemplate template = UrlTemplateCreator.joinGroup(userId, groupId);
+        NetworkRequest networkRequest = new NetworkRequest(template, taskCompletionSource);
 
-        return networkRequestBolts.runNetworkRequestBolts().continueWith(new Continuation<JSONObject, Task<JSONObject>>() {
+        Continuation<JSONObject, Void> checkJoiningGroup = new Continuation<JSONObject, Void>() {
             @Override
-            public Task<JSONObject> then(Task<JSONObject> task) throws Exception {
+            public Void then(Task<JSONObject> task) throws Exception {
+                if (task.isFaulted()) {
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in joinGroup", exception);
+                    throw exception;
+                }
 
-                if (task.getResult() == null) {
-                    Log.e(TAG, "Error getting uploading photo response json");
-                    return null;
+                JSONObject jsonObject = task.getResult();
+                if (jsonObject == null) {
+                    throw new InvalidResponseException("Empty response");
                 }
 
                 try {
-                    String photoName = task.getResult().getString("name");
-                    Log.d(TAG, "first:" + task.getResult().toString());
-                    SharedPreferences sharedPreferences =
-                            MyApplication.getContext().getSharedPreferences(
-                                    MyApplication.getContext()
-                                            .getString(R.string.login_or_sign_up_session), 0);
-                    String userId = sharedPreferences.getString(SyncUser.JsonKeys.USER_ID, null);
-
-                    Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
-                    UrlTemplate template = UrlTemplateCreator.updateProfilePhoto(userId, photoName);
-                    NetworkRequestBolts networkRequestBolts = new NetworkRequestBolts(template, taskCompletionSource);
-
-                    return networkRequestBolts.runNetworkRequestBolts().onSuccess(new Continuation<JSONObject, Void>() {
-                        public Void then(Task<JSONObject> task) throws Exception {
-                            if (task.getResult() == null) {
-                                Log.e(TAG, "Error getting updating photo response json");
-                            }
-
-                            try {
-                                String updatedAt = task.getResult().getString(SyncUser.JsonKeys.UPDATED_AT);
-                                if (!TextUtils.isEmpty(updatedAt)) {
-                                    // on success
-                                }
-                            } catch (JSONException e) {
-                                Log.e(TAG, "Error parsing updating user photo response json", e);
-                            }
-                            return null;
-                        }
-                    });
-
+                    if (TextUtils.isEmpty(jsonObject.getString(JsonKeys.UPDATED_AT))) {
+                        throw new InvalidResponseException("Invalid join group response");
+                    }
                 } catch (JSONException e) {
-                    Log.e(TAG, "uploading photo failure", e);
+                    Log.e(TAG, "Error parsing joining group response", e);
                 }
 
                 return null;
             }
-        });
+        };
+
+        return networkRequest.runNetworkRequest().continueWith(checkJoiningGroup);
+    }
+
+    public static Task<JSONObject> updateProfilePhoto(String photoName, byte[] data) {
+
+        SharedPreferences sharedPreferences =
+                MyApplication.getContext().getSharedPreferences(
+                        MyApplication.getContext()
+                                .getString(R.string.login_or_sign_up_session), 0);
+        final String userId = sharedPreferences.getString(JsonKeys.USER_ID, null);
+
+        final Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
+
+        Continuation<JSONObject, Void> updateUserPhoto = new Continuation<JSONObject, Void>() {
+            @Override
+            public Void then(Task<JSONObject> task) throws Exception {
+                if (task.isFaulted()) {
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in uploadPhoto", exception);
+                    throw exception;
+                }
+
+                String photoName = task.getResult().optString("name");
+                if (TextUtils.isEmpty(photoName)) {
+                    throw new InvalidResponseException("Empty response");
+                }
+
+                final UrlTemplate template = UrlTemplateCreator.updateProfilePhoto(userId, photoName);
+
+                Continuation<JSONObject, Void> UpdatingPhoto = new Continuation<JSONObject, Void>() {
+                    @Override
+                    public Void then(Task<JSONObject> task) throws Exception{
+                        if (task.isFaulted()) {
+                            Exception exception = task.getError();
+                            Log.e(TAG, "Error in UpdatingPhoto", exception);
+                            throw exception;
+                        }
+
+                        try {
+                            String updatedAt = task.getResult().getString(RUser.JsonKeys.UPDATED_AT);
+                            if (!TextUtils.isEmpty(updatedAt)) {
+                                Context context = MyApplication.getContext();
+                                SharedPreferences sharedPreferences = context.getSharedPreferences(
+                                        context.getString(R.string.login_or_sign_up_session), 0);
+                                String userId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
+                                SyncUser.getById(userId);
+                            } else {
+                                throw new InvalidResponseException("Incorrect updating user's photo response");
+                            }
+                        } catch (JSONException e) {
+                            Log.e(TAG, "Error parsing updating photo response", e);
+                        }
+                        return null;
+                    }
+                };
+                new NetworkRequest(template, taskCompletionSource).runNetworkRequest().continueWith(UpdatingPhoto);
+
+                return null;
+            }
+        };
+
+        SyncPhoto.uploadPhoto(photoName, data).continueWith(updateUserPhoto);
+
+        return taskCompletionSource.getTask();
     }
 
     public static Task<RUser> getById(String userId) {
 
         Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
         UrlTemplate template = UrlTemplateCreator.getSingleUser(userId);
-        NetworkRequestBolts networkRequestBolts = new NetworkRequestBolts(template, taskCompletionSource);
+        NetworkRequest networkRequest = new NetworkRequest(template, taskCompletionSource);
 
-        return networkRequestBolts.runNetworkRequestBolts().continueWith(new Continuation<JSONObject, RUser>() {
+        Continuation<JSONObject, RUser> addSingleUserToRealm = new Continuation<JSONObject, RUser>() {
             @Override
-            public RUser then(Task task) throws Exception {
+            public RUser then(Task<JSONObject> task) throws Exception {
+                if (task.isFaulted()) {
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in getById", exception);
+                    throw exception;
+                }
 
-                Log.d(TAG, "jsonString:" + task.getResult().toString());
+                if (task.getResult() == null) {
+                    throw new InvalidResponseException("Empty response");
+                }
 
-                JSONObject userJsonObj = new JSONObject(task.getResult().toString());
-                String userId = userJsonObj.getString(JsonKeys.OBJECT_ID);
-                String username = userJsonObj.getString(JsonKeys.USERNAME);
-                String url = userJsonObj.getJSONObject(JsonKeys.PHOTO).getString(JsonKeys.URL);
+                try {
+                    JSONObject userJsonObj = new JSONObject(task.getResult().toString());
 
-                RUser rUser = new RUser();
-                rUser.setUserId(userId);
-                rUser.setUsername(username);
-                rUser.setUrl(url);
+                    RUser rUser = new RUser();
+                    rUser.setUserId(userJsonObj.getString(JsonKeys.OBJECT_ID));
+                    rUser.setUsername(userJsonObj.getString(JsonKeys.USERNAME));
+                    rUser.setEmail(userJsonObj.optString(JsonKeys.EMAIL));
+                    rUser.setPhone(userJsonObj.optString(JsonKeys.PHONE));
 
-                return rUser;
+                    JSONObject groupIdObj = userJsonObj.optJSONObject(JsonKeys.GROUP_ID);
+                    if (groupIdObj != null) {
+                        rUser.setGroupId(groupIdObj.getString(JsonKeys.OBJECT_ID));
+                    }
+                    rUser.setPhone(userJsonObj.optString(JsonKeys.PHONE));
+                    JSONObject photoJsonObj = userJsonObj.optJSONObject(JsonKeys.PHOTO);
+                    if (photoJsonObj != null) {
+                        rUser.setUrl(photoJsonObj.getString(JsonKeys.URL));
+                    }
+
+                    Realm realmInsert = Realm.getInstance(MyApplication.getContext());
+                    realmInsert.beginTransaction();
+                    realmInsert.copyToRealmOrUpdate(rUser);
+                    realmInsert.commitTransaction();
+                    realmInsert.close();
+
+                    return rUser;
+
+                } catch (JSONException e) {
+                    Log.e(TAG, "Error parsing user object", e);
+                }
+
+                return null;
             }
-        });
+        };
+
+        return networkRequest.runNetworkRequest().continueWith(addSingleUserToRealm);
     }
 }

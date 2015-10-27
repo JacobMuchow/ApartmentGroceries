@@ -21,9 +21,9 @@
             android:layout_marginTop="@dimen/login_margin_top_land"
             android:layout_marginLeft="@dimen/login_sign_up_username_password_margin"
             android:layout_marginRight="@dimen/login_sign_up_username_password_margin"
-            android:padding="@dimen/login_sign_up_username_password_padding"
-
             android:layout_centerHorizontal="true"
+
+            android:padding="@dimen/login_sign_up_username_password_padding"
             android:inputType="textPersonName"
             android:hint="username"
             android:textAlignment="center"
@@ -36,9 +36,10 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/login_sign_up_username_password_height"
             android:layout_margin="@dimen/login_sign_up_username_password_margin"
-            android:padding="@dimen/login_sign_up_username_password_padding"
             android:layout_below="@+id/login_activity_username_id"
             android:layout_centerHorizontal="true"
+
+            android:padding="@dimen/login_sign_up_username_password_padding"
             android:inputType="textPassword"
             android:hint="password"
             android:textAlignment="center"
@@ -51,9 +52,10 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/login_sign_up_username_password_height"
             android:layout_margin="@dimen/login_sign_up_username_password_margin"
-            android:padding="@dimen/login_sign_up_username_password_padding"
             android:layout_below="@+id/login_activity_password_id"
             android:layout_centerHorizontal="true"
+
+            android:padding="@dimen/login_sign_up_username_password_padding"
             android:text="@string/login_button"
             android:textColor="@android:color/white"
             android:textAllCaps="false"
@@ -66,12 +68,27 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/login_sign_up_username_password_height"
             android:layout_margin="@dimen/login_sign_up_username_password_margin"
-            android:padding="@dimen/login_sign_up_username_password_padding"
             android:layout_below="@+id/login_activity_login_button_id"
             android:layout_centerHorizontal="true"
+
+            android:padding="@dimen/login_sign_up_username_password_padding"
             android:gravity="center"
             android:text="@string/sign_up_button"
             android:textColor="@android:color/black"
             style="@android:style/TextAppearance.Small" />
     </RelativeLayout>
+
+    <ProgressBar
+        android:id="@+id/login_activity_progress_bar_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+
+        android:visibility="invisible"
+        android:indeterminate="true"
+        android:indeterminateTintMode="src_atop"
+        android:indeterminateTint="@color/colorPrimaryDark"
+        style="?android:attr/progressBarStyleLarge"/>
 </RelativeLayout>
