@@ -1,5 +1,6 @@
 package com.quarkworks.apartmentgroceries.service;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.quarkworks.apartmentgroceries.MyApplication;
@@ -21,7 +22,7 @@ import com.quarkworks.apartmentgroceries.service.models.RGroceryItem.JsonKeys;
 public class SyncGroceryItem {
     private static final String TAG = SyncGroceryItem.class.getSimpleName();
 
-    public static Task<Void> getAll() {
+    public static Task getAll() {
 
         Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
         UrlTemplate template = UrlTemplateCreator.getAllGroceryItems();
@@ -32,14 +33,13 @@ public class SyncGroceryItem {
             public Void then(Task<JSONObject> task) throws Exception {
 
                 if (task.isFaulted()) {
-                    Log.e(TAG, "Error in getAll: " + task.getError());
+                    throw task.getError();
                 } else {
 
                     JSONObject jsonObject = task.getResult();
 
                     if (jsonObject == null) {
-                        Log.e(TAG, "Error getting grocery items from server");
-                        return null;
+                        throw new InvalidResponseException("Empty response");
                     }
 
                     Realm realm = Realm.getInstance(MyApplication.getContext());
@@ -74,8 +74,8 @@ public class SyncGroceryItem {
 
                         realm.commitTransaction();
                     } catch (JSONException e) {
-                        Log.e(TAG, "Error getting grocery object from server", e);
                         realm.cancelTransaction();
+                        throw new InvalidResponseException("Error getting grocery object from server");
                     }
                     realm.close();
                 }
@@ -87,28 +87,33 @@ public class SyncGroceryItem {
         return networkRequest.runNetworkRequest().onSuccess(addGroceryItemsToRealm);
     }
 
-    public static Task<Boolean> add(RGroceryItem rGroceryItem) {
+    public static Task add(RGroceryItem rGroceryItem) {
 
         Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
         UrlTemplate template = UrlTemplateCreator.addGroceryItem(rGroceryItem);
         NetworkRequest networkRequest = new NetworkRequest(template, taskCompletionSource);
 
-        Continuation<JSONObject, Boolean> continuation = new Continuation<JSONObject, Boolean>() {
+        Continuation<JSONObject, Void> continuation = new Continuation<JSONObject, Void>() {
             @Override
-            public Boolean then(Task<JSONObject> task) throws Exception {
-                JSONObject jsonObject = task.getResult();
+            public Void then(Task<JSONObject> task) throws Exception {
+                if (task.isFaulted()) {
+                    throw task.getError();
+                } else {
+                    JSONObject jsonObject = task.getResult();
 
-                if (jsonObject == null) {
-                    Log.e(TAG, "Error adding grocery object");
-                    return false;
-                }
+                    if (jsonObject == null) {
+                        throw new InvalidResponseException("Empty response");
+                    }
 
-                try {
-                    String groceryId = jsonObject.getString(JsonKeys.OBJECT_ID);
-                    return  !groceryId.isEmpty();
-                } catch (JSONException e) {
-                    Log.e(TAG, "adding grocery failed", e);
-                    return false;
+                    try {
+                        String groceryId = jsonObject.getString(JsonKeys.OBJECT_ID);
+                        if (TextUtils.isEmpty(groceryId)) {
+                            throw new InvalidResponseException("Incorrect response");
+                        }
+                    } catch (JSONException e) {
+                        Log.e(TAG, "Error parsing grocery object", e);
+                    }
+                    return null;
                 }
             }
         };

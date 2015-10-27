@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -17,7 +16,6 @@ import android.widget.Toast;
 import com.quarkworks.apartmentgroceries.MyApplication;
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.group.GroupActivity;
-import com.quarkworks.apartmentgroceries.main.HomeActivity;
 import com.quarkworks.apartmentgroceries.service.SyncUser;
 
 import bolts.Continuation;
@@ -84,10 +82,12 @@ public class SignUpActivity extends AppCompatActivity {
                 if (!username.isEmpty() && !password.isEmpty() && !secondPassword.isEmpty()) {
                     if (password.equals(secondPassword)) {
                         progressBar.setVisibility(View.VISIBLE);
-                        final Continuation<Boolean, Object> loginOnSuccess = new Continuation<Boolean, Object>() {
+                        final Continuation<Void, Object> loginOnSuccess = new Continuation<Void, Object>() {
                             @Override
-                            public Void then(Task<Boolean> task) {
-                                if (task.getResult()) {
+                            public Void then(Task<Void> task) {
+                                if (task.isFaulted()) {
+                                    Log.e(TAG, task.getError().toString());
+                                } else {
                                     progressBar.setVisibility(View.GONE);
 
                                     GroupActivity.newIntent(SignUpActivity.this);
@@ -95,22 +95,21 @@ public class SignUpActivity extends AppCompatActivity {
                                             Toast.LENGTH_SHORT).show();
                                     Toast.makeText(getApplicationContext(), getString(R.string.choose_group_message),
                                             Toast.LENGTH_SHORT).show();
-                                } else {
-                                    Log.e(TAG, "Error login in after sign up");
                                 }
                                 return null;
                             }
                         };
 
-                        Continuation<Boolean, Void> signUpOnSuccess = new Continuation<Boolean, Void>() {
+                        Continuation<Void, Void> signUpOnSuccess = new Continuation<Void, Void>() {
                             @Override
-                            public Void then(Task<Boolean> task) {
-                                if (task.getResult()) {
-                                    SyncUser.loginBolts(username, password).onSuccess(loginOnSuccess, Task.UI_THREAD_EXECUTOR);
-                                } else {
+                            public Void then(Task<Void> task) {
+                                if (task.isFaulted()) {
+                                    Log.e(TAG, task.getError().toString());
                                     progressBar.setVisibility(View.GONE);
                                     Toast.makeText(MyApplication.getContext(),
                                             getString(R.string.sign_up_failure_message), Toast.LENGTH_SHORT).show();
+                                } else {
+                                    SyncUser.loginBolts(username, password).onSuccess(loginOnSuccess, Task.UI_THREAD_EXECUTOR);
                                 }
                                 return null;
                             }

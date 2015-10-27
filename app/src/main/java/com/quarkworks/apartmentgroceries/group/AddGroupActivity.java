@@ -5,13 +5,13 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.quarkworks.apartmentgroceries.MyApplication;
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.main.HomeActivity;
 import com.quarkworks.apartmentgroceries.service.SyncGroup;
@@ -74,7 +74,7 @@ public class AddGroupActivity extends AppCompatActivity {
                 RGroup groupItem = new RGroup();
                 groupItem.setName(groupItemName);
 
-                SyncGroup.add(groupItem).onSuccess(checkAddingGroup, Task.UI_THREAD_EXECUTOR);
+                SyncGroup.add(groupItem).continueWith(checkAddingGroup, Task.UI_THREAD_EXECUTOR);
             } else {
                 Toast.makeText(getApplicationContext(),
                         getString(R.string.grocery_item_name_empty), Toast.LENGTH_SHORT).show();
@@ -82,16 +82,17 @@ public class AddGroupActivity extends AppCompatActivity {
         }
     };
 
-    private Continuation<Boolean, Void> checkAddingGroup = new Continuation<Boolean, Void>() {
+    private Continuation<Void, Void> checkAddingGroup = new Continuation<Void, Void>() {
         @Override
-        public Void then(Task<Boolean> task) throws Exception {
-            if (task.getResult()) {
+        public Void then(Task<Void> task) throws Exception {
+            if (task.isFaulted()) {
+                Log.e(TAG, "Adding group failure", task.getError());
+                Toast.makeText(getApplicationContext(),
+                        getString(R.string.add_group_failure), Toast.LENGTH_SHORT).show();
+            } else {
                 HomeActivity.newIntent(AddGroupActivity.this);
                 Toast.makeText(getApplicationContext(), getString(R.string.add_group_success),
                         Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(getApplicationContext(),
-                        getString(R.string.add_group_failure), Toast.LENGTH_SHORT).show();
             }
             return null;
         }

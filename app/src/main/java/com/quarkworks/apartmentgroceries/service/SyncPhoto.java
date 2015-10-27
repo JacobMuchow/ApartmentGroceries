@@ -28,8 +28,7 @@ public class SyncPhoto {
                 } else {
 
                     if (task.getResult() == null) {
-                        Log.e(TAG, "Error getting uploading photo response json");
-                        return null;
+                        throw new InvalidResponseException("Empty response");
                     }
 
                     try {
@@ -38,7 +37,7 @@ public class SyncPhoto {
                         return task.getResult();
 
                     } catch (JSONException e) {
-                        Log.e(TAG, "uploading photo failure", e);
+                        Log.e(TAG, "Error parsing photo object", e);
                     }
                 }
 
@@ -47,6 +46,5 @@ public class SyncPhoto {
         };
 
         return networkRequest.runNetworkRequest().onSuccess(uploadingPhoto);
-
     }
 }

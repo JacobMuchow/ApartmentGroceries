@@ -6,13 +6,13 @@ import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.quarkworks.apartmentgroceries.MyApplication;
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.main.HomeActivity;
 import com.quarkworks.apartmentgroceries.service.SyncGroceryItem;
@@ -92,13 +92,14 @@ public class AddGroceryItemActivity extends AppCompatActivity {
     private Continuation<Boolean, Void> addGroceryItemOnSuccess = new Continuation<Boolean, Void>() {
         @Override
         public Void then(Task<Boolean> task) throws Exception {
-            if (task.getResult()) {
+            if (task.isFaulted()) {
+                Log.e(TAG, "Failed to add grocery", task.getError());
+                Toast.makeText(getApplicationContext(),
+                        getString(R.string.add_grocery_item_failure), Toast.LENGTH_SHORT).show();
+            } else {
                 HomeActivity.newIntent(AddGroceryItemActivity.this);
                 Toast.makeText(getApplicationContext(), getString(R.string.add_grocery_item_success),
                         Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(getApplicationContext(),
-                        getString(R.string.add_grocery_item_failure), Toast.LENGTH_SHORT).show();
             }
             return null;
         }

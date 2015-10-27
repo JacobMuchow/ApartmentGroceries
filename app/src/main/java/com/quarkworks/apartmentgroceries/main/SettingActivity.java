@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -76,13 +77,17 @@ public class SettingActivity extends AppCompatActivity {
     public View.OnClickListener logoutTextViewOnClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Continuation<Boolean, Void> logoutOnSuccess = new Continuation<Boolean, Void>() {
+            Continuation<Void, Void> logoutOnSuccess = new Continuation<Void, Void>() {
                 @Override
-                public Void then(Task<Boolean> task) throws Exception {
-                    SharedPreferences sharedPreferences =
-                            getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
-                    sharedPreferences.edit().clear().apply();
-                    LoginActivity.newIntent(SettingActivity.this);
+                public Void then(Task<Void> task) throws Exception {
+                    if (task.isFaulted()) {
+                        Log.e(TAG, task.getError().toString());
+                    } else {
+                        SharedPreferences sharedPreferences =
+                                getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
+                        sharedPreferences.edit().clear().apply();
+                        LoginActivity.newIntent(SettingActivity.this);
+                    }
                     return null;
                 }
             };

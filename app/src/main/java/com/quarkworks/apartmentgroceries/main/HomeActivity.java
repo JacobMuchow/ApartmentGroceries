@@ -14,21 +14,15 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.quarkworks.apartmentgroceries.MyApplication;
 import com.quarkworks.apartmentgroceries.R;
-import com.quarkworks.apartmentgroceries.auth.LoginActivity;
 import com.quarkworks.apartmentgroceries.grocery.AddGroceryItemActivity;
 import com.quarkworks.apartmentgroceries.grocery.GroceryCell;
-import com.quarkworks.apartmentgroceries.group.GroupActivity;
 import com.quarkworks.apartmentgroceries.service.DataStore;
 import com.quarkworks.apartmentgroceries.service.SyncGroceryItem;
 import com.quarkworks.apartmentgroceries.service.SyncUser;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
 import com.quarkworks.apartmentgroceries.service.models.RUser;
-import com.quarkworks.apartmentgroceries.user.UserActivity;
 
-import bolts.Continuation;
-import bolts.Task;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 

@@ -77,32 +77,32 @@ public class SyncGroup {
         return networkRequest.runNetworkRequest().continueWith(addGroupsToRealm);
     }
 
-    public static Task<Boolean> add(RGroup rRGroup) {
+    public static Task add(RGroup rRGroup) {
 
         Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
         UrlTemplate template = UrlTemplateCreator.addGroup(rRGroup);
         NetworkRequest networkRequest = new NetworkRequest(template, taskCompletionSource);
 
-        Continuation<JSONObject, Boolean> checkAddGroup = new Continuation<JSONObject, Boolean>() {
+        Continuation<JSONObject, Void> checkAddGroup = new Continuation<JSONObject, Void>() {
             @Override
-            public Boolean then(Task<JSONObject> task) throws Exception {
+            public Void then(Task<JSONObject> task) throws Exception {
                 if (task.isFaulted()) {
-                    Log.e(TAG, "Error in add: " + task.getError());
-                    return false;
+                    throw task.getError();
                 } else {
                     JSONObject jsonObject = task.getResult();
 
                     if (jsonObject == null) {
-                        Log.e(TAG, "Error adding group object");
-                        return false;
+                        throw new InvalidResponseException("Empty response");
                     }
 
                     try {
-                        return !TextUtils.isEmpty(jsonObject.getString(JsonKeys.OBJECT_ID));
+                        if(TextUtils.isEmpty(jsonObject.getString(JsonKeys.OBJECT_ID))) {
+                            throw new InvalidResponseException("Incorrect response");
+                        }
                     } catch (JSONException e) {
-                        Log.e(TAG, "adding group failed", e);
-                        return false;
+                        Log.e(TAG, "Error parsing group object", e);
                     }
+                    return null;
                 }
             }
         };

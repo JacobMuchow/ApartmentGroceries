@@ -29,7 +29,6 @@ import com.quarkworks.apartmentgroceries.service.DataStore;
 import com.quarkworks.apartmentgroceries.service.SyncUser;
 import com.quarkworks.apartmentgroceries.service.models.RUser;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
@@ -164,7 +163,6 @@ public class PhotoActivity extends AppCompatActivity {
                 try {
                     inputStream = getContentResolver().openInputStream(selectedImageUri);
 
-
                     try {
                         String photoName = dateToString(new Date(), getString(R.string.photo_date_format_string));
                         inputData = getBytes(inputStream);
@@ -176,23 +174,20 @@ public class PhotoActivity extends AppCompatActivity {
                         Continuation<JSONObject, Void> checkUpdatingPhoto = new Continuation<JSONObject, Void>() {
                             @Override
                             public Void then(Task<JSONObject> task) {
-                                try {
-                                    String updatedAt = task.getResult().getString(RUser.JsonKeys.UPDATED_AT);
-                                    if (!TextUtils.isEmpty(updatedAt)) {
-                                        Toast.makeText(getApplicationContext(),
-                                                getString(R.string.photo_update_success), Toast.LENGTH_SHORT).show();
-                                        SharedPreferences sharedPreferences =
-                                                getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
-                                        String userId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
+                                if (task.isFaulted()) {
+                                    Log.e(TAG, "Failed updating photo", task.getError());
+                                    Toast.makeText(getApplicationContext(),
+                                            getString(R.string.photo_update_failure), Toast.LENGTH_SHORT).show();
 
-                                        SyncUser.getById(userId);
+                                } else {
 
-                                    } else {
-                                        Toast.makeText(getApplicationContext(),
-                                                getString(R.string.photo_update_failure), Toast.LENGTH_SHORT).show();
-                                    }
-                                } catch (JSONException e) {
-                                    Log.e(TAG, "Error updating photo", e);
+                                    Toast.makeText(getApplicationContext(),
+                                            getString(R.string.photo_update_success), Toast.LENGTH_SHORT).show();
+                                    SharedPreferences sharedPreferences =
+                                            getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
+                                    String userId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
+
+                                    SyncUser.getById(userId);
                                 }
                                 return null;
                             }

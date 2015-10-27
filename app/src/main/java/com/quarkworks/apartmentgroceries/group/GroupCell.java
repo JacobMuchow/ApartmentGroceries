@@ -1,7 +1,6 @@
 package com.quarkworks.apartmentgroceries.group;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -83,23 +82,24 @@ public class GroupCell extends RelativeLayout{
             editor.putString(RUser.JsonKeys.GROUP_ID, groupId);
             editor.apply();
 
-            SyncUser.joinGroup(userId, groupId).onSuccess(checkJoiningGroup, Task.UI_THREAD_EXECUTOR);
+            SyncUser.joinGroup(userId, groupId).continueWith(checkJoiningGroup, Task.UI_THREAD_EXECUTOR);
         }
     };
 
-    private Continuation<Boolean, Void> checkJoiningGroup = new Continuation<Boolean, Void>() {
+    private Continuation<Void, Void> checkJoiningGroup = new Continuation<Void, Void>() {
         @Override
-        public Void then(Task<Boolean> task) throws Exception {
-            if (task.getResult()) {
-                SyncUser.getAll(groupId);
-//                            HomeActivity.newIntent(getContext());
-                Toast.makeText(MyApplication.getContext(),
-                        MyApplication.getContext().getString(R.string.join_group_success),
-                        Toast.LENGTH_SHORT).show();
-            } else {
+        public Void then(Task<Void> task) throws Exception {
+            if (task.isFaulted()) {
                 Toast.makeText(MyApplication.getContext(),
                         MyApplication.getContext().getString(R.string.join_group_failure),
                         Toast.LENGTH_LONG).show();
+
+            } else {
+                SyncUser.getAll(groupId);
+                HomeActivity.newIntent(getContext());
+                Toast.makeText(MyApplication.getContext(),
+                        MyApplication.getContext().getString(R.string.join_group_success),
+                        Toast.LENGTH_SHORT).show();
             }
             return null;
         }

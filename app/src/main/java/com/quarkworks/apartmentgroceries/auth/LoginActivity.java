@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,7 +15,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.quarkworks.apartmentgroceries.MyApplication;
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.group.GroupActivity;
 import com.quarkworks.apartmentgroceries.main.HomeActivity;
@@ -81,10 +81,15 @@ public class LoginActivity extends AppCompatActivity {
                 if (!username.isEmpty() && !password.isEmpty()) {
                     progressBar.setVisibility(View.VISIBLE);
 
-                    Continuation<Boolean, Void> loginOnSuccess = new Continuation<Boolean, Void>() {
+                    Continuation<Void, Void> loginOnSuccess = new Continuation<Void, Void>() {
                         @Override
-                        public Void then(Task<Boolean> task) throws Exception {
-                            if(task.getResult()) {
+                        public Void then(Task<Void> task) throws Exception {
+                            if (task.isFaulted()) {
+                                Log.e(TAG, task.getError().toString());
+                                progressBar.setVisibility(View.GONE);
+                                Toast.makeText(getApplicationContext(),
+                                        getString(R.string.login_failure_message), Toast.LENGTH_LONG).show();
+                            } else {
                                 SharedPreferences sharedPreferences = getApplication()
                                         .getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
                                 String groupId = sharedPreferences.getString(RUser.JsonKeys.GROUP_ID, null);
@@ -101,16 +106,12 @@ public class LoginActivity extends AppCompatActivity {
                                     Toast.makeText(getApplicationContext(), getString(R.string.login_success_message),
                                             Toast.LENGTH_SHORT).show();
                                 }
-                            } else {
-                                progressBar.setVisibility(View.GONE);
-                                Toast.makeText(getApplicationContext(),
-                                        getString(R.string.login_failure_message), Toast.LENGTH_LONG).show();
                             }
                             return null;
                         }
                     };
 
-                    SyncUser.loginBolts(username, password).onSuccess(loginOnSuccess, Task.UI_THREAD_EXECUTOR);
+                    SyncUser.loginBolts(username, password).continueWith(loginOnSuccess, Task.UI_THREAD_EXECUTOR);
                 } else {
                     progressBar.setVisibility(View.GONE);
                     Toast.makeText(getApplicationContext(),

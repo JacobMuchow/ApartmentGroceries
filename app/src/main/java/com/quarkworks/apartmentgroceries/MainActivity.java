@@ -7,7 +7,6 @@ import android.text.TextUtils;
 
 import com.quarkworks.apartmentgroceries.auth.LoginActivity;
 import com.quarkworks.apartmentgroceries.main.HomeActivity;
-import com.quarkworks.apartmentgroceries.service.models.RGroup;
 import com.quarkworks.apartmentgroceries.service.models.RUser;
 
 public class MainActivity extends AppCompatActivity {
