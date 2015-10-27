@@ -320,7 +320,7 @@ public class SyncUser {
         return taskCompletionSource.getTask();
     }
 
-    public static Task getById(String userId) {
+    public static Task<RUser> getById(String userId) {
 
         Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
         UrlTemplate template = UrlTemplateCreator.getSingleUser(userId);
