@@ -5,8 +5,6 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -70,26 +68,5 @@ public class UserActivity extends AppCompatActivity {
 
         ListView listView = (ListView) findViewById(R.id.user_list_view_id);
         listView.setAdapter(realmBaseAdapter);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.user_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        Intent intent;
-
-        switch (item.getItemId()) {
-            case R.id.action_edit_photo:
-                intent = new Intent(this, PhotoActivity.class);
-                startActivity(intent);
-                return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 }

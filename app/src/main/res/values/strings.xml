@@ -6,7 +6,6 @@
     <string name="sign_up_button">Sign Up</string>
     <string name="add_button">Add</string>
     <string name="join_group_button">Join</string>
-    <string name="add_photo_button">Add photo</string>
 
     <!-- menu -->
     <string name="action_user">User</string>
@@ -27,7 +26,6 @@
     <string name="title_activity_group">Group</string>
     <string name="title_activity_add_group">Add Group</string>
     <string name="title_activity_user_detail">Profile</string>
-    <string name="title_activity_photo">Photo</string>
     <string name="title_activity_setting">Setting</string>
 
     <!-- login or sign up-->
