@@ -254,10 +254,15 @@ public class UrlTemplateCreator {
             subGroceryIdObj.put("objectId", groceryId);
             groceryIdObj.put("groceryId", subGroceryIdObj);
         } catch (JSONException e) {
-            Log.d(TAG, "Error creating grocery id object for where in getGroceryPhotoByGroceryId", e);
+            Log.d(TAG, "Error creating grocery id object for where in getAllGroceryPhotos", e);
         }
 
         params.put("where", Utilities.encodeURIComponent(groceryIdObj.toString()));
         return new UrlTemplate(GET, url, params);
+    }
+
+    public static UrlTemplate getAllGroceryPhotos() {
+        String url = baseUrl + "classes/GroceryPhoto";
+        return new UrlTemplate(GET, url, null);
     }
 }

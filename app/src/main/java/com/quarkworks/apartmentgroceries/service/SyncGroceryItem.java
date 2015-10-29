@@ -17,7 +17,6 @@ import io.realm.Realm;
 
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem.JsonKeys;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryPhoto;
-import com.quarkworks.apartmentgroceries.service.models.RUser;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -190,18 +189,28 @@ public class SyncGroceryItem {
         return taskCompletionSource.getTask();
     }
 
-    public static Task<JSONObject> getGroceryPhotoByGroceryId(String groceryId) {
+    public static void getAllGroceryPhotos() {
+        getAllGroceryPhotos(null);
+    }
+
+    public static Task<Void> getAllGroceryPhotos(String groceryId) {
 
         Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
-        UrlTemplate template = UrlTemplateCreator.getGroceryPhotoByGroceryId(groceryId);
+        UrlTemplate template;
+        if (TextUtils.isEmpty(groceryId)) {
+            template = UrlTemplateCreator.getAllGroceryPhotos();
+        } else {
+            template = UrlTemplateCreator.getGroceryPhotoByGroceryId(groceryId);
+        }
+
         NetworkRequest networkRequest = new NetworkRequest(template, taskCompletionSource);
 
-        Continuation<JSONObject, JSONObject> addGroceryPhotoToRealm = new Continuation<JSONObject, JSONObject>() {
+        Continuation<JSONObject, Void> addGroceryPhotoToRealm = new Continuation<JSONObject, Void>() {
             @Override
-            public JSONObject then(Task<JSONObject> task) throws Exception {
+            public Void then(Task<JSONObject> task) throws Exception {
                 if (task.isFaulted()) {
                     Exception exception = task.getError();
-                    Log.e(TAG, "Error in getGroceryPhotoByGroceryId", exception);
+                    Log.e(TAG, "Error in getAllGroceryPhotos", exception);
                     throw exception;
                 }
 
