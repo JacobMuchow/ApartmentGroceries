@@ -241,4 +241,23 @@ public class UrlTemplateCreator {
 
         return null;
     }
+
+    public static UrlTemplate getGroceryPhotoByGroceryId(String groceryId) {
+        String url = baseUrl + "classes/GroceryPhoto";
+        Map<String, String> params = new HashMap<>();
+
+        JSONObject subGroceryIdObj = new JSONObject();
+        JSONObject groceryIdObj=new JSONObject();
+        try {
+            subGroceryIdObj.put("__type", "Pointer");
+            subGroceryIdObj.put("className", "GroceryItem");
+            subGroceryIdObj.put("objectId", groceryId);
+            groceryIdObj.put("groceryId", subGroceryIdObj);
+        } catch (JSONException e) {
+            Log.d(TAG, "Error creating grocery id object for where in getGroceryPhotoByGroceryId", e);
+        }
+
+        params.put("where", Utilities.encodeURIComponent(groceryIdObj.toString()));
+        return new UrlTemplate(GET, url, params);
+    }
 }

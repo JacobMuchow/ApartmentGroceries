@@ -187,4 +187,35 @@ public class SyncGroceryItem {
 
         return taskCompletionSource.getTask();
     }
+
+    public static Task<JSONObject> getGroceryPhotoByGroceryId(String groceryId) {
+
+        Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
+        UrlTemplate template = UrlTemplateCreator.getGroceryPhotoByGroceryId(groceryId);
+        NetworkRequest networkRequest = new NetworkRequest(template, taskCompletionSource);
+
+        Continuation<JSONObject, JSONObject> addGroceryItemsToRealm = new Continuation<JSONObject, JSONObject>() {
+            @Override
+            public JSONObject then(Task<JSONObject> task) throws Exception {
+
+                if (task.isFaulted()) {
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in getGroceryPhotoByGroceryId", exception);
+                    throw exception;
+                }
+
+                JSONObject jsonObject = task.getResult();
+
+                if (jsonObject == null) {
+                    throw new InvalidResponseException("Empty response");
+                }
+
+                Log.d(TAG, "grocery photo:" + jsonObject.toString());
+
+                return jsonObject;
+            }
+        };
+
+        return networkRequest.runNetworkRequest().onSuccess(addGroceryItemsToRealm);
+    }
 }
