@@ -16,6 +16,8 @@ import bolts.Task;
 import io.realm.Realm;
 
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem.JsonKeys;
+import com.quarkworks.apartmentgroceries.service.models.RGroceryPhoto;
+import com.quarkworks.apartmentgroceries.service.models.RUser;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -194,10 +196,9 @@ public class SyncGroceryItem {
         UrlTemplate template = UrlTemplateCreator.getGroceryPhotoByGroceryId(groceryId);
         NetworkRequest networkRequest = new NetworkRequest(template, taskCompletionSource);
 
-        Continuation<JSONObject, JSONObject> addGroceryItemsToRealm = new Continuation<JSONObject, JSONObject>() {
+        Continuation<JSONObject, JSONObject> addGroceryPhotoToRealm = new Continuation<JSONObject, JSONObject>() {
             @Override
             public JSONObject then(Task<JSONObject> task) throws Exception {
-
                 if (task.isFaulted()) {
                     Exception exception = task.getError();
                     Log.e(TAG, "Error in getGroceryPhotoByGroceryId", exception);
@@ -210,12 +211,37 @@ public class SyncGroceryItem {
                     throw new InvalidResponseException("Empty response");
                 }
 
-                Log.d(TAG, "grocery photo:" + jsonObject.toString());
+                Realm realm = Realm.getInstance(MyApplication.getContext());
+                realm.beginTransaction();
 
-                return jsonObject;
+                try {
+                    JSONArray groceryPhotoJsonArray = jsonObject.getJSONArray(JsonKeys.RESULTS);
+
+                    for (int i = 0; i < groceryPhotoJsonArray.length(); i++) {
+                        try {
+                            RGroceryPhoto groceryPhoto = realm.createObject(RGroceryPhoto.class);
+                            JSONObject groceryPhotoJsonObj = groceryPhotoJsonArray.getJSONObject(i);
+
+                            groceryPhoto.setGroceryPhotoId(groceryPhotoJsonObj.getString(RGroceryPhoto.JsonKeys.OBJECT_ID));
+                            groceryPhoto.setGroceryId(groceryPhotoJsonObj.getJSONObject(RGroceryPhoto.JsonKeys.GROCERY_ID).getString(JsonKeys.OBJECT_ID));
+                            groceryPhoto.setUrl(groceryPhotoJsonObj.getJSONObject(RGroceryPhoto.JsonKeys.PHOTO).getString(RGroceryPhoto.JsonKeys.URL));
+
+                            realm.copyToRealmOrUpdate(groceryPhoto);
+                        } catch (JSONException e) {
+                            Log.e(TAG, "Error parsing grocery photo object", e);
+                        }
+                    }
+                    realm.commitTransaction();
+                } catch (JSONException e) {
+                    realm.cancelTransaction();
+                    throw new InvalidResponseException("Error getting grocery photo object from server");
+                }
+                realm.close();
+
+                return null;
             }
         };
 
-        return networkRequest.runNetworkRequest().onSuccess(addGroceryItemsToRealm);
+        return networkRequest.runNetworkRequest().onSuccess(addGroceryPhotoToRealm);
     }
 }

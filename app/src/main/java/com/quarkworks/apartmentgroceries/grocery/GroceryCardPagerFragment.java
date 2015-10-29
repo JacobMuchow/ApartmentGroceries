@@ -20,6 +20,7 @@ import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.service.DataStore;
 import com.quarkworks.apartmentgroceries.service.SyncGroceryItem;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
+import com.quarkworks.apartmentgroceries.service.models.RGroceryPhoto;
 import com.quarkworks.apartmentgroceries.user.UserDetailActivity;
 
 import org.json.JSONArray;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 
 import bolts.Continuation;
 import bolts.Task;
+import io.realm.RealmResults;
 
 /**
  * Created by zz on 10/22/15.
@@ -39,7 +41,7 @@ public class GroceryCardPagerFragment extends Fragment {
     private static final String GROCERY_ID = "groceryId";
     private String groceryId;
     private RGroceryItem rGroceryItem;
-    private ArrayList<String> photoUrlList;
+    private RealmResults<RGroceryPhoto> groceryPhotos;
     private ImageAdapter imageAdapter;
 
     /**
@@ -65,46 +67,11 @@ public class GroceryCardPagerFragment extends Fragment {
         rGroceryItem = DataStore.getInstance().getRealm().where(RGroceryItem.class)
                 .equalTo(GROCERY_ID, groceryId).findFirst();
 
+        groceryPhotos = DataStore.getInstance().getRealm()
+                .where(RGroceryPhoto.class).equalTo(RGroceryPhoto.RealmKeys.GROCERY_ID,
+                        rGroceryItem.getGroceryId()).findAll();
 
-        Continuation<JSONObject, Void> getGroceryPhotoUrl = new Continuation<JSONObject, Void>() {
-            @Override
-            public Void then(Task<JSONObject> task) throws Exception {
-                if (task.isFaulted()) {
-                    Exception exception = task.getError();
-                    Log.e(TAG, "Error in getGroceryPhoto", exception);
-                    throw exception;
-                }
-
-                JSONObject jsonObject = task.getResult();
-                if (jsonObject == null) {
-                    return null;
-                }
-
-                JSONArray photoUrlArray = jsonObject.getJSONArray("results");
-                for (int i = 0; i < photoUrlArray.length(); i++) {
-                    String url = photoUrlArray.getJSONObject(i).getJSONObject("photo").getString("url");
-                    if (!TextUtils.isEmpty(url)) photoUrlList.add(url);
-                }
-
-                if (photoUrlList != null) imageAdapter.notifyDataSetChanged();
-
-                return null;
-            }
-        };
-
-        Continuation<Void, Void> checkGroceryPhotoResult = new Continuation<Void, Void>() {
-            @Override
-            public Void then(Task<Void> task) throws Exception {
-                if(task.isFaulted()) {
-                    Log.e(TAG, "Error:" + task.getError());
-                }
-                return null;
-            }
-        };
-
-        SyncGroceryItem.getGroceryPhotoByGroceryId(rGroceryItem.getGroceryId())
-                .continueWith(getGroceryPhotoUrl, Task.UI_THREAD_EXECUTOR)
-                .continueWith(checkGroceryPhotoResult);
+        SyncGroceryItem.getGroceryPhotoByGroceryId(rGroceryItem.getGroceryId());
     }
 
     @Override
@@ -125,8 +92,7 @@ public class GroceryCardPagerFragment extends Fragment {
         nameTextView.setText(rGroceryItem.getName());
         createdByTextView.setText(rGroceryItem.getCreatedBy());
 
-        if (photoUrlList == null) photoUrlList = new ArrayList<>();
-        imageAdapter = new ImageAdapter(getContext(), photoUrlList);
+        imageAdapter = new ImageAdapter(getContext(), groceryPhotos);
         photoGridView.setAdapter(imageAdapter);
 
         /**
@@ -154,17 +120,16 @@ public class GroceryCardPagerFragment extends Fragment {
 
     private class ImageAdapter extends BaseAdapter {
         private Context context;
-        private ArrayList<String> photoUrlList;
+        private RealmResults<RGroceryPhoto> groceryPhotos;
 
-        public ImageAdapter(Context context, ArrayList<String> photoList) {
-            if (photoList == null) photoList = new ArrayList<>();
+        public ImageAdapter(Context context, RealmResults<RGroceryPhoto> groceryPhotos) {
             this.context = context;
-            this.photoUrlList = photoList;
+            this.groceryPhotos = groceryPhotos;
 
         }
 
         public int getCount() {
-            return photoUrlList.size();
+            return groceryPhotos.size();
         }
 
         public Object getItem(int position) {
@@ -180,7 +145,7 @@ public class GroceryCardPagerFragment extends Fragment {
             View rootView = View.inflate(context, R.layout.grocery_pager_photo_grid_view_item, null);
             imageView = (ImageView) rootView.findViewById(R.id.grocery_pager_grid_view_image_view_id);
 
-            String photoUrl = photoUrlList.get(position);
+            String photoUrl = groceryPhotos.get(position).getUrl();
             Glide.with(getContext())
                     .load(photoUrl)
                     .placeholder(R.drawable.ic_launcher)
