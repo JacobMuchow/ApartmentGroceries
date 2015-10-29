@@ -16,6 +16,8 @@ import io.realm.Realm;
 
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem.JsonKeys;
 
+import java.util.ArrayList;
+
 /**
  * Created by zz on 10/14/15.
  */
@@ -88,7 +90,7 @@ public class SyncGroceryItem {
         return networkRequest.runNetworkRequest().onSuccess(addGroceryItemsToRealm);
     }
 
-    public static Task<Void> add(RGroceryItem rGroceryItem) {
+    public static Task<Void> add(RGroceryItem rGroceryItem, ArrayList<byte[]> photoList) {
 
         Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
         UrlTemplate template = UrlTemplateCreator.addGroceryItem(rGroceryItem);
