@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 
-    android:background="@color/colorPrimary">
+    android:background="@drawable/rectangle_border">
 
     <TextView android:id="@+id/grocery_card_pager_fragment_grocery_item_name_id"
         android:layout_width="match_parent"

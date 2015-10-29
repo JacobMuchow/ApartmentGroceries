@@ -8,7 +8,9 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.TextView;
 
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.service.DataStore;
@@ -21,10 +23,16 @@ public class GroceryCardPagerActivity extends AppCompatActivity {
 
     public static final String POSITION = "position";
     private static int NUM_PAGES = 0;
-    private ViewPager viewPager;
     private GroceryCardPagerAdapter groceryCardPagerAdapter;
 
     private static RealmResults<RGroceryItem> groceryItems;
+
+    /*
+        References
+     */
+    private Toolbar toolbar;
+    private TextView titleTextView;
+    private ViewPager viewPager;
 
     public static void newIntent(Context context, int position) {
         Intent intent = new Intent(context, GroceryCardPagerActivity.class);
@@ -40,8 +48,20 @@ public class GroceryCardPagerActivity extends AppCompatActivity {
         /**
          * Get view references
          */
+        toolbar = (Toolbar) findViewById(R.id.main_toolbar_id);
+        titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
         viewPager = (ViewPager) findViewById(R.id.grocery_card_pager_view_pager_id);
-        viewPager.setPageTransformer(true, new zoomOutPageTransformer());
+
+        /**
+         * Set view data
+         */
+        titleTextView.setText(getString(R.string.title_activity_grocery_card_pager));
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+//        viewPager.setPageTransformer(true, new zoomOutPageTransformer());
+        viewPager.setClipToPadding(false);
+        viewPager.setPageMargin(12);
 
         groceryItems = DataStore.getInstance().getRealm().where(RGroceryItem.class).findAll();
         groceryItems.sort(RGroceryItem.RealmKeys.CREATED_AT, false);
@@ -52,6 +72,7 @@ public class GroceryCardPagerActivity extends AppCompatActivity {
 
         int position = getIntent().getIntExtra(POSITION, 0);
         viewPager.setCurrentItem(position);
+
     }
 
     private static class GroceryCardPagerAdapter extends FragmentStatePagerAdapter {
@@ -68,6 +89,11 @@ public class GroceryCardPagerActivity extends AppCompatActivity {
         @Override
         public int getCount() {
             return NUM_PAGES;
+        }
+
+        @Override
+        public float getPageWidth (int position) {
+            return 0.93f;
         }
     }
 
