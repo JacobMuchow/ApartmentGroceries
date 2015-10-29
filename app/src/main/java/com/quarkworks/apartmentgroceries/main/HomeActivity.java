@@ -67,6 +67,7 @@ public class HomeActivity extends AppCompatActivity {
         SyncUser.getAll(groupId);
 
         final RealmResults<RGroceryItem> groceries = DataStore.getInstance().getRealm().where(RGroceryItem.class).findAll();
+        groceries.sort(RGroceryItem.RealmKeys.CREATED_AT, false);
 
         RealmBaseAdapter<RGroceryItem> realmBaseAdapter = new RealmBaseAdapter<RGroceryItem>(this, groceries, true) {
             @Override
