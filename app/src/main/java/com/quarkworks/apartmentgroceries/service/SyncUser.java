@@ -16,7 +16,6 @@ import org.json.JSONObject;
 import bolts.Continuation;
 import bolts.Task;
 import io.realm.Realm;
-import io.realm.RealmResults;
 
 import com.quarkworks.apartmentgroceries.service.models.RUser.JsonKeys;
 

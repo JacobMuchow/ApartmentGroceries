@@ -2,16 +2,12 @@ package com.quarkworks.apartmentgroceries.service;
 
 import android.util.Log;
 
-import com.quarkworks.apartmentgroceries.MyApplication;
-import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
 import com.quarkworks.apartmentgroceries.service.models.RGroup;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 

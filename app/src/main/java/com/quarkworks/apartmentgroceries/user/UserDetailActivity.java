@@ -3,7 +3,6 @@ package com.quarkworks.apartmentgroceries.user;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
@@ -22,7 +21,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.quarkworks.apartmentgroceries.MyApplication;
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.service.DataStore;
 import com.quarkworks.apartmentgroceries.service.SyncUser;
@@ -42,7 +40,6 @@ import java.util.List;
 
 import bolts.Continuation;
 import bolts.Task;
-import io.realm.Realm;
 
 public class UserDetailActivity extends AppCompatActivity {
     private static final String TAG = UserDetailActivity.class.getSimpleName();
