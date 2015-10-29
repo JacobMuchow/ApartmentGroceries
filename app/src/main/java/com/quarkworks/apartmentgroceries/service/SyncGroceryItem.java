@@ -4,6 +4,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.quarkworks.apartmentgroceries.MyApplication;
+import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
 
 import org.json.JSONArray;
@@ -17,6 +18,7 @@ import io.realm.Realm;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem.JsonKeys;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by zz on 10/14/15.
@@ -90,7 +92,7 @@ public class SyncGroceryItem {
         return networkRequest.runNetworkRequest().onSuccess(addGroceryItemsToRealm);
     }
 
-    public static Task<Void> add(RGroceryItem rGroceryItem, ArrayList<byte[]> photoList) {
+    public static Task<Void> add(RGroceryItem rGroceryItem, final ArrayList<byte[]> photoList) {
 
         Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
         UrlTemplate template = UrlTemplateCreator.addGroceryItem(rGroceryItem);
@@ -115,6 +117,10 @@ public class SyncGroceryItem {
                     String groceryId = jsonObject.getString(JsonKeys.OBJECT_ID);
                     if (TextUtils.isEmpty(groceryId)) {
                         throw new InvalidResponseException("Incorrect response");
+                    } else {
+                        for (int i = 0; i < photoList.size(); i++) {
+                            addGroceryPhoto(groceryId, photoList.get(i));
+                        }
                     }
                 } catch (JSONException e) {
                     Log.e(TAG, "Error parsing grocery object", e);
@@ -125,5 +131,60 @@ public class SyncGroceryItem {
         };
 
         return networkRequest.runNetworkRequest().continueWith(continuation);
+    }
+
+    public static Task<JSONObject> addGroceryPhoto(final String groceryId, byte[] data) {
+
+
+        final Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
+
+        Continuation<JSONObject, Void> addPhotoNameToGroceryPhoto = new Continuation<JSONObject, Void>() {
+            @Override
+            public Void then(Task<JSONObject> task) throws Exception {
+                if (task.isFaulted()) {
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in uploadPhoto", exception);
+                    throw exception;
+                }
+
+                String photoName = task.getResult().optString("name");
+                if (TextUtils.isEmpty(photoName)) {
+                    throw new InvalidResponseException("Empty response");
+                }
+
+                final UrlTemplate template = UrlTemplateCreator.addGroceryPhoto(groceryId, photoName);
+
+                Continuation<JSONObject, Void> addingGroceryPhoto = new Continuation<JSONObject, Void>() {
+                    @Override
+                    public Void then(Task<JSONObject> task) throws Exception{
+                        if (task.isFaulted()) {
+                            Exception exception = task.getError();
+                            Log.e(TAG, "Error in addingGroceryPhoto", exception);
+                            throw exception;
+                        }
+
+                        try {
+                            Log.d(TAG, "adding to GroceryPhoto:" + task.getResult().toString());
+                            String createdAt = task.getResult().getString("createdAt");
+                            if (TextUtils.isEmpty(createdAt)) {
+                                throw new InvalidResponseException("Incorrect adding to GroceryPhoto response");
+                            }
+                        } catch (JSONException e) {
+                            Log.e(TAG, "Error parsing adding grocery photo response", e);
+                        }
+                        return null;
+                    }
+                };
+                new NetworkRequest(template, taskCompletionSource).runNetworkRequest().continueWith(addingGroceryPhoto);
+
+                return null;
+            }
+        };
+
+        String photoName = Utilities.dateToString(new Date(), MyApplication.getContext()
+                .getString(R.string.photo_date_format_string)) + ".jpg";
+        SyncPhoto.uploadPhoto(photoName, data).continueWith(addPhotoNameToGroceryPhoto);
+
+        return taskCompletionSource.getTask();
     }
 }

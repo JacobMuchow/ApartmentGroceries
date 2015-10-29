@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/main_toolbar_id">
+
         <!-- grocery item name -->
         <EditText
             android:id="@+id/add_grocery_item_name_id"
@@ -22,7 +23,7 @@
 
             android:padding="@dimen/margin_padding_medium"
             android:gravity="start|left"
-            android:hint="description"
+            android:hint="@string/grocery_hint"
             android:ems="10"
             android:background="@drawable/rectangle_border"/>
 
@@ -44,15 +45,6 @@
                 android:gravity="center" />
         </LinearLayout>
 
-        <!-- add button -->
-        <Button
-            android:id="@+id/add_grocery_item_add_button_id"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/add_grocery_linear_layout_grid_view_id"
-            android:layout_centerHorizontal="true"
-
-            android:text="@string/add_button"/>
     </RelativeLayout>
 
 </RelativeLayout>

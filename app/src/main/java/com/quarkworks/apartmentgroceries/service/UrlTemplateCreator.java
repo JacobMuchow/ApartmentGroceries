@@ -2,12 +2,16 @@ package com.quarkworks.apartmentgroceries.service;
 
 import android.util.Log;
 
+import com.quarkworks.apartmentgroceries.MyApplication;
+import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
 import com.quarkworks.apartmentgroceries.service.models.RGroup;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -204,5 +208,37 @@ public class UrlTemplateCreator {
         String url = baseUrl + "users" + "/" + userId;
 
         return new UrlTemplate(GET, url, null);
+    }
+
+    public static UrlTemplate addGroceryPhoto(String groceryId, String photoName) {
+        String url = baseUrl + "classes/GroceryPhoto";
+        Map<String, String> params = new HashMap<>();
+        JSONObject groceryObject = new JSONObject();
+        JSONObject photoObject = new JSONObject();
+
+        try {
+
+            // grocery pointer
+            groceryObject.put("__type", "Pointer");
+            groceryObject.put("className", "GroceryItem");
+            groceryObject.put("objectId", groceryId);
+
+            Log.d(TAG, "groceryObject:" + groceryObject.toString());
+            params.put("groceryId", groceryObject.toString());
+
+            // photo pointer
+            photoObject.put("__type", "File");
+            photoObject.put("name", photoName);
+
+            Log.d(TAG, "photoObject:" + photoObject.toString());
+            params.put("photo", photoObject.toString());
+
+            return new UrlTemplate(POST, url, params, true);
+
+        } catch (JSONException e) {
+            Log.e(TAG, "Error creating grocery pointer or photo pointer for where clause in addGroceryPhoto()", e);
+        }
+
+        return null;
     }
 }

@@ -27,7 +27,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -60,6 +59,7 @@ public class AddGroceryItemActivity extends AppCompatActivity {
     private Uri outputFileUri;
     private ArrayList<byte[]> photoList;
     private ImageAdapter imageAdapter;
+
     /*
         References
      */
@@ -67,7 +67,6 @@ public class AddGroceryItemActivity extends AppCompatActivity {
     private TextView titleTextView;
     private TextView titleRightTextView;
     private EditText groceryItemNameEditText;
-    private Button addButton;
     private GridView photoGridView;
 
     public static void newIntent(Context context) {
@@ -87,7 +86,6 @@ public class AddGroceryItemActivity extends AppCompatActivity {
         titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
         titleRightTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_right_id);
         groceryItemNameEditText = (EditText) findViewById(R.id.add_grocery_item_name_id);
-        addButton = (Button) findViewById(R.id.add_grocery_item_add_button_id);
         photoGridView = (GridView) findViewById(R.id.add_grocery_grid_view_id);
 
         /**
@@ -97,13 +95,10 @@ public class AddGroceryItemActivity extends AppCompatActivity {
         titleRightTextView.setText(getString(R.string.post));
 
         photoList = new ArrayList<>();
-
         Bitmap cameraIconBitmap = getCameraIconBitmap();
-
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         cameraIconBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
         byte[] sampledInputData = stream.toByteArray();
-
         photoList.add(sampledInputData);
         imageAdapter = new ImageAdapter(this, photoList);
         photoGridView.setAdapter(imageAdapter);
@@ -111,55 +106,12 @@ public class AddGroceryItemActivity extends AppCompatActivity {
         /**
          * Set view OnClickListener
          */
-        addButton.setOnClickListener(addGroceryButtonOnClick);
         titleTextView.setOnClickListener(cancelOnClick);
         titleRightTextView.setOnClickListener(postOnClick);
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
     }
-
-    private View.OnClickListener addGroceryButtonOnClick = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String groceryItemName = groceryItemNameEditText.getText().toString();
-
-                if (!groceryItemName.isEmpty()) {
-                    SharedPreferences sharedPreferences = getApplication()
-                            .getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
-                    String groupId = sharedPreferences.getString(RUser.JsonKeys.GROUP_ID, null);
-                    String userId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
-
-                    RGroceryItem rGroceryItem = new RGroceryItem();
-                    rGroceryItem.setName(groceryItemName);
-                    rGroceryItem.setGroupId(groupId);
-                    rGroceryItem.setCreatedBy(userId);
-
-//                    SyncGroceryItem.add(rGroceryItem).onSuccess(addGroceryItemOnSuccess, Task.UI_THREAD_EXECUTOR);
-                } else {
-                    Toast.makeText(getApplicationContext(),
-                            getString(R.string.grocery_item_name_empty), Toast.LENGTH_SHORT).show();
-                }
-            }
-        };
-
-    private Continuation<Void, Void> addGroceryItemOnSuccess = new Continuation<Void, Void>() {
-        @Override
-        public Void then(Task<Void> task) throws Exception {
-            if (task.isFaulted()) {
-                Log.e(TAG, "Failed to add grocery", task.getError());
-                Toast.makeText(getApplicationContext(),
-                        getString(R.string.add_grocery_item_failure), Toast.LENGTH_SHORT).show();
-                return null;
-            }
-
-            HomeActivity.newIntent(AddGroceryItemActivity.this);
-            Toast.makeText(getApplicationContext(), getString(R.string.add_grocery_item_success),
-                    Toast.LENGTH_SHORT).show();
-
-            return null;
-        }
-    };
 
     private View.OnClickListener cancelOnClick = new View.OnClickListener() {
         @Override
@@ -184,11 +136,30 @@ public class AddGroceryItemActivity extends AppCompatActivity {
                 rGroceryItem.setGroupId(groupId);
                 rGroceryItem.setCreatedBy(userId);
 
+                photoList.remove(photoList.size() - 1);
                 SyncGroceryItem.add(rGroceryItem, photoList).onSuccess(addGroceryItemOnSuccess, Task.UI_THREAD_EXECUTOR);
             } else {
                 Toast.makeText(getApplicationContext(),
                         getString(R.string.grocery_item_name_empty), Toast.LENGTH_SHORT).show();
             }
+        }
+    };
+
+    private Continuation<Void, Void> addGroceryItemOnSuccess = new Continuation<Void, Void>() {
+        @Override
+        public Void then(Task<Void> task) throws Exception {
+            if (task.isFaulted()) {
+                Log.e(TAG, "Failed to add grocery", task.getError());
+                Toast.makeText(getApplicationContext(),
+                        getString(R.string.add_grocery_item_failure), Toast.LENGTH_SHORT).show();
+                return null;
+            }
+
+            HomeActivity.newIntent(AddGroceryItemActivity.this);
+            Toast.makeText(getApplicationContext(), getString(R.string.add_grocery_item_success),
+                    Toast.LENGTH_SHORT).show();
+
+            return null;
         }
     };
 
@@ -227,13 +198,9 @@ public class AddGroceryItemActivity extends AppCompatActivity {
             imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.d(TAG, "photoList.size():" + photoList.size());
-
                     if (position == photoList.size() - 1) {
                         openImageIntent();
-                        Toast.makeText(context, "add photo:" + position, Toast.LENGTH_SHORT).show();
                     }
-
                 }
             });
             return rootView;
@@ -250,7 +217,7 @@ public class AddGroceryItemActivity extends AppCompatActivity {
         outputFileUri = Uri.fromFile(sdImageMainDirectory);
 
         // camera
-        final List<Intent> camaraIntents = new ArrayList<>();
+        final List<Intent> cameraIntents = new ArrayList<>();
         final Intent captureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         final PackageManager packageManager = getPackageManager();
         final List<ResolveInfo> listCamera = packageManager.queryIntentActivities(captureIntent, 0);
@@ -260,7 +227,7 @@ public class AddGroceryItemActivity extends AppCompatActivity {
             intent.setComponent(new ComponentName(res.activityInfo.packageName, res.activityInfo.name));
             intent.setPackage(packageName);
             intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
-            camaraIntents.add(intent);
+            cameraIntents.add(intent);
         }
 
         // file
@@ -269,7 +236,7 @@ public class AddGroceryItemActivity extends AppCompatActivity {
         galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
 
         final Intent chooserIntent = Intent.createChooser(galleryIntent, getString(R.string.photo_select_source));
-        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, camaraIntents.toArray(new Parcelable[camaraIntents.size()]));
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, cameraIntents.toArray(new Parcelable[cameraIntents.size()]));
         startActivityForResult(chooserIntent, SELECT_PICTURE_REQUEST_CODE);
     }
 
@@ -292,14 +259,10 @@ public class AddGroceryItemActivity extends AppCompatActivity {
                     selectedImageUri = data.getData();
                 }
 
-                InputStream inputStream;
-                byte[] inputData = null;
                 try {
-                    inputStream = getContentResolver().openInputStream(selectedImageUri);
-
+                    InputStream inputStream = getContentResolver().openInputStream(selectedImageUri);
                     try {
-                        String photoName = Utilities.dateToString(new Date(), getString(R.string.photo_date_format_string));
-                        inputData = Utilities.getBytesFromInputStream(inputStream);
+                        byte[] inputData = Utilities.getBytesFromInputStream(inputStream);
                         Bitmap bitmap = Utilities.decodeSampledBitmapFromByteArray(inputData, 0, 400, 400);
                         int dimension = Utilities.getCenterCropDimensionForBitmap(bitmap);
                         bitmap = ThumbnailUtils.extractThumbnail(bitmap, dimension, dimension);
@@ -311,47 +274,16 @@ public class AddGroceryItemActivity extends AppCompatActivity {
                         photoList.remove(photoList.size() - 1);
                         photoList.add(sampledInputData);
                         photoList.add(cameraBytes);
-                        Log.d(TAG, "after adding a new photo, photoList.size():" + photoList.size());
                         imageAdapter.notifyDataSetChanged();
-
-//                        Continuation<JSONObject, Void> checkUpdatingPhoto = new Continuation<JSONObject, Void>() {
-//                            @Override
-//                            public Void then(Task<JSONObject> task) {
-//                                if (task.isFaulted()) {
-//                                    Log.e(TAG, "Failed updating photo", task.getError());
-//                                    Toast.makeText(getApplicationContext(),
-//                                            getString(R.string.photo_update_failure), Toast.LENGTH_SHORT).show();
-//                                    return null;
-//                                }
-//
-//                                Toast.makeText(getApplicationContext(),
-//                                        getString(R.string.photo_update_success), Toast.LENGTH_SHORT).show();
-//                                SharedPreferences sharedPreferences =
-//                                        getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
-//                                String userId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
-//
-//                                SyncUser.getById(userId);
-//
-//                                return null;
-//                            }
-//                        };
-//
-//                        SyncUser.updateProfilePhoto(photoName + ".jpg", sampledInputData)
-//                                .continueWith(checkUpdatingPhoto, Task.UI_THREAD_EXECUTOR);
                     } catch (IOException e) {
                         Log.e(TAG, "Error reading image byte data from uri");
                     }
-
                 } catch (FileNotFoundException e) {
                     Log.e(TAG, "Error file with uri " + selectedImageUri + " not found", e);
                 }
-
-//                photoImageView.setImageBitmap(decodeSampledBitmapFromByteArray(inputData, 0, 400, 400));
             }
         }
     }
-
-
 
     private Bitmap getCameraIconBitmap() {
         Drawable drawable = getResources().getDrawable(R.drawable.ic_local_see_white_48dp);

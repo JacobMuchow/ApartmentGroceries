@@ -69,4 +69,5 @@
     <!-- post grocery -->
     <string name="cancel">Cancel</string>
     <string name="post">Post</string>
+    <string name="grocery_hint">description</string>
 </resources>
