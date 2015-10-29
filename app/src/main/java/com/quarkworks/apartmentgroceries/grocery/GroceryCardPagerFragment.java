@@ -17,6 +17,7 @@ import com.quarkworks.apartmentgroceries.service.DataStore;
 import com.quarkworks.apartmentgroceries.service.SyncGroceryItem;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryPhoto;
+import com.quarkworks.apartmentgroceries.service.models.RUser;
 import com.quarkworks.apartmentgroceries.user.UserDetailActivity;
 
 import io.realm.RealmResults;
@@ -77,7 +78,12 @@ public class GroceryCardPagerFragment extends Fragment {
          * Set view data
          */
         nameTextView.setText(rGroceryItem.getName());
-        createdByTextView.setText(rGroceryItem.getCreatedBy());
+        RUser rUser = DataStore.getInstance().getRealm()
+                .where(RUser.class).equalTo(RUser.RealmKeys.USER_ID,
+                        rGroceryItem.getCreatedBy()).findFirst();
+        if (rUser != null) {
+            createdByTextView.setText(rUser.getUsername());
+        }
 
         imageAdapter = new ImageAdapter(getContext(), groceryPhotos);
         photoGridView.setAdapter(imageAdapter);
