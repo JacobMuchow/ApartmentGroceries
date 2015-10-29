@@ -21,7 +21,7 @@
     <string name="title_activity_signup">Sign Up</string>
     <string name="title_activity_user">User</string>d
     <string name="title_activity_home">Home</string>
-    <string name="title_activity_grocery_card_pager">Grocery Card Pager</string>
+    <string name="title_activity_grocery_card_pager">Grocery</string>
     <string name="title_activity_grocery_item_detail">Grocery Detail</string>
     <string name="title_activity_add_grocery_item">Add Grocery</string>
     <string name="title_activity_group">Group</string>
