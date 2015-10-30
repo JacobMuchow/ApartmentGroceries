@@ -314,7 +314,6 @@ public class SyncGroceryItem {
                             Log.e(TAG, "Error parsing grocery photo object", e);
                         }
                     }
-                    Log.d(TAG, "begin commitTransaction");
                     realm.commitTransaction();
                 } catch (JSONException e) {
                     realm.cancelTransaction();
