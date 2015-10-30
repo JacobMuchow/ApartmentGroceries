@@ -28,11 +28,11 @@ public class SyncGroup {
 
     public static Task<Void> getAll() {
 
-        Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
+        Task<JSONObject>.TaskCompletionSource tcs = Task.create();
         UrlTemplate template = UrlTemplateCreator.getAllGroup();
-        NetworkRequest networkRequest = new NetworkRequest(template, taskCompletionSource);
+        NetworkRequest networkRequest = new NetworkRequest(template, tcs);
 
-        Continuation addGroupsToRealm = new Continuation<JSONObject, Void>() {
+        Continuation<JSONObject, Void> addGroupItemToRealm = new Continuation<JSONObject, Void>() {
             @Override
             public Void then(Task<JSONObject> task) throws Exception {
                 if (task.isFaulted()) {
@@ -75,14 +75,14 @@ public class SyncGroup {
             }
         };
 
-        return networkRequest.runNetworkRequest().continueWith(addGroupsToRealm);
+        return networkRequest.runNetworkRequest().continueWith(addGroupItemToRealm);
     }
 
     public static Task<Void> add(RGroup rRGroup) {
 
-        Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
+        Task<JSONObject>.TaskCompletionSource tcs = Task.create();
         UrlTemplate template = UrlTemplateCreator.addGroup(rRGroup);
-        NetworkRequest networkRequest = new NetworkRequest(template, taskCompletionSource);
+        NetworkRequest networkRequest = new NetworkRequest(template, tcs);
 
         Continuation<JSONObject, Void> checkAddGroup = new Continuation<JSONObject, Void>() {
             @Override

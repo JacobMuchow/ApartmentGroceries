@@ -51,8 +51,6 @@ public class UserActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        SyncUser.getAll();
-
         RealmResults<RUser> users = DataStore.getInstance().getRealm().where(RUser.class).findAll();
 
         RealmBaseAdapter<RUser> realmBaseAdapter = new RealmBaseAdapter<RUser>(this, users, true) {

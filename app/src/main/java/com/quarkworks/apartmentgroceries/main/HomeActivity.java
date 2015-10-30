@@ -58,12 +58,12 @@ public class HomeActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        SyncGroceryItem.getAll();
-        SyncGroceryItem.getAllGroceryPhotos();
-
         SharedPreferences sharedPreferences = getApplication()
                 .getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
         String groupId = sharedPreferences.getString(RUser.JsonKeys.GROUP_ID, null);
+
+        SyncGroceryItem.getAll(groupId);
+        SyncGroceryItem.getAllGroceryPhotosByGroupId(groupId);
         SyncUser.getAll(groupId);
 
         final RealmResults<RGroceryItem> groceries = DataStore.getInstance().getRealm().where(RGroceryItem.class).findAll();

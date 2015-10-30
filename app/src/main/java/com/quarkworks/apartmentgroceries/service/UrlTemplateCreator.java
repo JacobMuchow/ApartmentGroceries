@@ -52,15 +52,7 @@ public class UrlTemplateCreator {
         return new UrlTemplate(POST, url, null);
     }
 
-    public static UrlTemplate getAllGroceryItems() {
-        String url = baseUrl + "classes/GroceryItem";
-        Map<String, String> params = new HashMap<>();
-        params.put(INCLUDE, "createdBy,groupId,purchasedBy");
-
-        return new UrlTemplate(GET, url, params);
-    }
-
-    public static UrlTemplate getGroceryItemsByGroupId(String groupId) {
+    public static UrlTemplate getAllGroceryItemsByGroupId(String groupId) {
         String url = baseUrl + "classes/GroceryItem";
         Map<String, String> params = new HashMap<>();
 
@@ -75,6 +67,7 @@ public class UrlTemplateCreator {
             Log.d(TAG, "Error creating group id object for where in getGroceryItemsByGroupId", e);
         }
 
+        params.put(INCLUDE, "createdBy,groupId,purchasedBy");
         params.put("where", Utilities.encodeURIComponent(groupIdObj.toString()));
         return new UrlTemplate(GET, url, params);
     }
@@ -206,11 +199,12 @@ public class UrlTemplateCreator {
         return new UrlTemplate(GET, url, null);
     }
 
-    public static UrlTemplate addGroceryPhoto(String groceryId, String photoName) {
+    public static UrlTemplate addGroceryPhoto(String groceryId, String photoName, String groupId) {
         String url = baseUrl + "classes/GroceryPhoto";
         Map<String, String> params = new HashMap<>();
         JSONObject groceryObject = new JSONObject();
         JSONObject photoObject = new JSONObject();
+        JSONObject groupIdObj=new JSONObject();
 
         try {
 
@@ -229,6 +223,11 @@ public class UrlTemplateCreator {
             Log.d(TAG, "photoObject:" + photoObject.toString());
             params.put("photo", photoObject.toString());
 
+            groupIdObj.put("__type", "Pointer");
+            groupIdObj.put("className", "Group");
+            groupIdObj.put("objectId", groupId);
+            params.put("groupId", groupIdObj.toString());
+
             return new UrlTemplate(POST, url, params, true);
 
         } catch (JSONException e) {
@@ -238,27 +237,27 @@ public class UrlTemplateCreator {
         return null;
     }
 
-    public static UrlTemplate getGroceryPhotoByGroceryId(String groceryId) {
+    public static UrlTemplate getGroceryPhotoByGroupId(String groupId) {
         String url = baseUrl + "classes/GroceryPhoto";
         Map<String, String> params = new HashMap<>();
 
-        JSONObject subGroceryIdObj = new JSONObject();
-        JSONObject groceryIdObj=new JSONObject();
+        JSONObject subGroupIdObj = new JSONObject();
+        JSONObject groupIdObj=new JSONObject();
         try {
-            subGroceryIdObj.put("__type", "Pointer");
-            subGroceryIdObj.put("className", "GroceryItem");
-            subGroceryIdObj.put("objectId", groceryId);
-            groceryIdObj.put("groceryId", subGroceryIdObj);
+            subGroupIdObj.put("__type", "Pointer");
+            subGroupIdObj.put("className", "Group");
+            subGroupIdObj.put("objectId", groupId);
+            groupIdObj.put("groupId", subGroupIdObj);
         } catch (JSONException e) {
-            Log.d(TAG, "Error creating grocery id object for where in getAllGroceryPhotos", e);
+            Log.d(TAG, "Error creating group id object for where in getGroceryPhotoByGroupId", e);
         }
 
-        params.put("where", Utilities.encodeURIComponent(groceryIdObj.toString()));
+        params.put("where", Utilities.encodeURIComponent(groupIdObj.toString()));
         return new UrlTemplate(GET, url, params);
     }
 
-    public static UrlTemplate getAllGroceryPhotos() {
-        String url = baseUrl + "classes/GroceryPhoto";
+    public static UrlTemplate getGroceryPhotoByGroceryPhotoId(String groceryPhotoId) {
+        String url = baseUrl + "classes/GroceryPhoto/" + groceryPhotoId;
         return new UrlTemplate(GET, url, null);
     }
 }
