@@ -18,6 +18,10 @@ public class RGroceryItem extends RealmObject {
         public static final String CREATED_AT ="createdAt";
     }
 
+    public static final class RealmKeys {
+        public static final String CREATED_AT ="createdAt";
+    }
+
     @PrimaryKey
     private String groceryId;
     private String name;

@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -59,14 +58,16 @@ public class HomeActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        SyncGroceryItem.getAll();
-
         SharedPreferences sharedPreferences = getApplication()
                 .getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
         String groupId = sharedPreferences.getString(RUser.JsonKeys.GROUP_ID, null);
+
+        SyncGroceryItem.getAll(groupId);
+        SyncGroceryItem.getAllGroceryPhotosByGroupId(groupId);
         SyncUser.getAll(groupId);
 
         final RealmResults<RGroceryItem> groceries = DataStore.getInstance().getRealm().where(RGroceryItem.class).findAll();
+        groceries.sort(RGroceryItem.RealmKeys.CREATED_AT, false);
 
         RealmBaseAdapter<RGroceryItem> realmBaseAdapter = new RealmBaseAdapter<RGroceryItem>(this, groceries, true) {
             @Override

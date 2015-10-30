@@ -17,8 +17,8 @@
             android:id="@+id/add_group_name_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="118dp"
             android:layout_alignParentTop="true"
+            android:layout_marginTop="118dp"
             android:layout_centerHorizontal="true"
 
             android:hint="group name"

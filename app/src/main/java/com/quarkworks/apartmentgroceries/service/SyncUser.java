@@ -218,10 +218,6 @@ public class SyncUser {
         return networkRequest.runNetworkRequest().continueWith(addUsersToRealm);
     }
 
-    public static Task<Void> getAll() {
-        return getAll(null);
-    }
-
     public static Task<Void> joinGroup(String userId, String groupId) {
 
         Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();

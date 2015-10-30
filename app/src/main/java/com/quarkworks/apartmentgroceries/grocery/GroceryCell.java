@@ -93,6 +93,9 @@ public class GroceryCell extends RelativeLayout {
                     .centerCrop()
                     .crossFade()
                     .into(photoImageView);
+        } else {
+            createdByTextView.setText("");
+            photoImageView.setImageResource(R.drawable.ic_launcher);
         }
 
         /**

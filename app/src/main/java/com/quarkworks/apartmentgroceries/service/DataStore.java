@@ -1,6 +1,5 @@
 package com.quarkworks.apartmentgroceries.service;
 
-import com.quarkworks.apartmentgroceries.MyApplication;
 
 import io.realm.Realm;
 

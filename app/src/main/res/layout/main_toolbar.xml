@@ -5,14 +5,35 @@
 
     android:background="@color/colorPrimary">
 
-    <!-- title -->
-    <TextView
-        android:id="@+id/toolbar_title_id"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        android:textColor="@android:color/white"
-        android:gravity="center"
-        style="@android:style/TextAppearance.Large"/>
+        <!-- title -->
+        <TextView
+            android:id="@+id/toolbar_title_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+
+            android:textColor="@android:color/white"
+            android:gravity="center"
+            style="@android:style/TextAppearance.Large"/>
+
+        <!-- text view in the right-->
+        <TextView
+            android:id="@+id/toolbar_title_right_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="@dimen/margin_padding_medium"
+
+            android:textColor="@android:color/white"
+            android:gravity="center"
+            style="@android:style/TextAppearance.Large"/>
+
+    </RelativeLayout>
 
 </android.support.v7.widget.Toolbar>

@@ -44,6 +44,7 @@ public class GroceryCardPagerActivity extends AppCompatActivity {
         viewPager.setPageTransformer(true, new zoomOutPageTransformer());
 
         groceryItems = DataStore.getInstance().getRealm().where(RGroceryItem.class).findAll();
+        groceryItems.sort(RGroceryItem.RealmKeys.CREATED_AT, false);
         NUM_PAGES = groceryItems.size();
 
         groceryCardPagerAdapter = new GroceryCardPagerAdapter(getSupportFragmentManager());
