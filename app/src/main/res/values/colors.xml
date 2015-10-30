@@ -6,4 +6,6 @@
 
     <!-- rectangle border color-->
     <color name="colorBorder">#7ED321</color>
+
+    <color name="colorGrey">#424242</color>
 </resources>

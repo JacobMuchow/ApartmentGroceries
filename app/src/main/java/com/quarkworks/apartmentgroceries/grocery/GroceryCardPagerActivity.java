@@ -81,17 +81,23 @@ public class GroceryCardPagerActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
+            if (position == NUM_PAGES) {
+                return GroceryCardPagerFragment.newInstance(null, position);
+            }
             String groceryId = groceryItems.get(position).getGroceryId();
             return GroceryCardPagerFragment.newInstance(groceryId, position);
         }
 
         @Override
         public int getCount() {
-            return NUM_PAGES;
+            return NUM_PAGES + 1;
         }
 
         @Override
         public float getPageWidth (int position) {
+            if (position == NUM_PAGES) {
+                return 0.07f;
+            }
             return 0.93f;
         }
     }

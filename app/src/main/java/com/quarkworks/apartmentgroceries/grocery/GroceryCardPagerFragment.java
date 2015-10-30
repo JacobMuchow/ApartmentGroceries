@@ -3,6 +3,7 @@ package com.quarkworks.apartmentgroceries.grocery;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,18 +59,25 @@ public class GroceryCardPagerFragment extends Fragment {
         super.onCreate(savedInstanceState);
         groceryId = getArguments().getString(GROCERY_ID);
         position = getArguments().getInt(POSITION);
-        rGroceryItem = DataStore.getInstance().getRealm().where(RGroceryItem.class)
-                .equalTo(GROCERY_ID, groceryId).findFirst();
 
-        groceryPhotos = DataStore.getInstance().getRealm()
-                .where(RGroceryPhoto.class).equalTo(RGroceryPhoto.RealmKeys.GROCERY_ID,
-                        rGroceryItem.getGroceryId()).findAll();
+        if (!TextUtils.isEmpty(groceryId)) {
+            rGroceryItem = DataStore.getInstance().getRealm().where(RGroceryItem.class)
+                    .equalTo(GROCERY_ID, groceryId).findFirst();
+
+            groceryPhotos = DataStore.getInstance().getRealm()
+                    .where(RGroceryPhoto.class).equalTo(RGroceryPhoto.RealmKeys.GROCERY_ID,
+                            rGroceryItem.getGroceryId()).findAll();
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+        if (TextUtils.isEmpty(groceryId)) {
+            return inflater.inflate(R.layout.empty, container, false);
+        }
         View rootView = inflater.inflate(R.layout.grocery_card_pager_fragment, container, false);
+
 
         rootView.setOnClickListener(new View.OnClickListener() {
             @Override
