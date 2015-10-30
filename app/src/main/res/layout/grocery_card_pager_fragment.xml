@@ -3,14 +3,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 
-    android:background="@drawable/rectangle_border">
+    android:background="@drawable/rectangle_border_shadow">
 
     <TextView android:id="@+id/grocery_card_pager_fragment_grocery_item_name_id"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/pager_title_height"
 
         android:gravity="center_vertical|center_horizontal"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:background="@drawable/rectangle_border_title"/>
 
     <TextView android:id="@+id/grocery_card_pager_fragment_grocery_item_created_by_id"
         android:layout_width="match_parent"
