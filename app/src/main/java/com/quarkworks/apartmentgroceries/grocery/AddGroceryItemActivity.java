@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.main.HomeActivity;
+import com.quarkworks.apartmentgroceries.service.GroceryItemBuilder;
 import com.quarkworks.apartmentgroceries.service.SyncGroceryItem;
 import com.quarkworks.apartmentgroceries.service.Utilities;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
@@ -116,7 +117,11 @@ public class AddGroceryItemActivity extends AppCompatActivity {
 
                 photoList.remove(photoList.size() - 1);
 
-                SyncGroceryItem.add(rGroceryItem, photoList).onSuccess(addGroceryItemOnSuccess, Task.UI_THREAD_EXECUTOR);
+                GroceryItemBuilder builder = new GroceryItemBuilder();
+                builder.setGroceryName(groceryItemName);
+                builder.setPhotoList(photoList);
+
+                SyncGroceryItem.add(builder).onSuccess(addGroceryItemOnSuccess, Task.UI_THREAD_EXECUTOR);
             } else {
                 Toast.makeText(getApplicationContext(),
                         getString(R.string.grocery_item_name_empty), Toast.LENGTH_SHORT).show();

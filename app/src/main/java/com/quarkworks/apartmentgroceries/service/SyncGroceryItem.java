@@ -96,7 +96,7 @@ public class SyncGroceryItem {
         return networkRequest.runNetworkRequest().onSuccess(addGroceryItemsToRealm);
     }
 
-    public static Task<Void> add(RGroceryItem rGroceryItem, final ArrayList<byte[]> photoList) {
+    public static Task<Void> add(final GroceryItemBuilder builder) {
         SharedPreferences sharedPreferences = MyApplication.getContext()
                 .getSharedPreferences(MyApplication.getContext()
                         .getString(R.string.login_or_sign_up_session), 0);
@@ -108,11 +108,11 @@ public class SyncGroceryItem {
             return null;
         }
 
-        rGroceryItem.setGroupId(groupId);
-        rGroceryItem.setCreatedBy(userId);
+        builder.setGroupId(groupId);
+        builder.setCreatedBy(userId);
 
         Task<JSONObject>.TaskCompletionSource tcs = Task.create();
-        UrlTemplate template = UrlTemplateCreator.addGroceryItem(rGroceryItem);
+        UrlTemplate template = UrlTemplateCreator.addGroceryItem(builder);
         NetworkRequest networkRequest = new NetworkRequest(template, tcs);
 
         Continuation<JSONObject, Void> addGroceryItem = new Continuation<JSONObject, Void>() {
@@ -135,8 +135,8 @@ public class SyncGroceryItem {
                     if (TextUtils.isEmpty(groceryId)) {
                         throw new InvalidResponseException("Incorrect response");
                     } else {
-                        for (int i = 0; i < photoList.size(); i++) {
-                            addGroceryPhoto(groceryId, photoList.get(i));
+                        for (int i = 0; i < builder.getPhotoList().size(); i++) {
+                            addGroceryPhoto(groceryId, builder.getPhotoList().get(i));
                         }
                     }
                 } catch (JSONException e) {

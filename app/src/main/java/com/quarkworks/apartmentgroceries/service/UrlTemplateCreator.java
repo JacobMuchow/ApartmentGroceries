@@ -102,17 +102,17 @@ public class UrlTemplateCreator {
         return new UrlTemplate(GET, url, null);
     }
 
-    public static UrlTemplate addGroceryItem(RGroceryItem rGroceryItem) {
+    public static UrlTemplate addGroceryItem(GroceryItemBuilder builder) {
         String url = baseUrl + "classes/GroceryItem";
         Map<String, String> params = new HashMap<>();
 
-        params.put("name", rGroceryItem.getName());
+        params.put("name", builder.getGroceryName());
 
         JSONObject groupIdObj=new JSONObject();
         try {
             groupIdObj.put("__type", "Pointer");
             groupIdObj.put("className", "Group");
-            groupIdObj.put("objectId", rGroceryItem.getGroupId());
+            groupIdObj.put("objectId", builder.getGroupId());
             params.put("groupId", groupIdObj.toString());
         } catch (JSONException e) {
             Log.d(TAG, "Error creating group id object for where in addGroceryItem", e);
@@ -122,7 +122,7 @@ public class UrlTemplateCreator {
         try {
             createdByObj.put("__type", "Pointer");
             createdByObj.put("className", "_User");
-            createdByObj.put("objectId", rGroceryItem.getCreatedBy());
+            createdByObj.put("objectId", builder.getCreatedBy());
             params.put("createdBy", createdByObj.toString());
         } catch (JSONException e) {
             Log.d(TAG, "Error creating created by object for where in addGroceryItem", e);
