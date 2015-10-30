@@ -10,6 +10,7 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.quarkworks.apartmentgroceries.R;
@@ -28,7 +29,9 @@ public class GroceryCardPagerFragment extends Fragment {
     private static final String TAG = GroceryCardPagerFragment.class.getSimpleName();
 
     private static final String GROCERY_ID = "groceryId";
+    private static final String POSITION = "position";
     private String groceryId;
+    private int position;
     private RGroceryItem rGroceryItem;
     private RealmResults<RGroceryPhoto> groceryPhotos;
     private ImageAdapter imageAdapter;
@@ -40,10 +43,11 @@ public class GroceryCardPagerFragment extends Fragment {
     private TextView createdByTextView;
     private GridView photoGridView;
 
-    static GroceryCardPagerFragment newInstance(String groceryId) {
+    static GroceryCardPagerFragment newInstance(String groceryId, int position) {
         GroceryCardPagerFragment groceryCardPagerFragment = new GroceryCardPagerFragment();
         Bundle args = new Bundle();
         args.putString(GROCERY_ID, groceryId);
+        args.putInt(POSITION, position);
         groceryCardPagerFragment.setArguments(args);
 
         return groceryCardPagerFragment;
@@ -53,6 +57,7 @@ public class GroceryCardPagerFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         groceryId = getArguments().getString(GROCERY_ID);
+        position = getArguments().getInt(POSITION);
         rGroceryItem = DataStore.getInstance().getRealm().where(RGroceryItem.class)
                 .equalTo(GROCERY_ID, groceryId).findFirst();
 
@@ -65,6 +70,13 @@ public class GroceryCardPagerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.grocery_card_pager_fragment, container, false);
+
+        rootView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                GroceryCardPagerActivity.viewPager.setCurrentItem(position);
+            }
+        });
 
         /**
          * Get view references
