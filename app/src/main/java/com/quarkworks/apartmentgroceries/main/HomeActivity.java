@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,6 +15,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.quarkworks.apartmentgroceries.R;
+import com.quarkworks.apartmentgroceries.TestActivity;
 import com.quarkworks.apartmentgroceries.grocery.AddGroceryItemActivity;
 import com.quarkworks.apartmentgroceries.grocery.GroceryCell;
 import com.quarkworks.apartmentgroceries.service.DataStore;
@@ -97,6 +99,9 @@ public class HomeActivity extends AppCompatActivity {
                 return true;
             case R.id.action_settings:
                 SettingActivity.newIntent(HomeActivity.this);
+                return true;
+            case R.id.action_test:
+                TestActivity.newIntent(HomeActivity.this);
                 return true;
 
         }
