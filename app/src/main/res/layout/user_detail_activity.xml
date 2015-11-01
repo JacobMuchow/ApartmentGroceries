@@ -33,9 +33,16 @@
             android:id="@+id/user_detail_edit_username_text_view_id"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/user_detail_edit_photo_text_view_id"
+            android:layout_below="@+id/user_detail_edit_photo_text_view_id" />
 
-            android:text="@string/edit_photo"/>
+        <!-- phone -->
+        <TextView
+            android:id="@+id/user_detail_edit_phone_text_view_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/user_detail_edit_username_text_view_id"
+
+            android:text="phone"/>
     </RelativeLayout>
 
 </RelativeLayout>
