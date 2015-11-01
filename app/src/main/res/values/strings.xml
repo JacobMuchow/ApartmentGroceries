@@ -70,4 +70,8 @@
     <string name="cancel">Cancel</string>
     <string name="post">Post</string>
     <string name="grocery_hint">description</string>
+
+    <!-- dialog -->
+    <string name="dialog_cancel">cancel</string>
+    <string name="dialog_save">save</string>
 </resources>
