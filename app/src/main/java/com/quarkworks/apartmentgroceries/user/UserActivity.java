@@ -12,7 +12,6 @@ import android.widget.TextView;
 
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.service.DataStore;
-import com.quarkworks.apartmentgroceries.service.SyncUser;
 import com.quarkworks.apartmentgroceries.service.models.RUser;
 
 import io.realm.RealmBaseAdapter;
@@ -22,8 +21,8 @@ public class UserActivity extends AppCompatActivity {
 
     private static final String TAG = UserActivity.class.getSimpleName();
 
-    /*
-        References
+    /**
+     * References
      */
     private Toolbar toolbar;
     private TextView titleTextView;

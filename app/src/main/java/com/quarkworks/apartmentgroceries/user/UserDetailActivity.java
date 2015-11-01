@@ -11,11 +11,14 @@ import android.net.Uri;
 import android.os.Environment;
 import android.os.Parcelable;
 import android.provider.MediaStore;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,6 +26,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.service.DataStore;
+import com.quarkworks.apartmentgroceries.service.MyDialogFragment;
 import com.quarkworks.apartmentgroceries.service.SyncUser;
 import com.quarkworks.apartmentgroceries.service.Utilities;
 import com.quarkworks.apartmentgroceries.service.models.RUser;
@@ -56,6 +60,7 @@ public class UserDetailActivity extends AppCompatActivity {
     private TextView titleTextView;
     private TextView editPhotoTextView;
     private TextView usernameTextView;
+    private TextView phoneTextView;
     private ImageView profileImageView;
 
     public static void newIntent(Context context, String userId) {
@@ -72,7 +77,7 @@ public class UserDetailActivity extends AppCompatActivity {
         userId = getIntent().getStringExtra(USER_ID);
         RUser rUser = DataStore.getInstance().getRealm().where(RUser.class)
                 .equalTo(USER_ID, userId).findFirst();
-        Log.d(TAG, "rUser id:" + userId);
+
         /**
          * Get view reference
          */
@@ -80,6 +85,7 @@ public class UserDetailActivity extends AppCompatActivity {
         titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
         editPhotoTextView = (TextView) findViewById(R.id.user_detail_edit_photo_text_view_id);
         usernameTextView = (TextView) findViewById(R.id.user_detail_edit_username_text_view_id);
+        phoneTextView = (TextView) findViewById(R.id.user_detail_edit_phone_text_view_id);
         profileImageView = (ImageView) findViewById(R.id.user_detail_profile_image_view_id);
 
         /**
@@ -90,6 +96,7 @@ public class UserDetailActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         usernameTextView.setText(rUser.getUsername());
+        phoneTextView.setText(rUser.getPhone());
 
         Glide.with(this)
                 .load(rUser.getUrl())
@@ -101,20 +108,25 @@ public class UserDetailActivity extends AppCompatActivity {
         /**
          * Set view on click
          */
-        editPhotoTextView.setOnClickListener(editPhotoTextViewOnClick());
-
-
+        editPhotoTextView.setOnClickListener(editPhotoTextViewOnClick);
+        phoneTextView.setOnClickListener(phoneOnClick);
     }
 
-    private View.OnClickListener editPhotoTextViewOnClick() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openImageIntent();
-//                PhotoActivity.newIntent(UserDetailActivity.this, userId);
-            }
-        };
-    }
+    private View.OnClickListener editPhotoTextViewOnClick =  new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            openImageIntent();
+        }
+    };
+
+    private View.OnClickListener phoneOnClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            android.app.FragmentManager manager = getFragmentManager();
+            MyDialogFragment editPhoneDialog = MyDialogFragment.newInstance("phone");
+            editPhoneDialog.show(manager, "phone");
+        }
+    };
 
     private void openImageIntent() {
         // root to save image
