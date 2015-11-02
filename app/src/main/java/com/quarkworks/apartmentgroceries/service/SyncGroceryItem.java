@@ -343,4 +343,72 @@ public class SyncGroceryItem {
 
         return null;
     }
+
+    public static Task<Void> deleteGrocery(final String groceryId) {
+        if (TextUtils.isEmpty(groceryId)) {
+            Log.e(TAG, "groceryId is null");
+            return null;
+        }
+
+        Continuation<JSONObject, Void> deleteGroceryPhotos = new Continuation<JSONObject, Void>() {
+            @Override
+            public Void then(Task<JSONObject> task) throws Exception {
+                if (task.isFaulted()) {
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in deleteGroceryPhotos", exception);
+                    throw exception;
+                }
+
+                JSONObject jsonObject = task.getResult();
+                if (jsonObject == null) {
+                    Log.d(TAG, "No photo associated with this grocery.");
+                    return null;
+                }
+
+                JSONArray groceryPhotos = jsonObject.getJSONArray("results");
+                ArrayList<String> groceryPhotoIds = new ArrayList<>();
+                for (int i = 0; i < groceryPhotos.length(); i++) {
+                    JSONObject groceryPhotoObj = groceryPhotos.getJSONObject(i);
+                    String groceryPhotoId = groceryPhotoObj.getString("objectId");
+                    groceryPhotoIds.add(groceryPhotoId);
+                }
+
+                Task<JSONObject>.TaskCompletionSource tcs = Task.create();
+                UrlTemplate template = UrlTemplateCreator.deleteGroceryPhotoByGroceryIds(groceryPhotoIds);
+                NetworkRequest networkRequest = new NetworkRequest(template, tcs);
+                networkRequest.runNetworkRequest();
+                // the result will be json object: {"results":[{"success":{}}, {"success":{}}]} if we delete two photos
+                return null;
+            }
+        };
+
+        Continuation<Void, Void> deleteGrocery = new Continuation<Void, Void>() {
+            @Override
+            public Void then(Task<Void> task) throws Exception {
+                if (task.isFaulted()) {
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in deleteGrocery", exception);
+                    throw exception;
+                }
+
+                Task<JSONObject>.TaskCompletionSource tcs = Task.create();
+                UrlTemplate template = UrlTemplateCreator.deleteGroceryByGroceryId(groceryId);
+                NetworkRequest networkRequest = new NetworkRequest(template, tcs);
+                networkRequest.runNetworkRequest();
+
+                return null;
+            }
+        };
+
+        Task<JSONObject>.TaskCompletionSource tcs = Task.create();
+        UrlTemplate template = UrlTemplateCreator.getGroceryPhotoByGroceryId(groceryId);
+        NetworkRequest networkRequest = new NetworkRequest(template, tcs);
+
+        // step 1: find all the grocery photos
+        // step 2: delete all the grocery photos
+        // step 3: delete grocery
+        networkRequest.runNetworkRequest().continueWith(deleteGroceryPhotos).continueWith(deleteGrocery);
+
+        return null;
+    }
 }
