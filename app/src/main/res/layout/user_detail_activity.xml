@@ -28,6 +28,7 @@
             android:layout_below="@+id/user_detail_profile_image_view_id"
 
             android:text="@string/edit_photo"/>
+
         <!-- username -->
         <TextView
             android:id="@+id/user_detail_edit_username_text_view_id"
