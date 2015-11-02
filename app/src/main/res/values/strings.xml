@@ -74,4 +74,6 @@
     <!-- dialog -->
     <string name="dialog_cancel">cancel</string>
     <string name="dialog_save">save</string>
+
+    <string name="delete">delete</string>
 </resources>
