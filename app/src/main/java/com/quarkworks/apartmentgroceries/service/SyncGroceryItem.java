@@ -15,6 +15,7 @@ import org.json.JSONObject;
 import bolts.Continuation;
 import bolts.Task;
 import io.realm.Realm;
+import io.realm.RealmResults;
 
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem.JsonKeys;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryPhoto;
@@ -400,6 +401,28 @@ public class SyncGroceryItem {
             }
         };
 
+        Continuation<Void, Void> deleteGroceryInRealm = new Continuation<Void, Void>() {
+            @Override
+            public Void then(Task<Void> task) throws Exception {
+                if (task.isFaulted()) {
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in deleteGroceryInRealm", exception);
+                    throw exception;
+                }
+
+                Realm realm = Realm.getInstance(MyApplication.getContext());
+                RealmResults<RGroceryPhoto> groceryPhotos = realm.where(RGroceryPhoto.class).equalTo("groceryId", groceryId).findAll();
+                RealmResults<RGroceryItem> groceryItems = realm.where(RGroceryItem.class).equalTo("groceryId", groceryId).findAll();
+                realm.beginTransaction();
+                groceryPhotos.clear();
+                groceryItems.clear();
+                realm.commitTransaction();
+                realm.close();
+
+                return null;
+            }
+        };
+
         Task<JSONObject>.TaskCompletionSource tcs = Task.create();
         UrlTemplate template = UrlTemplateCreator.getGroceryPhotoByGroceryId(groceryId);
         NetworkRequest networkRequest = new NetworkRequest(template, tcs);
@@ -407,7 +430,11 @@ public class SyncGroceryItem {
         // step 1: find all the grocery photos
         // step 2: delete all the grocery photos
         // step 3: delete grocery
-        networkRequest.runNetworkRequest().continueWith(deleteGroceryPhotos).continueWith(deleteGrocery);
+        // step 4: delete grocery in realm
+        networkRequest.runNetworkRequest()
+                .continueWith(deleteGroceryPhotos)
+                .continueWith(deleteGrocery)
+                .continueWith(deleteGroceryInRealm);
 
         return null;
     }

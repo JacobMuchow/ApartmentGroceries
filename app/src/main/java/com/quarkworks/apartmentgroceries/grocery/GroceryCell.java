@@ -1,6 +1,7 @@
 package com.quarkworks.apartmentgroceries.grocery;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.service.DataStore;
+import com.quarkworks.apartmentgroceries.service.SyncGroceryItem;
 import com.quarkworks.apartmentgroceries.service.Utilities;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
 import com.quarkworks.apartmentgroceries.service.models.RUser;
@@ -32,6 +34,7 @@ public class GroceryCell extends RelativeLayout {
     private TextView createdAtTextView;
     private TextView purchasedByTextView;
     private TextView statusTextView;
+    private TextView deleteTextView;
     private ImageView photoImageView;
 
     public GroceryCell(Context context) {
@@ -56,6 +59,7 @@ public class GroceryCell extends RelativeLayout {
         createdAtTextView = (TextView) findViewById(R.id.grocery_cell_created_at_id);
         purchasedByTextView = (TextView) findViewById(R.id.grocery_cell_purchased_by_id);
         statusTextView = (TextView) findViewById(R.id.grocery_cell_grocery_status_id);
+        deleteTextView = (TextView) findViewById(R.id.grocery_cell_grocery_delete_id);
         photoImageView = (ImageView) findViewById(R.id.grocery_cell_created_by_image_view_id);
     }
 
@@ -78,6 +82,15 @@ public class GroceryCell extends RelativeLayout {
             } else {
                 purchasedByTextView.setText("");
             }
+        }
+
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences(getContext()
+                .getString(R.string.login_or_sign_up_session), 0);
+        String globalUserId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
+        if (globalUserId.equals(rGroceryItem.getCreatedBy())) {
+            deleteTextView.setVisibility(VISIBLE);
+        } else {
+            deleteTextView.setVisibility(GONE);
         }
 
         statusTextView.setTextColor(getResources().getColor(R.color.colorPrimary));
@@ -104,6 +117,7 @@ public class GroceryCell extends RelativeLayout {
         nameTextView.setOnClickListener(groceryNameOnClick);
         createdByTextView.setOnClickListener(createdByOnClick);
         purchasedByTextView.setOnClickListener(purchasedByOnClick);
+        deleteTextView.setOnClickListener(deleteOnClick);
     }
 
     private View.OnClickListener groceryNameOnClick = new OnClickListener() {
@@ -125,6 +139,13 @@ public class GroceryCell extends RelativeLayout {
         @Override
         public void onClick(View v) {
             UserDetailActivity.newIntent(getContext(), rGroceryItem.getPurchasedBy());
+        }
+    };
+
+    private View.OnClickListener deleteOnClick = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            SyncGroceryItem.deleteGrocery(rGroceryItem.getGroceryId());
         }
     };
 }
