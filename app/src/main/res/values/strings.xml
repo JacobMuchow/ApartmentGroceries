@@ -28,7 +28,6 @@
     <string name="title_activity_add_group">Add Group</string>
     <string name="title_activity_user_detail">Profile</string>
     <string name="title_activity_setting">Setting</string>
-    <string name="title_activity_test">Test</string>
 
     <!-- login or sign up-->
     <string name="empty_username_or_password">Please input username and password.</string>

@@ -27,6 +27,7 @@ public class UrlTemplateCreator {
     public static final String INCLUDE = "include";
     public static final String BATCH = "BATCH";
     public static final String CONTENT = "CONTENT";
+    public static final String PUSH = "PUSH";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
     public static final String OBJECT_ID = "objectId";
@@ -290,7 +291,7 @@ public class UrlTemplateCreator {
     }
 
     public static UrlTemplate deleteGroceryPhotoByGroceryIds(ArrayList<String> groceryPhotoIds) {
-        String url = baseUrl + "/batch";
+        String url = baseUrl + "batch";
         Map<String, String> params = new HashMap<>();
 
         JSONArray requestBody = new JSONArray();
@@ -315,6 +316,43 @@ public class UrlTemplateCreator {
 
         params.put(BATCH, requestObj.toString());
 
+        return new UrlTemplate(POST, url, params);
+    }
+
+    public static UrlTemplate createInstallation(String deviceToken, String groupId) {
+        String url = baseUrl +  "installations" ;
+
+        Map<String, String> params = new HashMap<>();
+        params.put("deviceType", "android");
+        params.put("pushType", "gcm");
+        params.put("deviceToken", deviceToken);
+        params.put("groupId", groupId);
+
+        return new UrlTemplate(POST, url, params);
+    }
+
+    public static UrlTemplate pushNotification(String groupId) {
+        String url = baseUrl +  "push" ;
+
+        Map<String, String> params = new HashMap<>();
+        String message = "new grocery";
+        JSONObject messageObj = new JSONObject();
+
+        try {
+            messageObj.put("alert", message);
+        } catch (JSONException e) {
+            Log.e(TAG, "Error creating message object in pushNotification", e);
+        }
+
+        JSONObject groupIdObj = new JSONObject();
+        try {
+            groupIdObj.put("groupId", groupId);
+        } catch (JSONException e) {
+            Log.e(TAG, "Error creating group id object for where in pushNotification", e);
+        }
+
+        String pushStr = "{" + "\"where\":" + groupIdObj.toString() +  ",\"data\":" + messageObj.toString() + "}";
+        params.put(PUSH, pushStr);
         return new UrlTemplate(POST, url, params);
     }
 }

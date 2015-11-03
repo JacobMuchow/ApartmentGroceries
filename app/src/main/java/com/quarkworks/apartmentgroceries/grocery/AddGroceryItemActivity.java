@@ -27,8 +27,11 @@ import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.main.HomeActivity;
 import com.quarkworks.apartmentgroceries.service.GroceryItemBuilder;
 import com.quarkworks.apartmentgroceries.service.SyncGroceryItem;
+import com.quarkworks.apartmentgroceries.service.SyncNotification;
 import com.quarkworks.apartmentgroceries.service.Utilities;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
+
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -129,16 +132,15 @@ public class AddGroceryItemActivity extends AppCompatActivity {
         }
     };
 
-    private Continuation<Void, Void> addGroceryItemOnSuccess = new Continuation<Void, Void>() {
+    private Continuation<JSONObject, Void> addGroceryItemOnSuccess = new Continuation<JSONObject, Void>() {
         @Override
-        public Void then(Task<Void> task) throws Exception {
+        public Void then(Task<JSONObject> task) throws Exception {
             if (task.isFaulted()) {
                 Log.e(TAG, "Failed to add grocery", task.getError());
                 Toast.makeText(getApplicationContext(),
                         getString(R.string.add_grocery_item_failure), Toast.LENGTH_SHORT).show();
                 return null;
             }
-
             HomeActivity.newIntent(AddGroceryItemActivity.this);
             Toast.makeText(getApplicationContext(), getString(R.string.add_grocery_item_success),
                     Toast.LENGTH_SHORT).show();
