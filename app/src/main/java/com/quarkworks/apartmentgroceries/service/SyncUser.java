@@ -242,6 +242,8 @@ public class SyncUser {
                     if (TextUtils.isEmpty(jsonObject.getString(JsonKeys.UPDATED_AT))) {
                         throw new InvalidResponseException("Invalid join group response");
                     }
+
+                    SyncNotification.updateInstallation();
                 } catch (JSONException e) {
                     Log.e(TAG, "Error parsing joining group response", e);
                 }

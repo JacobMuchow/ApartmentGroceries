@@ -79,6 +79,9 @@ public class NetworkRequest {
                 } else if (paramsMap!= null && !TextUtils.isEmpty(paramsMap.get(UrlTemplateCreator.BATCH))) {
                     requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"),
                             paramsMap.get(UrlTemplateCreator.BATCH));
+                } else if (paramsMap!= null && !TextUtils.isEmpty(paramsMap.get(UrlTemplateCreator.PUSH))) {
+                    requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"),
+                            paramsMap.get(UrlTemplateCreator.PUSH));
                 } else {
                     StringBuilder jsonBuilder = new StringBuilder();
                     jsonBuilder.append("{");

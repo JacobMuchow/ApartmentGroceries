@@ -97,7 +97,7 @@ public class SyncGroceryItem {
         return networkRequest.runNetworkRequest().onSuccess(addGroceryItemsToRealm);
     }
 
-    public static Task<Void> add(final GroceryItemBuilder builder) {
+    public static Task<JSONObject> add(final GroceryItemBuilder builder) {
         SharedPreferences sharedPreferences = MyApplication.getContext()
                 .getSharedPreferences(MyApplication.getContext()
                         .getString(R.string.login_or_sign_up_session), 0);
@@ -148,7 +148,26 @@ public class SyncGroceryItem {
             }
         };
 
-        return networkRequest.runNetworkRequest().continueWith(addGroceryItem);
+        Continuation<Void, Task<JSONObject>> pushNotification = new Continuation<Void, Task<JSONObject>>() {
+            @Override
+            public Task<JSONObject> then(Task<Void> task) throws Exception {
+                if (task.isFaulted()) {
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in pushNotification", exception);
+                    throw exception;
+                }
+
+                Log.d(TAG, "start pushing");
+
+                Task<JSONObject>.TaskCompletionSource tcs = Task.create();
+                UrlTemplate template = UrlTemplateCreator.pushNotification(groupId);
+
+                return new NetworkRequest(template, tcs).runNetworkRequest();
+            }
+        };
+
+        return networkRequest.runNetworkRequest().continueWith(addGroceryItem).continueWithTask(pushNotification);
+
     }
 
     public static Task<Void> addGroceryPhoto(final String groceryId, byte[] data) {
