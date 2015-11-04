@@ -15,6 +15,7 @@ import org.json.JSONObject;
 import bolts.Continuation;
 import bolts.Task;
 import io.realm.Realm;
+import io.realm.RealmResults;
 
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem.JsonKeys;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryPhoto;
@@ -30,10 +31,6 @@ public class SyncGroceryItem {
     private static final String TAG = SyncGroceryItem.class.getSimpleName();
 
     public static Task<Void> getAll(String groupId) {
-        if (TextUtils.isEmpty(groupId)) {
-            Log.e(TAG, "groupId is null");
-            return null;
-        }
 
         Task<JSONObject>.TaskCompletionSource tcs = Task.create();
         UrlTemplate template = UrlTemplateCreator.getAllGroceryItemsByGroupId(groupId);
@@ -96,17 +93,12 @@ public class SyncGroceryItem {
         return networkRequest.runNetworkRequest().onSuccess(addGroceryItemsToRealm);
     }
 
-    public static Task<Void> add(final GroceryItemBuilder builder) {
+    public static Task<JSONObject> add(final GroceryItemBuilder builder) {
         SharedPreferences sharedPreferences = MyApplication.getContext()
                 .getSharedPreferences(MyApplication.getContext()
                         .getString(R.string.login_or_sign_up_session), 0);
         final String groupId = sharedPreferences.getString(RUser.JsonKeys.GROUP_ID, null);
         String userId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
-
-        if(TextUtils.isEmpty(groupId) || TextUtils.isEmpty(userId)) {
-            Log.e(TAG, "groupId or userId is null");
-            return null;
-        }
 
         builder.setGroupId(groupId);
         builder.setCreatedBy(userId);
@@ -147,7 +139,26 @@ public class SyncGroceryItem {
             }
         };
 
-        return networkRequest.runNetworkRequest().continueWith(addGroceryItem);
+        Continuation<Void, Task<JSONObject>> pushNotification = new Continuation<Void, Task<JSONObject>>() {
+            @Override
+            public Task<JSONObject> then(Task<Void> task) throws Exception {
+                if (task.isFaulted()) {
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in pushNotification", exception);
+                    throw exception;
+                }
+
+                Log.d(TAG, "start pushing");
+
+                Task<JSONObject>.TaskCompletionSource tcs = Task.create();
+                UrlTemplate template = UrlTemplateCreator.pushNotification(groupId);
+
+                return new NetworkRequest(template, tcs).runNetworkRequest();
+            }
+        };
+
+        return networkRequest.runNetworkRequest().continueWith(addGroceryItem).continueWithTask(pushNotification);
+
     }
 
     public static Task<Void> addGroceryPhoto(final String groceryId, byte[] data) {
@@ -155,11 +166,6 @@ public class SyncGroceryItem {
                 .getSharedPreferences(MyApplication.getContext()
                         .getString(R.string.login_or_sign_up_session), 0);
         final String groupId = sharedPreferences.getString(RUser.JsonKeys.GROUP_ID, null);
-
-        if(TextUtils.isEmpty(groupId)) {
-            Log.e(TAG, "groupId is null");
-            return null;
-        }
 
         Continuation<JSONObject, Task<JSONObject>> addGroceryPhotoItem = new Continuation<JSONObject, Task<JSONObject>>() {
             @Override
@@ -197,7 +203,6 @@ public class SyncGroceryItem {
                     throw new InvalidResponseException("Empty input for getGroceryPhotoById");
                 }
 
-                Log.d(TAG, "getGroceryPhotoById:" + jsonObject.toString());
                 String groceryPhotoId = jsonObject.getString("objectId");
                 UrlTemplate template = UrlTemplateCreator.getGroceryPhotoByGroceryPhotoId(groceryPhotoId);
                 Task<JSONObject>.TaskCompletionSource tcs = Task.create();
@@ -268,10 +273,6 @@ public class SyncGroceryItem {
     }
 
     public static Task<Void> getAllGroceryPhotosByGroupId(String groupId) {
-        if (TextUtils.isEmpty(groupId)) {
-            Log.e(TAG, "groupId is null");
-            return null;
-        }
 
         Task<JSONObject>.TaskCompletionSource tcs = Task.create();
         UrlTemplate template = UrlTemplateCreator.getGroceryPhotoByGroupId(groupId);
@@ -314,7 +315,6 @@ public class SyncGroceryItem {
                             Log.e(TAG, "Error parsing grocery photo object", e);
                         }
                     }
-                    Log.d(TAG, "begin commitTransaction");
                     realm.commitTransaction();
                 } catch (JSONException e) {
                     realm.cancelTransaction();
@@ -341,6 +341,92 @@ public class SyncGroceryItem {
         networkRequest.runNetworkRequest()
                 .continueWith(addGroceryPhotoToRealm)
                 .continueWith(addGroceryPhotoToRealmOnSuccess);
+
+        return null;
+    }
+
+    public static Task<Void> deleteGrocery(final String groceryId) {
+
+        Continuation<JSONObject, Void> deleteGroceryPhotos = new Continuation<JSONObject, Void>() {
+            @Override
+            public Void then(Task<JSONObject> task) throws Exception {
+                if (task.isFaulted()) {
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in deleteGroceryPhotos", exception);
+                    throw exception;
+                }
+
+                JSONObject jsonObject = task.getResult();
+                if (jsonObject == null) {
+                    Log.d(TAG, "No photo associated with this grocery.");
+                    return null;
+                }
+
+                JSONArray groceryPhotos = jsonObject.getJSONArray("results");
+                ArrayList<String> groceryPhotoIds = new ArrayList<>();
+                for (int i = 0; i < groceryPhotos.length(); i++) {
+                    JSONObject groceryPhotoObj = groceryPhotos.getJSONObject(i);
+                    String groceryPhotoId = groceryPhotoObj.getString("objectId");
+                    groceryPhotoIds.add(groceryPhotoId);
+                }
+
+                Task<JSONObject>.TaskCompletionSource tcs = Task.create();
+                UrlTemplate template = UrlTemplateCreator.deleteGroceryPhotoByGroceryIds(groceryPhotoIds);
+                NetworkRequest networkRequest = new NetworkRequest(template, tcs);
+                networkRequest.runNetworkRequest();
+                // the result will be json object: {"results":[{"success":{}}, {"success":{}}]} if we delete two photos
+                return null;
+            }
+        };
+
+        Continuation<Void, Void> deleteGrocery = new Continuation<Void, Void>() {
+            @Override
+            public Void then(Task<Void> task) throws Exception {
+                if (task.isFaulted()) {
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in deleteGrocery", exception);
+                    throw exception;
+                }
+
+                Task<JSONObject>.TaskCompletionSource tcs = Task.create();
+                UrlTemplate template = UrlTemplateCreator.deleteGroceryByGroceryId(groceryId);
+                NetworkRequest networkRequest = new NetworkRequest(template, tcs);
+                networkRequest.runNetworkRequest();
+
+                return null;
+            }
+        };
+
+        Continuation<Void, Void> deleteGroceryInRealm = new Continuation<Void, Void>() {
+            @Override
+            public Void then(Task<Void> task) throws Exception {
+                if (task.isFaulted()) {
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in deleteGroceryInRealm", exception);
+                    throw exception;
+                }
+
+                Realm realm = Realm.getInstance(MyApplication.getContext());
+                RealmResults<RGroceryPhoto> groceryPhotos = realm.where(RGroceryPhoto.class).equalTo("groceryId", groceryId).findAll();
+                RealmResults<RGroceryItem> groceryItems = realm.where(RGroceryItem.class).equalTo("groceryId", groceryId).findAll();
+                realm.beginTransaction();
+                groceryPhotos.clear();
+                groceryItems.clear();
+                realm.commitTransaction();
+                realm.close();
+
+                return null;
+            }
+        };
+
+        Task<JSONObject>.TaskCompletionSource tcs = Task.create();
+        UrlTemplate template = UrlTemplateCreator.getGroceryPhotoByGroceryId(groceryId);
+        NetworkRequest networkRequest = new NetworkRequest(template, tcs);
+
+        networkRequest.runNetworkRequest()
+                .continueWith(deleteGroceryPhotos)
+                .continueWith(deleteGrocery)
+                .continueWith(deleteGroceryInRealm);
 
         return null;
     }

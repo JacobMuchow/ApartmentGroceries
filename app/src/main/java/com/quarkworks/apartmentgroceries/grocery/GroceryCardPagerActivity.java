@@ -8,7 +8,8 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
+import android.support.v7.widget.Toolbar;
+import android.widget.TextView;
 
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.service.DataStore;
@@ -20,11 +21,16 @@ public class GroceryCardPagerActivity extends AppCompatActivity {
     private static final String TAG = GroceryCardPagerActivity.class.getSimpleName();
 
     public static final String POSITION = "position";
-    private static int NUM_PAGES = 0;
-    private ViewPager viewPager;
     private GroceryCardPagerAdapter groceryCardPagerAdapter;
-
     private static RealmResults<RGroceryItem> groceryItems;
+
+    /*
+        References
+     */
+    private Toolbar toolbar;
+    private TextView titleTextView;
+    private ViewPager viewPager;
+    private int curPosition;
 
     public static void newIntent(Context context, int position) {
         Intent intent = new Intent(context, GroceryCardPagerActivity.class);
@@ -37,21 +43,31 @@ public class GroceryCardPagerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.grocery_card_pager_activity);
 
-        /**
-         * Get view references
+        /*
+            Get view references
          */
+        toolbar = (Toolbar) findViewById(R.id.main_toolbar_id);
+        titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
         viewPager = (ViewPager) findViewById(R.id.grocery_card_pager_view_pager_id);
-        viewPager.setPageTransformer(true, new zoomOutPageTransformer());
+
+        /*
+            Set view data
+         */
+        titleTextView.setText(getString(R.string.title_activity_grocery_card_pager));
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         groceryItems = DataStore.getInstance().getRealm().where(RGroceryItem.class).findAll();
         groceryItems.sort(RGroceryItem.RealmKeys.CREATED_AT, false);
-        NUM_PAGES = groceryItems.size();
 
         groceryCardPagerAdapter = new GroceryCardPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(groceryCardPagerAdapter);
 
-        int position = getIntent().getIntExtra(POSITION, 0);
-        viewPager.setCurrentItem(position);
+        curPosition = getIntent().getIntExtra(POSITION, 0);
+        viewPager.setCurrentItem(curPosition);
+        viewPager.setOffscreenPageLimit(2);
+        viewPager.setClipChildren(false);
+
     }
 
     private static class GroceryCardPagerAdapter extends FragmentStatePagerAdapter {
@@ -67,43 +83,7 @@ public class GroceryCardPagerActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return NUM_PAGES;
-        }
-    }
-
-    private class zoomOutPageTransformer implements ViewPager.PageTransformer {
-        private static final float MIN_SCALE = 0.85f;
-        private static final float MIN_ALPHA = 0.5f;
-
-        public void transformPage(View view, float position) {
-            int pageWidth = view.getWidth();
-            int pageHeight = view.getHeight();
-
-            if (position < -1) {
-                // left most
-                view.setAlpha(0);
-
-            } else if (position <= 1) {
-                float scaleFactor = Math.max(MIN_SCALE, 1 - Math.abs(position));
-                float verticalMargin = pageHeight * (1 - scaleFactor) / 2;
-                float horizontalMargin = pageWidth * (1 - scaleFactor) / 2;
-                if (position < 0) {
-                    view.setTranslationX(horizontalMargin - verticalMargin / 2);
-                } else {
-                    view.setTranslationX(-horizontalMargin + verticalMargin / 2);
-                }
-
-                view.setScaleX(scaleFactor);
-                view.setScaleY(scaleFactor);
-
-                view.setAlpha(MIN_ALPHA +
-                        (scaleFactor - MIN_SCALE) /
-                                (1 - MIN_SCALE) * (1 - MIN_ALPHA));
-
-            } else {
-                // right most
-                view.setAlpha(0);
-            }
+            return groceryItems.size();
         }
     }
 }

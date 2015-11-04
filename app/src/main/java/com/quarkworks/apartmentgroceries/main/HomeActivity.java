@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -45,14 +46,14 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home_activity);
 
-        /**
-         * Get view references
+        /*
+            Get view references
          */
         toolbar = (Toolbar) findViewById(R.id.main_toolbar_id);
         titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
 
-        /**
-         * Set view data
+        /*
+            Set view data
          */
         titleTextView.setText(getString(R.string.title_activity_home));
         setSupportActionBar(toolbar);

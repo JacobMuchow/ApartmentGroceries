@@ -41,21 +41,21 @@ public class AddGroupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_group_activity);
 
-        /**
-         * Get view references
+        /*
+            Get view references
          */
         toolbar = (Toolbar) findViewById(R.id.main_toolbar_id);
         titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
         groupNameEditText = (EditText) findViewById(R.id.add_group_name_id);
         addGroupButton = (Button) findViewById(R.id.add_group_add_button_id);
 
-        /**
-         * Set view data
+        /*
+            Set view data
          */
         titleTextView.setText(getString(R.string.title_activity_add_group));
 
-        /**
-         * Set view OnClickListener
+        /*
+            Set view OnClickListener
          */
         addGroupButton.setOnClickListener(addGroupButtonOnClick);
 

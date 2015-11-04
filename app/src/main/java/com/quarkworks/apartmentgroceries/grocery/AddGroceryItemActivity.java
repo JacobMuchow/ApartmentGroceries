@@ -30,6 +30,8 @@ import com.quarkworks.apartmentgroceries.service.SyncGroceryItem;
 import com.quarkworks.apartmentgroceries.service.Utilities;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
 
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -65,8 +67,8 @@ public class AddGroceryItemActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_grocery_activity);
 
-        /**
-         * Get view references
+        /*
+            Get view references
          */
         toolbar = (Toolbar) findViewById(R.id.main_toolbar_id);
         titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
@@ -74,8 +76,8 @@ public class AddGroceryItemActivity extends AppCompatActivity {
         groceryItemNameEditText = (EditText) findViewById(R.id.add_grocery_item_name_id);
         photoGridView = (GridView) findViewById(R.id.add_grocery_grid_view_id);
 
-        /**
-         * Set view data
+        /*
+            Set view data
          */
         titleTextView.setText(getString(R.string.cancel));
         titleRightTextView.setText(getString(R.string.post));
@@ -89,8 +91,8 @@ public class AddGroceryItemActivity extends AppCompatActivity {
         imageAdapter = new GroceryImageAdapter(this, photoList);
         photoGridView.setAdapter(imageAdapter);
 
-        /**
-         * Set view OnClickListener
+        /*
+            Set view OnClickListener
          */
         titleTextView.setOnClickListener(cancelOnClick);
         titleRightTextView.setOnClickListener(postOnClick);
@@ -129,16 +131,15 @@ public class AddGroceryItemActivity extends AppCompatActivity {
         }
     };
 
-    private Continuation<Void, Void> addGroceryItemOnSuccess = new Continuation<Void, Void>() {
+    private Continuation<JSONObject, Void> addGroceryItemOnSuccess = new Continuation<JSONObject, Void>() {
         @Override
-        public Void then(Task<Void> task) throws Exception {
+        public Void then(Task<JSONObject> task) throws Exception {
             if (task.isFaulted()) {
                 Log.e(TAG, "Failed to add grocery", task.getError());
                 Toast.makeText(getApplicationContext(),
                         getString(R.string.add_grocery_item_failure), Toast.LENGTH_SHORT).show();
                 return null;
             }
-
             HomeActivity.newIntent(AddGroceryItemActivity.this);
             Toast.makeText(getApplicationContext(), getString(R.string.add_grocery_item_success),
                     Toast.LENGTH_SHORT).show();

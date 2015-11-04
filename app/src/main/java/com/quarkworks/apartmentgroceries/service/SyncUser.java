@@ -151,12 +151,7 @@ public class SyncUser {
     public static Task<Void> getAll(String groupId){
 
         Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
-        UrlTemplate template;
-        if (TextUtils.isEmpty(groupId)) {
-            template = UrlTemplateCreator.getAllUsers();
-        } else {
-            template = UrlTemplateCreator.getUsersByGroupId(groupId);
-        }
+        UrlTemplate template = UrlTemplateCreator.getUsersByGroupId(groupId);
         NetworkRequest networkRequest = new NetworkRequest(template, taskCompletionSource);
 
         Continuation<JSONObject, Void> addUsersToRealm = new Continuation<JSONObject, Void>() {
@@ -242,6 +237,8 @@ public class SyncUser {
                     if (TextUtils.isEmpty(jsonObject.getString(JsonKeys.UPDATED_AT))) {
                         throw new InvalidResponseException("Invalid join group response");
                     }
+
+                    SyncNotification.updateInstallation();
                 } catch (JSONException e) {
                     Log.e(TAG, "Error parsing joining group response", e);
                 }
