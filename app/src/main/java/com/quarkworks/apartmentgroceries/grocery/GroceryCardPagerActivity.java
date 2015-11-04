@@ -21,9 +21,7 @@ public class GroceryCardPagerActivity extends AppCompatActivity {
     private static final String TAG = GroceryCardPagerActivity.class.getSimpleName();
 
     public static final String POSITION = "position";
-    private static int NUM_PAGES = 0;
     private GroceryCardPagerAdapter groceryCardPagerAdapter;
-
     private static RealmResults<RGroceryItem> groceryItems;
 
     /*
@@ -31,8 +29,8 @@ public class GroceryCardPagerActivity extends AppCompatActivity {
      */
     private Toolbar toolbar;
     private TextView titleTextView;
-    public static ViewPager viewPager;
-    public static int curPosition;
+    private ViewPager viewPager;
+    private int curPosition;
 
     public static void newIntent(Context context, int position) {
         Intent intent = new Intent(context, GroceryCardPagerActivity.class);
@@ -45,32 +43,30 @@ public class GroceryCardPagerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.grocery_card_pager_activity);
 
-        /**
-         * Get view references
+        /*
+            Get view references
          */
         toolbar = (Toolbar) findViewById(R.id.main_toolbar_id);
         titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
         viewPager = (ViewPager) findViewById(R.id.grocery_card_pager_view_pager_id);
 
-        /**
-         * Set view data
+        /*
+            Set view data
          */
         titleTextView.setText(getString(R.string.title_activity_grocery_card_pager));
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        viewPager.setClipToPadding(false);
-        viewPager.setPageMargin(12);
-
         groceryItems = DataStore.getInstance().getRealm().where(RGroceryItem.class).findAll();
         groceryItems.sort(RGroceryItem.RealmKeys.CREATED_AT, false);
-        NUM_PAGES = groceryItems.size();
 
         groceryCardPagerAdapter = new GroceryCardPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(groceryCardPagerAdapter);
 
         curPosition = getIntent().getIntExtra(POSITION, 0);
         viewPager.setCurrentItem(curPosition);
+        viewPager.setOffscreenPageLimit(2);
+        viewPager.setClipChildren(false);
 
     }
 
@@ -81,24 +77,13 @@ public class GroceryCardPagerActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            if (position == NUM_PAGES) {
-                return GroceryCardPagerFragment.newInstance(null, position);
-            }
             String groceryId = groceryItems.get(position).getGroceryId();
-            return GroceryCardPagerFragment.newInstance(groceryId, position);
+            return GroceryCardPagerFragment.newInstance(groceryId);
         }
 
         @Override
         public int getCount() {
-            return NUM_PAGES + 1;
-        }
-
-        @Override
-        public float getPageWidth (int position) {
-            if (position == NUM_PAGES) {
-                return 0.07f;
-            }
-            return 0.93f;
+            return groceryItems.size();
         }
     }
 }

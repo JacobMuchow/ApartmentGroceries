@@ -1,5 +1,6 @@
 package com.quarkworks.apartmentgroceries.user;
 
+import android.app.FragmentManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -23,7 +24,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.service.DataStore;
-import com.quarkworks.apartmentgroceries.service.MyDialogFragment;
+import com.quarkworks.apartmentgroceries.service.PopupDialog;
 import com.quarkworks.apartmentgroceries.service.SyncUser;
 import com.quarkworks.apartmentgroceries.service.Utilities;
 import com.quarkworks.apartmentgroceries.service.models.RUser;
@@ -50,14 +51,9 @@ public class UserDetailActivity extends AppCompatActivity {
     private String userId;
     private Uri outputFileUri;
 
-    /**
+    /*
      * References
      */
-    private Toolbar toolbar;
-    private TextView titleTextView;
-    private TextView editPhotoTextView;
-    private TextView usernameTextView;
-    private TextView phoneTextView;
     private ImageView profileImageView;
 
     public static void newIntent(Context context, String userId) {
@@ -75,17 +71,17 @@ public class UserDetailActivity extends AppCompatActivity {
         RUser rUser = DataStore.getInstance().getRealm().where(RUser.class)
                 .equalTo(USER_ID, userId).findFirst();
 
-        /**
-         * Get view reference
+        /*
+         * Get view references
          */
-        toolbar = (Toolbar) findViewById(R.id.main_toolbar_id);
-        titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
-        editPhotoTextView = (TextView) findViewById(R.id.user_detail_edit_photo_text_view_id);
-        usernameTextView = (TextView) findViewById(R.id.user_detail_edit_username_text_view_id);
-        phoneTextView = (TextView) findViewById(R.id.user_detail_edit_phone_text_view_id);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar_id);
+        TextView titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
+        TextView editPhotoTextView = (TextView) findViewById(R.id.user_detail_edit_photo_text_view_id);
+        TextView usernameTextView = (TextView) findViewById(R.id.user_detail_edit_username_text_view_id);
+        TextView phoneTextView = (TextView) findViewById(R.id.user_detail_edit_phone_text_view_id);
         profileImageView = (ImageView) findViewById(R.id.user_detail_profile_image_view_id);
 
-        /**
+        /*
          * Set view data
          */
         titleTextView.setText(getString(R.string.title_activity_user_detail));
@@ -102,8 +98,8 @@ public class UserDetailActivity extends AppCompatActivity {
                 .crossFade()
                 .into(profileImageView);
 
-        /**
-         * Set view on click
+        /*
+            Set view OnClickListener
          */
         editPhotoTextView.setOnClickListener(editPhotoTextViewOnClick);
         phoneTextView.setOnClickListener(phoneOnClick);
@@ -119,14 +115,13 @@ public class UserDetailActivity extends AppCompatActivity {
     private View.OnClickListener phoneOnClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            android.app.FragmentManager manager = getFragmentManager();
-            MyDialogFragment editPhoneDialog = MyDialogFragment.newInstance("phone");
+            FragmentManager manager = getFragmentManager();
+            PopupDialog editPhoneDialog = PopupDialog.newInstance("phone");
             editPhoneDialog.show(manager, "phone");
         }
     };
 
     private void openImageIntent() {
-        // root to save image
         String directoryName = Utilities.dateToString(new Date(), getString(R.string.photo_date_format_string));
         Log.d(TAG, directoryName);
         final File root = new File(Environment.getExternalStorageDirectory() + File.separator + directoryName + File.separator);
@@ -134,7 +129,6 @@ public class UserDetailActivity extends AppCompatActivity {
         final File sdImageMainDirectory = new File(root, directoryName);
         outputFileUri = Uri.fromFile(sdImageMainDirectory);
 
-        // camera
         final List<Intent> cameraIntents = new ArrayList<>();
         final Intent captureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         final PackageManager packageManager = getPackageManager();
@@ -148,7 +142,6 @@ public class UserDetailActivity extends AppCompatActivity {
             cameraIntents.add(intent);
         }
 
-        // file
         final Intent galleryIntent = new Intent();
         galleryIntent.setType("image/*");
         galleryIntent.setAction(Intent.ACTION_GET_CONTENT);

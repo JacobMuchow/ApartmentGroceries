@@ -1,42 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="400dp"
 
-    android:background="@drawable/rectangle_border_shadow">
+    android:paddingTop="50dp"
+    android:paddingLeft="15dp"
+    android:paddingRight="15dp">
 
-    <TextView android:id="@+id/grocery_card_pager_fragment_grocery_item_name_id"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/pager_title_height"
+        android:layout_height="400dp"
 
-        android:gravity="center_vertical|center_horizontal"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:background="@drawable/rectangle_border_title"/>
+        android:background="@drawable/rectangle_border_shadow">
 
-    <TextView android:id="@+id/grocery_card_pager_fragment_grocery_item_created_by_id"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/grocery_card_pager_fragment_grocery_item_name_id"
+        <TextView android:id="@+id/grocery_card_pager_fragment_grocery_item_name_id"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/pager_title_height"
 
-        android:gravity="center_vertical|center_horizontal"
-        android:textAppearance="?android:attr/textAppearanceSmall"/>
+            android:gravity="center_vertical|center_horizontal"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:background="@drawable/rectangle_border_title"/>
 
-    <!-- grocery photo -->
-    <LinearLayout
-        android:id="@+id/add_grocery_linear_layout_grid_view_id"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/grocery_card_pager_fragment_grocery_item_created_by_id"
-        android:layout_marginLeft="@dimen/margin_padding_medium">
-
-        <GridView
-            android:id="@+id/grocery_card_pager_grid_view_id"
+        <TextView android:id="@+id/grocery_card_pager_fragment_grocery_item_created_by_id"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/grocery_card_pager_fragment_grocery_item_name_id"
 
-            android:columnWidth="84dp"
-            android:numColumns="auto_fit"
-            android:gravity="center" />
-    </LinearLayout>
+            android:gravity="center_vertical|center_horizontal"
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+        <!-- grocery photo -->
+        <LinearLayout
+            android:id="@+id/add_grocery_linear_layout_grid_view_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/grocery_card_pager_fragment_grocery_item_created_by_id"
+            android:layout_marginLeft="@dimen/margin_padding_medium">
+
+            <GridView
+                android:id="@+id/grocery_card_pager_grid_view_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:columnWidth="84dp"
+                android:numColumns="auto_fit"
+                android:gravity="center" />
+        </LinearLayout>
+    </RelativeLayout>
 
 </RelativeLayout>

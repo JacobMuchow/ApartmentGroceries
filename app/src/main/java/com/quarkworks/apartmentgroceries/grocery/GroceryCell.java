@@ -111,8 +111,8 @@ public class GroceryCell extends RelativeLayout {
             photoImageView.setImageResource(R.drawable.ic_launcher);
         }
 
-        /**
-         * set view OnClickListener
+        /*
+            set view OnClickListener
          */
         nameTextView.setOnClickListener(groceryNameOnClick);
         createdByTextView.setOnClickListener(createdByOnClick);

@@ -31,10 +31,6 @@ public class SyncGroceryItem {
     private static final String TAG = SyncGroceryItem.class.getSimpleName();
 
     public static Task<Void> getAll(String groupId) {
-        if (TextUtils.isEmpty(groupId)) {
-            Log.e(TAG, "groupId is null");
-            return null;
-        }
 
         Task<JSONObject>.TaskCompletionSource tcs = Task.create();
         UrlTemplate template = UrlTemplateCreator.getAllGroceryItemsByGroupId(groupId);
@@ -104,11 +100,6 @@ public class SyncGroceryItem {
         final String groupId = sharedPreferences.getString(RUser.JsonKeys.GROUP_ID, null);
         String userId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
 
-        if(TextUtils.isEmpty(groupId) || TextUtils.isEmpty(userId)) {
-            Log.e(TAG, "groupId or userId is null");
-            return null;
-        }
-
         builder.setGroupId(groupId);
         builder.setCreatedBy(userId);
 
@@ -176,11 +167,6 @@ public class SyncGroceryItem {
                         .getString(R.string.login_or_sign_up_session), 0);
         final String groupId = sharedPreferences.getString(RUser.JsonKeys.GROUP_ID, null);
 
-        if(TextUtils.isEmpty(groupId)) {
-            Log.e(TAG, "groupId is null");
-            return null;
-        }
-
         Continuation<JSONObject, Task<JSONObject>> addGroceryPhotoItem = new Continuation<JSONObject, Task<JSONObject>>() {
             @Override
             public Task<JSONObject> then(Task<JSONObject> task) throws Exception {
@@ -217,7 +203,6 @@ public class SyncGroceryItem {
                     throw new InvalidResponseException("Empty input for getGroceryPhotoById");
                 }
 
-                Log.d(TAG, "getGroceryPhotoById:" + jsonObject.toString());
                 String groceryPhotoId = jsonObject.getString("objectId");
                 UrlTemplate template = UrlTemplateCreator.getGroceryPhotoByGroceryPhotoId(groceryPhotoId);
                 Task<JSONObject>.TaskCompletionSource tcs = Task.create();
@@ -288,10 +273,6 @@ public class SyncGroceryItem {
     }
 
     public static Task<Void> getAllGroceryPhotosByGroupId(String groupId) {
-        if (TextUtils.isEmpty(groupId)) {
-            Log.e(TAG, "groupId is null");
-            return null;
-        }
 
         Task<JSONObject>.TaskCompletionSource tcs = Task.create();
         UrlTemplate template = UrlTemplateCreator.getGroceryPhotoByGroupId(groupId);
@@ -365,10 +346,6 @@ public class SyncGroceryItem {
     }
 
     public static Task<Void> deleteGrocery(final String groceryId) {
-        if (TextUtils.isEmpty(groceryId)) {
-            Log.e(TAG, "groceryId is null");
-            return null;
-        }
 
         Continuation<JSONObject, Void> deleteGroceryPhotos = new Continuation<JSONObject, Void>() {
             @Override
@@ -446,10 +423,6 @@ public class SyncGroceryItem {
         UrlTemplate template = UrlTemplateCreator.getGroceryPhotoByGroceryId(groceryId);
         NetworkRequest networkRequest = new NetworkRequest(template, tcs);
 
-        // step 1: find all the grocery photos
-        // step 2: delete all the grocery photos
-        // step 3: delete grocery
-        // step 4: delete grocery in realm
         networkRequest.runNetworkRequest()
                 .continueWith(deleteGroceryPhotos)
                 .continueWith(deleteGrocery)

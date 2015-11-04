@@ -151,12 +151,7 @@ public class SyncUser {
     public static Task<Void> getAll(String groupId){
 
         Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
-        UrlTemplate template;
-        if (TextUtils.isEmpty(groupId)) {
-            template = UrlTemplateCreator.getAllUsers();
-        } else {
-            template = UrlTemplateCreator.getUsersByGroupId(groupId);
-        }
+        UrlTemplate template = UrlTemplateCreator.getUsersByGroupId(groupId);
         NetworkRequest networkRequest = new NetworkRequest(template, taskCompletionSource);
 
         Continuation<JSONObject, Void> addUsersToRealm = new Continuation<JSONObject, Void>() {

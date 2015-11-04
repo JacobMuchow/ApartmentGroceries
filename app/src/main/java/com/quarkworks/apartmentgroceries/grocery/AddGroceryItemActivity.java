@@ -27,7 +27,6 @@ import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.main.HomeActivity;
 import com.quarkworks.apartmentgroceries.service.GroceryItemBuilder;
 import com.quarkworks.apartmentgroceries.service.SyncGroceryItem;
-import com.quarkworks.apartmentgroceries.service.SyncNotification;
 import com.quarkworks.apartmentgroceries.service.Utilities;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
 
@@ -68,8 +67,8 @@ public class AddGroceryItemActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_grocery_activity);
 
-        /**
-         * Get view references
+        /*
+            Get view references
          */
         toolbar = (Toolbar) findViewById(R.id.main_toolbar_id);
         titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
@@ -77,8 +76,8 @@ public class AddGroceryItemActivity extends AppCompatActivity {
         groceryItemNameEditText = (EditText) findViewById(R.id.add_grocery_item_name_id);
         photoGridView = (GridView) findViewById(R.id.add_grocery_grid_view_id);
 
-        /**
-         * Set view data
+        /*
+            Set view data
          */
         titleTextView.setText(getString(R.string.cancel));
         titleRightTextView.setText(getString(R.string.post));
@@ -92,8 +91,8 @@ public class AddGroceryItemActivity extends AppCompatActivity {
         imageAdapter = new GroceryImageAdapter(this, photoList);
         photoGridView.setAdapter(imageAdapter);
 
-        /**
-         * Set view OnClickListener
+        /*
+            Set view OnClickListener
          */
         titleTextView.setOnClickListener(cancelOnClick);
         titleRightTextView.setOnClickListener(postOnClick);
