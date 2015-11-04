@@ -4,7 +4,7 @@
 
     <!-- dialogue title -->
     <TextView
-        android:id="@+id/dialog_title_text_view_id"
+        android:id="@+id/popup_dialog_title_text_view_id"
         android:layout_width="match_parent"
         android:layout_height="48dp"
 
@@ -15,10 +15,10 @@
 
     <!-- edit text -->
     <EditText
-        android:id="@+id/dialog_edit_text_id"
+        android:id="@+id/popup_dialog_edit_text_id"
         android:layout_width="match_parent"
         android:layout_height="120dp"
-        android:layout_below="@id/dialog_title_text_view_id"
+        android:layout_below="@id/popup_dialog_title_text_view_id"
         android:layout_margin="8dp"
 
         android:textAlignment="viewStart"
@@ -30,10 +30,10 @@
 
     <!-- cancel -->
     <TextView
-        android:id="@+id/dialog_cancel_id"
+        android:id="@+id/popup_dialog_cancel_id"
         android:layout_width="100dp"
         android:layout_height="32dp"
-        android:layout_below="@id/dialog_edit_text_id"
+        android:layout_below="@id/popup_dialog_edit_text_id"
         android:layout_alignParentLeft="true"
         android:layout_marginTop="4dp"
         android:layout_marginLeft="24dp"
@@ -45,10 +45,10 @@
 
     <!-- save -->
     <TextView
-        android:id="@+id/dialog_save_id"
+        android:id="@+id/popup_dialog_save_id"
         android:layout_width="100dp"
         android:layout_height="32dp"
-        android:layout_alignBaseline="@id/dialog_cancel_id"
+        android:layout_below="@id/popup_dialog_edit_text_id"
         android:layout_alignParentRight="true"
         android:layout_marginTop="4dp"
         android:layout_marginRight="24dp"

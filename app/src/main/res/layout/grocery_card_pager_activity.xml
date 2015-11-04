@@ -8,15 +8,15 @@
     <include layout="@layout/main_toolbar" />
 
     <!-- view pager -->
-    <android.support.v4.view.ViewPager
-        android:id="@+id/grocery_card_pager_view_pager_id"
+    <com.quarkworks.apartmentgroceries.grocery.PagerContainer
+        android:id="@+id/pager_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
 
-        android:paddingTop="48dp"
-        android:paddingBottom="48dp"
-        android:paddingLeft="24dp"
-        android:paddingRight="0dp"
-        android:gravity="center"/>
-
+        android:background="@color/colorGrey400">
+        <android.support.v4.view.ViewPager
+            android:id="@+id/grocery_card_pager_view_pager_id"
+            android:layout_width="300dp"
+            android:layout_height="match_parent"/>
+    </com.quarkworks.apartmentgroceries.grocery.PagerContainer>
 </LinearLayout>

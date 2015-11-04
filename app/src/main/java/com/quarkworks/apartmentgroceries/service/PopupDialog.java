@@ -14,22 +14,14 @@ import com.quarkworks.apartmentgroceries.R;
 /**
  * Created by zhao on 10/31/15.
  */
-public class MyDialogFragment extends DialogFragment {
-    private static final String TAG = MyDialogFragment.class.getSimpleName();
+public class PopupDialog extends DialogFragment {
+    private static final String TAG = PopupDialog.class.getSimpleName();
 
     private static final String TITLE = "title";
     private String title;
 
-    /**
-     * Reference
-     */
-    private TextView titleTextView;
-    private TextView cancelTextView;
-    private TextView saveTextView;
-    private EditText editText;
-
-    public static MyDialogFragment newInstance(String title) {
-        MyDialogFragment fragment = new MyDialogFragment();
+    public static PopupDialog newInstance(String title) {
+        PopupDialog fragment = new PopupDialog();
 
         Bundle args = new Bundle();
         args.putString(TITLE, title);
@@ -50,23 +42,23 @@ public class MyDialogFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.customized_dialog, container, false);
+        View rootView = inflater.inflate(R.layout.popup_dialog, container, false);
 
-        /**
-         * Get view references
+        /*
+            Reference
          */
-        titleTextView = (TextView) rootView.findViewById(R.id.dialog_title_text_view_id);
-        editText = (EditText) rootView.findViewById(R.id.dialog_edit_text_id);
-        cancelTextView = (TextView) rootView.findViewById(R.id.dialog_cancel_id);
-        saveTextView = (TextView) rootView.findViewById(R.id.dialog_save_id);
+        TextView titleTextView = (TextView) rootView.findViewById(R.id.popup_dialog_title_text_view_id);
+        EditText editText = (EditText) rootView.findViewById(R.id.popup_dialog_edit_text_id);
+        TextView cancelTextView = (TextView) rootView.findViewById(R.id.popup_dialog_cancel_id);
+        TextView saveTextView = (TextView) rootView.findViewById(R.id.popup_dialog_save_id);
 
-        /**
-         * Set view data
+        /*
+            Set view data
          */
         titleTextView.setText(title);
 
-        /**
-         * Set view on click
+        /*
+            Set view OnClickListener
          */
         cancelTextView.setOnClickListener(cancelTextViewOnClick);
         saveTextView.setOnClickListener(saveTextViewOnClick);
