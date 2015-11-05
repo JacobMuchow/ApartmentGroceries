@@ -42,8 +42,8 @@ public class SettingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.setting_activity);
 
-        /**
-         * Get view references
+        /*
+            Get view references
          */
         toolbar = (Toolbar) findViewById(R.id.main_toolbar_id);
         titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
@@ -51,16 +51,16 @@ public class SettingActivity extends AppCompatActivity {
         logoutTextView = (TextView) findViewById(R.id.setting_logout_text_view_id);
         editProfileTextView = (TextView) findViewById(R.id.setting_profile_text_view_id);
 
-        /**
-         * Set view data
+        /*
+            Set view data
          */
         titleTextView.setText(getString(R.string.title_activity_setting));
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        /**
-         * Set view on click
+        /*
+            Set view on click
          */
         groupTextView.setOnClickListener(groupTextViewOnClick);
         logoutTextView.setOnClickListener(logoutTextViewOnClick);

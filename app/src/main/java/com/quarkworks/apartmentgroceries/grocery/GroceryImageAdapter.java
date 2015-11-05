@@ -75,14 +75,18 @@ public class GroceryImageAdapter extends BaseAdapter {
     }
 
     private void openImageIntent() {
-        // root to save image
+        /*
+            root to save image
+         */
         String directoryName = Utilities.dateToString(new Date(), context.getString(R.string.photo_date_format_string));
         final File root = new File(Environment.getExternalStorageDirectory() + File.separator + directoryName + File.separator);
         root.mkdirs();
         final File sdImageMainDirectory = new File(root, directoryName);
         outputFileUri = Uri.fromFile(sdImageMainDirectory);
 
-        // camera
+        /*
+            camera
+         */
         final List<Intent> cameraIntents = new ArrayList<>();
         final Intent captureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         final PackageManager packageManager = context.getPackageManager();
@@ -96,7 +100,9 @@ public class GroceryImageAdapter extends BaseAdapter {
             cameraIntents.add(intent);
         }
 
-        // file
+        /*
+            file
+         */
         final Intent galleryIntent = new Intent();
         galleryIntent.setType("image/*");
         galleryIntent.setAction(Intent.ACTION_GET_CONTENT);

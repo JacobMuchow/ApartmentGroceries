@@ -2,6 +2,8 @@ package com.quarkworks.apartmentgroceries.grocery;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -20,11 +22,14 @@ public class GroceryCardPagerActivity extends AppCompatActivity {
     private static final String TAG = GroceryCardPagerActivity.class.getSimpleName();
 
     public static final String POSITION = "position";
-    private static int NUM_PAGES = 0;
-    private ViewPager viewPager;
     private GroceryCardPagerAdapter groceryCardPagerAdapter;
-
     private static RealmResults<RGroceryItem> groceryItems;
+
+    /*
+        References
+     */
+    private ViewPager viewPager;
+    private int curPosition;
 
     public static void newIntent(Context context, int position) {
         Intent intent = new Intent(context, GroceryCardPagerActivity.class);
@@ -37,21 +42,34 @@ public class GroceryCardPagerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.grocery_card_pager_activity);
 
-        /**
-         * Get view references
+        /*
+            Get view references
          */
         viewPager = (ViewPager) findViewById(R.id.grocery_card_pager_view_pager_id);
-        viewPager.setPageTransformer(true, new zoomOutPageTransformer());
 
+        /*
+            Set view data
+         */
         groceryItems = DataStore.getInstance().getRealm().where(RGroceryItem.class).findAll();
         groceryItems.sort(RGroceryItem.RealmKeys.CREATED_AT, false);
-        NUM_PAGES = groceryItems.size();
 
         groceryCardPagerAdapter = new GroceryCardPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(groceryCardPagerAdapter);
 
-        int position = getIntent().getIntExtra(POSITION, 0);
-        viewPager.setCurrentItem(position);
+        curPosition = getIntent().getIntExtra(POSITION, 0);
+        viewPager.setCurrentItem(curPosition);
+        viewPager.setOffscreenPageLimit(2);
+        viewPager.setClipChildren(false);
+        viewPager.setPageMarginDrawable(null);
+
+        getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+
+        if (Build.VERSION.SDK_INT > 21) {
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+        }
+
     }
 
     private static class GroceryCardPagerAdapter extends FragmentStatePagerAdapter {
@@ -67,43 +85,7 @@ public class GroceryCardPagerActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return NUM_PAGES;
-        }
-    }
-
-    private class zoomOutPageTransformer implements ViewPager.PageTransformer {
-        private static final float MIN_SCALE = 0.85f;
-        private static final float MIN_ALPHA = 0.5f;
-
-        public void transformPage(View view, float position) {
-            int pageWidth = view.getWidth();
-            int pageHeight = view.getHeight();
-
-            if (position < -1) {
-                // left most
-                view.setAlpha(0);
-
-            } else if (position <= 1) {
-                float scaleFactor = Math.max(MIN_SCALE, 1 - Math.abs(position));
-                float verticalMargin = pageHeight * (1 - scaleFactor) / 2;
-                float horizontalMargin = pageWidth * (1 - scaleFactor) / 2;
-                if (position < 0) {
-                    view.setTranslationX(horizontalMargin - verticalMargin / 2);
-                } else {
-                    view.setTranslationX(-horizontalMargin + verticalMargin / 2);
-                }
-
-                view.setScaleX(scaleFactor);
-                view.setScaleY(scaleFactor);
-
-                view.setAlpha(MIN_ALPHA +
-                        (scaleFactor - MIN_SCALE) /
-                                (1 - MIN_SCALE) * (1 - MIN_ALPHA));
-
-            } else {
-                // right most
-                view.setAlpha(0);
-            }
+            return groceryItems.size();
         }
     }
 }

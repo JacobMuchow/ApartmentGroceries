@@ -12,7 +12,6 @@ import android.widget.TextView;
 
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.service.DataStore;
-import com.quarkworks.apartmentgroceries.service.SyncUser;
 import com.quarkworks.apartmentgroceries.service.models.RUser;
 
 import io.realm.RealmBaseAdapter;
@@ -38,14 +37,14 @@ public class UserActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.user_activity);
 
-        /**
-         * Get view references
+        /*
+            Get view references
          */
         toolbar = (Toolbar) findViewById(R.id.main_toolbar_id);
         titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
 
-        /**
-         * Set view data
+        /*
+            Set view data
          */
         titleTextView.setText(getString(R.string.title_activity_user));
         setSupportActionBar(toolbar);

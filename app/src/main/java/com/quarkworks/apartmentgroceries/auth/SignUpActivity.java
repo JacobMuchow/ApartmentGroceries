@@ -48,8 +48,8 @@ public class SignUpActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sign_up_activity);
 
-        /**
-         * Get view references
+        /*
+            Get view references
          */
         toolbar = (Toolbar) findViewById(R.id.main_toolbar_id);
         titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
@@ -59,13 +59,13 @@ public class SignUpActivity extends AppCompatActivity {
         signUpButton = (Button) findViewById(R.id.sign_up_submit_button_id);
         progressBar = (ProgressBar) findViewById(R.id.sign_up_activity_progress_bar_id);
 
-        /**
-         * Set view data
+        /*
+            Set view data
          */
         titleTextView.setText(getString(R.string.title_activity_signup));
 
-        /**
-         * Set view OnClickListener
+        /*
+            Set view OnClickListener
          */
         signUpButton.setOnClickListener(signUpOnClick());
     }

@@ -1,0 +1,61 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="360dp"
+    android:layout_height="wrap_content">
+
+    <!-- dialogue title -->
+    <TextView
+        android:id="@+id/popup_dialog_title_text_view_id"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+
+        android:gravity="center"
+        android:background="@color/colorDialogueTitle"
+        android:fontFamily="sans-serif"
+        android:textAppearance="@android:style/TextAppearance.Large" />
+
+    <!-- edit text -->
+    <EditText
+        android:id="@+id/popup_dialog_edit_text_id"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:layout_below="@id/popup_dialog_title_text_view_id"
+        android:layout_margin="8dp"
+
+        android:textAlignment="viewStart"
+        android:gravity="start"
+        android:padding="8dp"
+        android:inputType="text"
+        android:fontFamily="sans-serif"
+        android:background="@drawable/rectangle_border_grey_400"/>
+
+    <!-- cancel -->
+    <TextView
+        android:id="@+id/popup_dialog_cancel_id"
+        android:layout_width="100dp"
+        android:layout_height="32dp"
+        android:layout_below="@id/popup_dialog_edit_text_id"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="4dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginBottom="12dp"
+
+        android:gravity="center"
+        android:background="@drawable/rectangle_border_grey_500"
+        android:text="@string/dialog_cancel" />
+
+    <!-- save -->
+    <TextView
+        android:id="@+id/popup_dialog_save_id"
+        android:layout_width="100dp"
+        android:layout_height="32dp"
+        android:layout_below="@id/popup_dialog_edit_text_id"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="4dp"
+        android:layout_marginRight="24dp"
+        android:layout_marginBottom="12dp"
+
+        android:gravity="center"
+        android:background="@drawable/rectangle_border_submit"
+        android:text="@string/dialog_save" />
+
+</RelativeLayout>

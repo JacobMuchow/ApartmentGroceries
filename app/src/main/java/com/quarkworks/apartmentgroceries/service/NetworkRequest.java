@@ -2,6 +2,7 @@ package com.quarkworks.apartmentgroceries.service;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.quarkworks.apartmentgroceries.MyApplication;
@@ -73,7 +74,14 @@ public class NetworkRequest {
                     }
                     url = urlStringBuilder.toString();
                 } else if (parmasMapByte != null) {
-                    requestBody = RequestBody.create(MediaType.parse("image/jpeg"), parmasMapByte.get("content"));
+                    requestBody = RequestBody.create(MediaType.parse("image/jpeg"),
+                            parmasMapByte.get(UrlTemplateCreator.CONTENT));
+                } else if (paramsMap!= null && !TextUtils.isEmpty(paramsMap.get(UrlTemplateCreator.BATCH))) {
+                    requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"),
+                            paramsMap.get(UrlTemplateCreator.BATCH));
+                } else if (paramsMap!= null && !TextUtils.isEmpty(paramsMap.get(UrlTemplateCreator.PUSH))) {
+                    requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"),
+                            paramsMap.get(UrlTemplateCreator.PUSH));
                 } else {
                     StringBuilder jsonBuilder = new StringBuilder();
                     jsonBuilder.append("{");
@@ -137,6 +145,10 @@ public class NetworkRequest {
                     String jsonString = response.body().string();
                     Log.d(TAG, "jsonString:" + jsonString);
                     try {
+                        if (jsonString.charAt(0) == '[') {
+                            jsonString = "{\"results\":" + jsonString + "}";
+                        }
+
                         JSONObject jsonObject = new JSONObject(jsonString);
                         taskCompletionSource.setResult(jsonObject);
                     } catch (JSONException e) {

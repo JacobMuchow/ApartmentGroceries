@@ -28,19 +28,13 @@ public class GroceryCardPagerFragment extends Fragment {
     private static final String TAG = GroceryCardPagerFragment.class.getSimpleName();
 
     private static final String GROCERY_ID = "groceryId";
+
     private String groceryId;
     private RGroceryItem rGroceryItem;
     private RealmResults<RGroceryPhoto> groceryPhotos;
     private ImageAdapter imageAdapter;
 
-    /**
-     * References
-     */
-    private TextView nameTextView;
-    private TextView createdByTextView;
-    private GridView photoGridView;
-
-    static GroceryCardPagerFragment newInstance(String groceryId) {
+    public static GroceryCardPagerFragment newInstance(String groceryId) {
         GroceryCardPagerFragment groceryCardPagerFragment = new GroceryCardPagerFragment();
         Bundle args = new Bundle();
         args.putString(GROCERY_ID, groceryId);
@@ -53,6 +47,7 @@ public class GroceryCardPagerFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         groceryId = getArguments().getString(GROCERY_ID);
+
         rGroceryItem = DataStore.getInstance().getRealm().where(RGroceryItem.class)
                 .equalTo(GROCERY_ID, groceryId).findFirst();
 
@@ -66,15 +61,15 @@ public class GroceryCardPagerFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.grocery_card_pager_fragment, container, false);
 
-        /**
-         * Get view references
+        /*
+            References
          */
-        nameTextView = (TextView)rootView.findViewById(R.id.grocery_card_pager_fragment_grocery_item_name_id);
-        createdByTextView = (TextView) rootView.findViewById(R.id.grocery_card_pager_fragment_grocery_item_created_by_id);
-        photoGridView = (GridView) rootView.findViewById(R.id.grocery_card_pager_grid_view_id);
+        TextView nameTextView = (TextView)rootView.findViewById(R.id.grocery_card_pager_fragment_grocery_item_name_id);
+        TextView createdByTextView = (TextView) rootView.findViewById(R.id.grocery_card_pager_fragment_grocery_item_created_by_id);
+        GridView photoGridView = (GridView) rootView.findViewById(R.id.grocery_card_pager_grid_view_id);
 
-        /**
-         * Set view data
+        /*
+            Set view data
          */
         nameTextView.setText(rGroceryItem.getName());
         RUser rUser = DataStore.getInstance().getRealm()
@@ -87,8 +82,8 @@ public class GroceryCardPagerFragment extends Fragment {
         imageAdapter = new ImageAdapter(getContext(), groceryPhotos);
         photoGridView.setAdapter(imageAdapter);
 
-        /**
-         * Set view OnClickListener
+        /*
+            Set view OnClickListener
          */
         nameTextView.setOnClickListener(groceryItemNameOnClick);
         createdByTextView.setOnClickListener(createByOnClick);
@@ -135,6 +130,7 @@ public class GroceryCardPagerFragment extends Fragment {
         public View getView(final int position, View convertView, ViewGroup parent) {
             ImageView imageView;
             View rootView = View.inflate(context, R.layout.grocery_pager_photo_grid_view_item, null);
+
             imageView = (ImageView) rootView.findViewById(R.id.grocery_pager_grid_view_image_view_id);
 
             String photoUrl = groceryPhotos.get(position).getUrl();
