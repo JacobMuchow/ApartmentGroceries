@@ -2,21 +2,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 
-    android:orientation="vertical">
-
-    <!-- toolbar -->
-    <include layout="@layout/main_toolbar" />
+    android:orientation="vertical"
+    android:background="#88000000">
 
     <!-- view pager -->
     <com.quarkworks.apartmentgroceries.grocery.PagerContainer
         android:id="@+id/pager_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-
-        android:background="@color/colorGrey400">
+        android:layout_height="match_parent">
         <android.support.v4.view.ViewPager
             android:id="@+id/grocery_card_pager_view_pager_id"
             android:layout_width="300dp"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"/>
     </com.quarkworks.apartmentgroceries.grocery.PagerContainer>
 </LinearLayout>

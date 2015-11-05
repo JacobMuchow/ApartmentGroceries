@@ -11,4 +11,5 @@
     <color name="colorGrey400">#BDBDBD</color>
     <color name="colorGrey500">#9E9E9E</color>
     <color name="colorDialogueTitle">#FFFFBB33</color>
+    <color name="colorWhite">#FFFFFF</color>
 </resources>

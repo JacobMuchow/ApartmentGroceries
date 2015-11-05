@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="400dp"
+    android:layout_height="match_parent"
 
-    android:paddingTop="50dp"
+    android:paddingTop="80dp"
+    android:paddingBottom="80dp"
     android:paddingLeft="15dp"
     android:paddingRight="15dp">
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
-
-        android:background="@drawable/rectangle_border_shadow">
+        android:layout_height="match_parent"
+        android:background="@drawable/rectangle_border_white">
 
         <TextView android:id="@+id/grocery_card_pager_fragment_grocery_item_name_id"
             android:layout_width="match_parent"
@@ -46,6 +46,7 @@
                 android:numColumns="auto_fit"
                 android:gravity="center" />
         </LinearLayout>
+
     </RelativeLayout>
 
 </RelativeLayout>

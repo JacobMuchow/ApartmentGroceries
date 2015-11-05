@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Point;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
-import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -84,16 +83,7 @@ public class PagerContainer extends FrameLayout implements ViewPager.OnPageChang
 
     @Override
     public void onPageSelected(int position) {
-        FrameLayout.LayoutParams viewPagerLayoutParams
-                = (FrameLayout.LayoutParams) viewPager.getLayoutParams();
-        if (position == 0) {
-            viewPagerLayoutParams.gravity = Gravity.START;
-        } else if (viewPager.getAdapter().getCount() - 1 == position) {
-            viewPagerLayoutParams.gravity = Gravity.END;
-        } else {
-            viewPagerLayoutParams.gravity = Gravity.CENTER_HORIZONTAL;
-        }
-        viewPager.requestLayout();
+
     }
 
     @Override

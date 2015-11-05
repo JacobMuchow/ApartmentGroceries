@@ -2,14 +2,15 @@ package com.quarkworks.apartmentgroceries.grocery;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
-import android.widget.TextView;
+import android.view.View;
 
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.service.DataStore;
@@ -27,8 +28,6 @@ public class GroceryCardPagerActivity extends AppCompatActivity {
     /*
         References
      */
-    private Toolbar toolbar;
-    private TextView titleTextView;
     private ViewPager viewPager;
     private int curPosition;
 
@@ -46,17 +45,11 @@ public class GroceryCardPagerActivity extends AppCompatActivity {
         /*
             Get view references
          */
-        toolbar = (Toolbar) findViewById(R.id.main_toolbar_id);
-        titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
         viewPager = (ViewPager) findViewById(R.id.grocery_card_pager_view_pager_id);
 
         /*
             Set view data
          */
-        titleTextView.setText(getString(R.string.title_activity_grocery_card_pager));
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-
         groceryItems = DataStore.getInstance().getRealm().where(RGroceryItem.class).findAll();
         groceryItems.sort(RGroceryItem.RealmKeys.CREATED_AT, false);
 
@@ -67,6 +60,15 @@ public class GroceryCardPagerActivity extends AppCompatActivity {
         viewPager.setCurrentItem(curPosition);
         viewPager.setOffscreenPageLimit(2);
         viewPager.setClipChildren(false);
+        viewPager.setPageMarginDrawable(null);
+
+        getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+
+        if (Build.VERSION.SDK_INT > 21) {
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+        }
 
     }
 
