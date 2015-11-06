@@ -355,4 +355,14 @@ public class UrlTemplateCreator {
         params.put(PUSH, pushStr);
         return new UrlTemplate(POST, url, params);
     }
+
+    public static UrlTemplate updateProfile(String userId, String fieldName, String fieldValue) {
+        String url = baseUrl + "users";
+        Map<String, String> params = new HashMap<>();
+
+        params.put(fieldName, fieldValue);
+        params.put("objectId", userId);
+
+        return new UrlTemplate(PUT, url, params, true);
+    }
 }

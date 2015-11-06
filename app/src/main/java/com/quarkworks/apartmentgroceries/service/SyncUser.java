@@ -369,4 +369,42 @@ public class SyncUser {
 
         return networkRequest.runNetworkRequest().continueWith(addSingleUserToRealm);
     }
+
+    public static Task<Void> updateProfile(String fieldName, String fieldValue) {
+
+        SharedPreferences sharedPreferences =
+                MyApplication.getContext().getSharedPreferences(
+                        MyApplication.getContext()
+                                .getString(R.string.login_or_sign_up_session), 0);
+        final String userId = sharedPreferences.getString(JsonKeys.USER_ID, null);
+
+        Task<JSONObject>.TaskCompletionSource tcs = Task.create();
+        UrlTemplate template = UrlTemplateCreator.updateProfile(userId, fieldName, fieldValue);
+
+        Continuation<JSONObject, Void> updatingProfile = new Continuation<JSONObject, Void>() {
+            @Override
+            public Void then(Task<JSONObject> task) throws Exception{
+                if (task.isFaulted()) {
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in updateProfile", exception);
+                    throw exception;
+                }
+
+                try {
+                    String updatedAt = task.getResult().getString(RUser.JsonKeys.UPDATED_AT);
+                    if (!TextUtils.isEmpty(updatedAt)) {
+                        SyncUser.getById(userId);
+                    } else {
+                        throw new InvalidResponseException("Incorrect updating profile response");
+                    }
+                } catch (JSONException e) {
+                    Log.e(TAG, "Error parsing updating profile response", e);
+                }
+                return null;
+            }
+        };
+
+        return new NetworkRequest(template, tcs).runNetworkRequest()
+                .continueWith(updatingProfile);
+    }
 }

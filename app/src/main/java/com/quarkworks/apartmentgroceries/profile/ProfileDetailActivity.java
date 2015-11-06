@@ -50,10 +50,13 @@ public class ProfileDetailActivity extends AppCompatActivity {
     private static final String USER_ID = "userId";
     private String userId;
     private Uri outputFileUri;
+    private RUser rUser;
 
     /*
      * References
      */
+    private TextView emailTextView;
+    private TextView phoneTextView;
     private ImageView profileImageView;
 
     public static void newIntent(Context context, String userId) {
@@ -68,7 +71,7 @@ public class ProfileDetailActivity extends AppCompatActivity {
         setContentView(R.layout.profile_detail_activity);
 
         userId = getIntent().getStringExtra(USER_ID);
-        RUser rUser = DataStore.getInstance().getRealm().where(RUser.class)
+        rUser = DataStore.getInstance().getRealm().where(RUser.class)
                 .equalTo(USER_ID, userId).findFirst();
 
         /*
@@ -76,8 +79,8 @@ public class ProfileDetailActivity extends AppCompatActivity {
          */
         Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar_id);
         TextView titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
-        TextView emailTextView = (TextView) findViewById(R.id.user_detail_email_text_view_id);
-        TextView phoneTextView = (TextView) findViewById(R.id.profile_detail_phone_text_view_id);
+        emailTextView = (TextView) findViewById(R.id.user_detail_email_text_view_id);
+        phoneTextView = (TextView) findViewById(R.id.profile_detail_phone_text_view_id);
         TextView usernameTextView = (TextView) findViewById(R.id.profile_detail_username_text_view_id);
         profileImageView = (ImageView) findViewById(R.id.profile_detail_profile_image_view_id);
 
@@ -118,8 +121,9 @@ public class ProfileDetailActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             FragmentManager manager = getFragmentManager();
-            PopupDialog editPhoneDialog = PopupDialog.newInstance("email");
-            editPhoneDialog.show(manager, "email");
+            PopupDialog editPhoneDialog = PopupDialog.newInstance(getString(R.string.email),
+                    RUser.JsonKeys.EMAIL, emailTextView.getText().toString());
+            editPhoneDialog.show(manager, getString(R.string.email));
         }
     };
 
@@ -127,8 +131,9 @@ public class ProfileDetailActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             FragmentManager manager = getFragmentManager();
-            PopupDialog editPhoneDialog = PopupDialog.newInstance("phone");
-            editPhoneDialog.show(manager, "phone");
+            PopupDialog editPhoneDialog = PopupDialog.newInstance(getString(R.string.phone),
+                    RUser.JsonKeys.PHONE, phoneTextView.getText().toString());
+            editPhoneDialog.show(manager, getString(R.string.phone));
         }
     };
 
@@ -199,12 +204,12 @@ public class ProfileDetailActivity extends AppCompatActivity {
                                 if (task.isFaulted()) {
                                     Log.e(TAG, "Failed updating photo", task.getError());
                                     Toast.makeText(getApplicationContext(),
-                                            getString(R.string.photo_update_failure), Toast.LENGTH_SHORT).show();
+                                            getString(R.string.update_failure), Toast.LENGTH_SHORT).show();
                                     return null;
                                 }
 
                                 Toast.makeText(getApplicationContext(),
-                                        getString(R.string.photo_update_success), Toast.LENGTH_SHORT).show();
+                                        getString(R.string.update_success), Toast.LENGTH_SHORT).show();
 
                                 SyncUser.getById(userId).continueWith(new Continuation<RUser, Void>() {
                                     @Override

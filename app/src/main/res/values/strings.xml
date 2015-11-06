@@ -50,8 +50,8 @@
     <string name="grocery_item_name_empty">Please input a item name</string>
     <string name="join_group_success">Joined a group successfully</string>
     <string name="join_group_failure">Joined a group failed</string>
-    <string name="photo_update_success">updated photo successfully</string>
-    <string name="photo_update_failure">updated photo failed</string>
+    <string name="update_success">updated successfully</string>
+    <string name="update_failure">updated failed</string>
 
     <!-- photo -->
     <string name="photo_date_format_string">yyyyMMddHHmmss</string>
