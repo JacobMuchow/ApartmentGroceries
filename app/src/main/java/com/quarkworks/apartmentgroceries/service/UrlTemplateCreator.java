@@ -177,7 +177,6 @@ public class UrlTemplateCreator {
             photoObject.put("__type", "File");
             photoObject.put("name", photoName);
 
-            Log.d(TAG, "photoObject:" + photoObject.toString());
             params.put("photo", photoObject.toString());
             params.put("objectId", userId);
 

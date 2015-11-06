@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.quarkworks.apartmentgroceries.R;
 
@@ -118,16 +117,9 @@ public class PopupDialog extends DialogFragment {
         public  void onClick(View v) {
             String newValue = editText.getText().toString();
             if (!TextUtils.isEmpty(newValue) && !newValue.equals(oldValue)) {
-
                 task = SyncUser.updateProfile(fieldName, newValue);
                 noticeDialogListener.onDialogPositiveClick(PopupDialog.this);
-
-            } else if (!newValue.equals(oldValue) && TextUtils.isEmpty(newValue)){
-                Toast.makeText(getActivity().getApplicationContext(),
-                        getString(R.string.invalid_input), Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(getActivity().getApplicationContext(),
-                        getString(R.string.update_success), Toast.LENGTH_SHORT).show();
                 dismiss();
             }
         }

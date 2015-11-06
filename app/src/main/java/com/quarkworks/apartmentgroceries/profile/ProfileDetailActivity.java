@@ -146,17 +146,20 @@ public class ProfileDetailActivity extends AppCompatActivity implements PopupDia
     @Override
     public void onDialogPositiveClick(final PopupDialog dialog) {
 
-        Continuation<Void, Void> onUpdateProfileFinished = new Continuation<Void, Void>() {
+        Continuation<RUser, Void> onUpdateProfileFinished = new Continuation<RUser, Void>() {
             @Override
-            public Void then(Task<Void> task){
+            public Void then(Task<RUser> task){
                 if (task.isFaulted()) {
                     Exception exception = task.getError();
                     Log.e(TAG, "Error in updateProfile", exception);
                     Toast.makeText(getApplication(), getString(R.string.update_failure), Toast.LENGTH_SHORT).show();
                 }
 
-                // todo: update ui
-                Toast.makeText(getApplication().getApplicationContext(), getString(R.string.update_success) + rUser.getPhone(), Toast.LENGTH_SHORT).show();
+                emailTextView.setText(task.getResult().getEmail());
+                phoneTextView.setText(task.getResult().getPhone());
+                Toast.makeText(getApplication().getApplicationContext(), getString(R.string.update_success), Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+
                 return null;
             }
         };
@@ -164,8 +167,6 @@ public class ProfileDetailActivity extends AppCompatActivity implements PopupDia
         if (dialog.task != null) {
             dialog.task.continueWith(onUpdateProfileFinished, Task.UI_THREAD_EXECUTOR);
         }
-
-        dialog.dismiss();
     }
 
     @Override
@@ -234,9 +235,9 @@ public class ProfileDetailActivity extends AppCompatActivity implements PopupDia
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
                         byte[] sampledInputData = stream.toByteArray();
 
-                        Continuation<JSONObject, Void> checkUpdatingPhoto = new Continuation<JSONObject, Void>() {
+                        Continuation<RUser, Void> checkUpdatingPhoto = new Continuation<RUser, Void>() {
                             @Override
-                            public Void then(Task<JSONObject> task) {
+                            public Void then(Task<RUser> task) {
                                 if (task.isFaulted()) {
                                     Log.e(TAG, "Failed updating photo", task.getError());
                                     Toast.makeText(getApplicationContext(),
@@ -244,27 +245,15 @@ public class ProfileDetailActivity extends AppCompatActivity implements PopupDia
                                     return null;
                                 }
 
+                                Glide.with(getApplication())
+                                        .load(task.getResult().getUrl())
+                                        .placeholder(R.drawable.ic_launcher)
+                                        .centerCrop()
+                                        .crossFade()
+                                        .into(profileImageView);
+
                                 Toast.makeText(getApplicationContext(),
                                         getString(R.string.update_success), Toast.LENGTH_SHORT).show();
-
-                                SyncUser.getById(userId).continueWith(new Continuation<RUser, Void>() {
-                                    @Override
-                                    public Void then(Task<RUser> task) throws Exception {
-                                        if (task.isFaulted()) {
-                                            Log.e(TAG, "Failed to add grocery", task.getError());
-                                            return null;
-                                        }
-
-                                        Glide.with(getApplication())
-                                                .load(task.getResult().getUrl())
-                                                .placeholder(R.drawable.ic_launcher)
-                                                .centerCrop()
-                                                .crossFade()
-                                                .into(profileImageView);
-
-                                        return null;
-                                    }
-                                }, Task.UI_THREAD_EXECUTOR);
 
                                 return null;
                             }
