@@ -1,9 +1,9 @@
 package com.quarkworks.apartmentgroceries.service;
 
+import android.app.Activity;
 import android.app.DialogFragment;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +14,6 @@ import android.widget.Toast;
 
 import com.quarkworks.apartmentgroceries.R;
 
-import bolts.Continuation;
 import bolts.Task;
 
 /**
@@ -30,7 +29,16 @@ public class PopupDialog extends DialogFragment {
     private String fieldName;
     private String oldValue;
 
+    public Task task;
+
     private EditText editText;
+
+    public interface NoticeDialogListener {
+        void onDialogPositiveClick(PopupDialog dialog);
+        void onDialogNegativeClick(PopupDialog dialog);
+    }
+
+    NoticeDialogListener noticeDialogListener;
 
     public static PopupDialog newInstance(String title, String fieldName, String oldValue) {
         PopupDialog fragment = new PopupDialog();
@@ -42,6 +50,17 @@ public class PopupDialog extends DialogFragment {
         fragment.setArguments(args);
 
         return fragment;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            noticeDialogListener = (NoticeDialogListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement NoticeDialogListener");
+        }
     }
 
     @Override
@@ -89,6 +108,7 @@ public class PopupDialog extends DialogFragment {
     private View.OnClickListener cancelTextViewOnClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            noticeDialogListener.onDialogNegativeClick(PopupDialog.this);
             dismiss();
         }
     };
@@ -96,30 +116,19 @@ public class PopupDialog extends DialogFragment {
     private View.OnClickListener saveTextViewOnClick = new View.OnClickListener() {
         @Override
         public  void onClick(View v) {
-
             String newValue = editText.getText().toString();
             if (!TextUtils.isEmpty(newValue) && !newValue.equals(oldValue)) {
-                Continuation<Void, Void> onUpdateProfileFinished = new Continuation<Void, Void>() {
-                    @Override
-                    public Void then(Task<Void> task) throws Exception{
-                        if (task.isFaulted()) {
-                            Exception exception = task.getError();
-                            Log.e(TAG, "Error in updateProfile", exception);
-                            Toast.makeText(getActivity().getApplicationContext(), getString(R.string.update_success), Toast.LENGTH_SHORT).show();
-                            throw exception;
-                        }
-                        Toast.makeText(getActivity().getApplicationContext(), getString(R.string.update_failure), Toast.LENGTH_SHORT).show();
-                        dismiss();
 
-                        return null;
-                    }
-                };
-                SyncUser.updateProfile(fieldName, newValue).continueWith(onUpdateProfileFinished, Task.UI_THREAD_EXECUTOR);
+                task = SyncUser.updateProfile(fieldName, newValue);
+                noticeDialogListener.onDialogPositiveClick(PopupDialog.this);
 
             } else if (!newValue.equals(oldValue) && TextUtils.isEmpty(newValue)){
-                Toast.makeText(getActivity().getApplicationContext(), "Please input " + fieldName, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity().getApplicationContext(),
+                        getString(R.string.invalid_input), Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(getActivity().getApplicationContext(), getString(R.string.update_success), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity().getApplicationContext(),
+                        getString(R.string.update_success), Toast.LENGTH_SHORT).show();
+                dismiss();
             }
         }
     };

@@ -48,6 +48,7 @@
     <string name="add_group_success">Added a group successfully</string>
     <string name="add_group_failure">Added a group failed</string>
     <string name="grocery_item_name_empty">Please input a item name</string>
+    <string name="invalid_input">Invalid input</string>
     <string name="join_group_success">Joined a group successfully</string>
     <string name="join_group_failure">Joined a group failed</string>
     <string name="update_success">updated successfully</string>

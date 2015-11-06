@@ -43,7 +43,7 @@ import java.util.List;
 import bolts.Continuation;
 import bolts.Task;
 
-public class ProfileDetailActivity extends AppCompatActivity {
+public class ProfileDetailActivity extends AppCompatActivity implements PopupDialog.NoticeDialogListener {
     private static final String TAG = ProfileDetailActivity.class.getSimpleName();
 
     private static final int SELECT_PICTURE_REQUEST_CODE = 1;
@@ -136,6 +136,36 @@ public class ProfileDetailActivity extends AppCompatActivity {
             editPhoneDialog.show(manager, getString(R.string.phone));
         }
     };
+
+    @Override
+    public void onDialogPositiveClick(final PopupDialog dialog) {
+
+        Continuation<Void, Void> onUpdateProfileFinished = new Continuation<Void, Void>() {
+            @Override
+            public Void then(Task<Void> task){
+                if (task.isFaulted()) {
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in updateProfile", exception);
+                    Toast.makeText(getApplication(), getString(R.string.update_failure), Toast.LENGTH_SHORT).show();
+                }
+
+                // todo: update ui
+                Toast.makeText(getApplication().getApplicationContext(), getString(R.string.update_success) + rUser.getPhone(), Toast.LENGTH_SHORT).show();
+                return null;
+            }
+        };
+
+        if (dialog.task != null) {
+            dialog.task.continueWith(onUpdateProfileFinished, Task.UI_THREAD_EXECUTOR);
+        }
+
+        dialog.dismiss();
+    }
+
+    @Override
+    public void onDialogNegativeClick(PopupDialog dialog) {
+
+    }
 
     private void openImageIntent() {
         String directoryName = Utilities.dateToString(new Date(), getString(R.string.photo_date_format_string));
