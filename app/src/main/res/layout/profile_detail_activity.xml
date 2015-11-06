@@ -1,0 +1,96 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.quarkworks.apartmentgroceries.profile.ProfileDetailActivity">
+
+    <!-- toolbar -->
+    <include layout="@layout/main_toolbar" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/main_toolbar_id"
+
+        android:padding="@dimen/margin_padding_medium">
+
+        <!-- profile photo -->
+        <ImageView
+            android:id="@+id/profile_detail_profile_image_view_id"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+
+            android:contentDescription="@string/selfie"/>
+
+        <!-- username label -->
+        <TextView
+            android:id="@+id/profile_detail_username_text_view_label_id"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/profile_detail_text_view_height"
+            android:layout_below="@+id/profile_detail_profile_image_view_id"
+
+            android:padding="@dimen/profile_detail_label_padding"
+            android:gravity="center_vertical"
+            android:text="@string/username"/>
+
+        <!-- username -->
+        <TextView
+            android:id="@+id/profile_detail_username_text_view_id"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/profile_detail_text_view_height"
+            android:layout_below="@+id/profile_detail_username_text_view_label_id"
+
+            android:padding="@dimen/profile_detail_text_view_padding"
+            android:gravity="center_vertical"
+            android:background="@drawable/rectangle_border_white"
+            android:textColor="@android:color/black"/>
+
+        <!-- email label -->
+        <TextView
+            android:id="@+id/profile_detail_email_text_view_label_id"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/profile_detail_text_view_height"
+            android:layout_below="@+id/profile_detail_username_text_view_id"
+
+            android:padding="@dimen/profile_detail_label_padding"
+            android:gravity="center_vertical"
+            android:text="@string/email"/>
+
+        <!-- email -->
+        <TextView
+            android:id="@+id/user_detail_email_text_view_id"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/profile_detail_text_view_height"
+            android:layout_below="@+id/profile_detail_email_text_view_label_id"
+
+            android:padding="@dimen/profile_detail_text_view_padding"
+            android:gravity="center_vertical"
+            android:background="@drawable/rectangle_border_white"
+            android:textColor="@android:color/black"/>
+
+        <!-- phone label -->
+        <TextView
+            android:id="@+id/profile_detail_phone_text_view_label_id"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/profile_detail_text_view_height"
+            android:layout_below="@+id/user_detail_email_text_view_id"
+
+            android:padding="@dimen/profile_detail_label_padding"
+            android:gravity="center_vertical"
+            android:text="@string/phone" />
+
+        <!-- phone -->
+        <TextView
+            android:id="@+id/profile_detail_phone_text_view_id"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/profile_detail_text_view_height"
+            android:layout_below="@+id/profile_detail_phone_text_view_label_id"
+
+            android:padding="@dimen/profile_detail_text_view_padding"
+            android:gravity="center_vertical"
+            android:background="@drawable/rectangle_border_white"
+            android:textColor="@android:color/black"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>

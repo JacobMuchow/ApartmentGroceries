@@ -1,4 +1,4 @@
-package com.quarkworks.apartmentgroceries.user;
+package com.quarkworks.apartmentgroceries.profile;
 
 import android.app.FragmentManager;
 import android.content.ComponentName;
@@ -43,8 +43,8 @@ import java.util.List;
 import bolts.Continuation;
 import bolts.Task;
 
-public class UserDetailActivity extends AppCompatActivity {
-    private static final String TAG = UserDetailActivity.class.getSimpleName();
+public class ProfileDetailActivity extends AppCompatActivity {
+    private static final String TAG = ProfileDetailActivity.class.getSimpleName();
 
     private static final int SELECT_PICTURE_REQUEST_CODE = 1;
     private static final String USER_ID = "userId";
@@ -57,7 +57,7 @@ public class UserDetailActivity extends AppCompatActivity {
     private ImageView profileImageView;
 
     public static void newIntent(Context context, String userId) {
-        Intent intent = new Intent(context, UserDetailActivity.class);
+        Intent intent = new Intent(context, ProfileDetailActivity.class);
         intent.putExtra(USER_ID, userId);
         context.startActivity(intent);
     }
@@ -65,7 +65,7 @@ public class UserDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.user_detail_activity);
+        setContentView(R.layout.profile_detail_activity);
 
         userId = getIntent().getStringExtra(USER_ID);
         RUser rUser = DataStore.getInstance().getRealm().where(RUser.class)
@@ -76,20 +76,21 @@ public class UserDetailActivity extends AppCompatActivity {
          */
         Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar_id);
         TextView titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
-        TextView editPhotoTextView = (TextView) findViewById(R.id.user_detail_edit_photo_text_view_id);
-        TextView usernameTextView = (TextView) findViewById(R.id.user_detail_edit_username_text_view_id);
-        TextView phoneTextView = (TextView) findViewById(R.id.user_detail_edit_phone_text_view_id);
-        profileImageView = (ImageView) findViewById(R.id.user_detail_profile_image_view_id);
+        TextView emailTextView = (TextView) findViewById(R.id.user_detail_email_text_view_id);
+        TextView phoneTextView = (TextView) findViewById(R.id.profile_detail_phone_text_view_id);
+        TextView usernameTextView = (TextView) findViewById(R.id.profile_detail_username_text_view_id);
+        profileImageView = (ImageView) findViewById(R.id.profile_detail_profile_image_view_id);
 
         /*
          * Set view data
          */
-        titleTextView.setText(getString(R.string.title_activity_user_detail));
+        titleTextView.setText(getString(R.string.title_activity_profile_detail));
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        usernameTextView.setText(rUser.getUsername());
+        emailTextView.setText(rUser.getEmail());
         phoneTextView.setText(rUser.getPhone());
+        usernameTextView.setText(rUser.getUsername());
 
         Glide.with(this)
                 .load(rUser.getUrl())
@@ -101,14 +102,24 @@ public class UserDetailActivity extends AppCompatActivity {
         /*
             Set view OnClickListener
          */
-        editPhotoTextView.setOnClickListener(editPhotoTextViewOnClick);
+        profileImageView.setOnClickListener(profileImageViewOnClick);
+        emailTextView.setOnClickListener(emailOnClick);
         phoneTextView.setOnClickListener(phoneOnClick);
     }
 
-    private View.OnClickListener editPhotoTextViewOnClick =  new View.OnClickListener() {
+    private View.OnClickListener profileImageViewOnClick =  new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             openImageIntent();
+        }
+    };
+
+    private View.OnClickListener emailOnClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            FragmentManager manager = getFragmentManager();
+            PopupDialog editPhoneDialog = PopupDialog.newInstance("email");
+            editPhoneDialog.show(manager, "email");
         }
     };
 

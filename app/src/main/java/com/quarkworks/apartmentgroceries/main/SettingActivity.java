@@ -15,7 +15,7 @@ import com.quarkworks.apartmentgroceries.auth.LoginActivity;
 import com.quarkworks.apartmentgroceries.group.GroupActivity;
 import com.quarkworks.apartmentgroceries.service.SyncUser;
 import com.quarkworks.apartmentgroceries.service.models.RUser;
-import com.quarkworks.apartmentgroceries.user.UserDetailActivity;
+import com.quarkworks.apartmentgroceries.profile.ProfileDetailActivity;
 
 import bolts.Continuation;
 import bolts.Task;
@@ -103,7 +103,7 @@ public class SettingActivity extends AppCompatActivity {
             SharedPreferences sharedPreferences = getApplication()
                     .getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
             String userId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
-            UserDetailActivity.newIntent(SettingActivity.this, userId);
+            ProfileDetailActivity.newIntent(SettingActivity.this, userId);
         }
     };
 }

@@ -69,7 +69,6 @@ public class GroceryCardPagerActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT > 21) {
             getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
-
     }
 
     private static class GroceryCardPagerAdapter extends FragmentStatePagerAdapter {
