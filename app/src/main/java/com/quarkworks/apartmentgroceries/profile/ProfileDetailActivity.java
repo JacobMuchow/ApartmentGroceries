@@ -4,6 +4,7 @@ import android.app.FragmentManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
@@ -22,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.quarkworks.apartmentgroceries.MyApplication;
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.service.DataStore;
 import com.quarkworks.apartmentgroceries.service.PopupDialog;
@@ -70,6 +72,7 @@ public class ProfileDetailActivity extends AppCompatActivity implements PopupDia
         super.onCreate(savedInstanceState);
         setContentView(R.layout.profile_detail_activity);
 
+
         userId = getIntent().getStringExtra(USER_ID);
         rUser = DataStore.getInstance().getRealm().where(RUser.class)
                 .equalTo(USER_ID, userId).findFirst();
@@ -105,9 +108,12 @@ public class ProfileDetailActivity extends AppCompatActivity implements PopupDia
         /*
             Set view OnClickListener
          */
-        profileImageView.setOnClickListener(profileImageViewOnClick);
-        emailTextView.setOnClickListener(emailOnClick);
-        phoneTextView.setOnClickListener(phoneOnClick);
+
+        if (isAuthorizedUser(userId)) {
+            profileImageView.setOnClickListener(profileImageViewOnClick);
+            emailTextView.setOnClickListener(emailOnClick);
+            phoneTextView.setOnClickListener(phoneOnClick);
+        }
     }
 
     private View.OnClickListener profileImageViewOnClick =  new View.OnClickListener() {
@@ -274,5 +280,15 @@ public class ProfileDetailActivity extends AppCompatActivity implements PopupDia
                 }
             }
         }
+    }
+
+    private boolean isAuthorizedUser(String userId) {
+        SharedPreferences sharedPreferences =
+                MyApplication.getContext().getSharedPreferences(
+                        MyApplication.getContext()
+                                .getString(R.string.login_or_sign_up_session), 0);
+        String loginUserId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
+
+        return userId.equals(loginUserId);
     }
 }
