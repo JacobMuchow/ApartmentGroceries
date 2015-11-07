@@ -31,8 +31,6 @@ import com.quarkworks.apartmentgroceries.service.SyncUser;
 import com.quarkworks.apartmentgroceries.service.Utilities;
 import com.quarkworks.apartmentgroceries.service.models.RUser;
 
-import org.json.JSONObject;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -45,7 +43,7 @@ import java.util.List;
 import bolts.Continuation;
 import bolts.Task;
 
-public class ProfileDetailActivity extends AppCompatActivity implements PopupDialog.NoticeDialogListener {
+public class ProfileDetailActivity extends AppCompatActivity {
     private static final String TAG = ProfileDetailActivity.class.getSimpleName();
 
     private static final int SELECT_PICTURE_REQUEST_CODE = 1;
@@ -140,39 +138,41 @@ public class ProfileDetailActivity extends AppCompatActivity implements PopupDia
             PopupDialog editPhoneDialog = PopupDialog.newInstance(getString(R.string.phone),
                     RUser.JsonKeys.PHONE, phoneTextView.getText().toString());
             editPhoneDialog.show(manager, getString(R.string.phone));
+            editPhoneDialog.setNoticeDialogListener(noticeDialogListener);
         }
     };
 
-    @Override
-    public void onDialogPositiveClick(final PopupDialog dialog) {
+    private PopupDialog.NoticeDialogListener noticeDialogListener = new PopupDialog.NoticeDialogListener() {
+        @Override
+        public void onDialogPositiveClick(final PopupDialog dialog) {
+            Continuation<RUser, Void> onUpdateProfileFinished = new Continuation<RUser, Void>() {
+                @Override
+                public Void then(Task<RUser> task){
+                    if (task.isFaulted()) {
+                        Exception exception = task.getError();
+                        Log.e(TAG, "Error in updateProfile", exception);
+                        Toast.makeText(getApplication(), getString(R.string.update_failure), Toast.LENGTH_SHORT).show();
+                    }
 
-        Continuation<RUser, Void> onUpdateProfileFinished = new Continuation<RUser, Void>() {
-            @Override
-            public Void then(Task<RUser> task){
-                if (task.isFaulted()) {
-                    Exception exception = task.getError();
-                    Log.e(TAG, "Error in updateProfile", exception);
-                    Toast.makeText(getApplication(), getString(R.string.update_failure), Toast.LENGTH_SHORT).show();
+                    emailTextView.setText(task.getResult().getEmail());
+                    phoneTextView.setText(task.getResult().getPhone());
+                    Toast.makeText(getApplication().getApplicationContext(), getString(R.string.update_success), Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+
+                    return null;
                 }
+            };
 
-                emailTextView.setText(task.getResult().getEmail());
-                phoneTextView.setText(task.getResult().getPhone());
-                Toast.makeText(getApplication().getApplicationContext(), getString(R.string.update_success), Toast.LENGTH_SHORT).show();
-                dialog.dismiss();
-
-                return null;
+            if (dialog.task != null) {
+                dialog.task.continueWith(onUpdateProfileFinished, Task.UI_THREAD_EXECUTOR);
             }
-        };
-
-        if (dialog.task != null) {
-            dialog.task.continueWith(onUpdateProfileFinished, Task.UI_THREAD_EXECUTOR);
         }
-    }
 
-    @Override
-    public void onDialogNegativeClick(PopupDialog dialog) {
+        @Override
+        public void onDialogNegativeClick(PopupDialog dialog) {
 
-    }
+        }
+    };
 
     private void openImageIntent() {
         String directoryName = Utilities.dateToString(new Date(), getString(R.string.photo_date_format_string));

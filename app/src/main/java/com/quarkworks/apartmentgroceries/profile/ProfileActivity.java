@@ -25,7 +25,7 @@ import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 
 public class ProfileActivity extends AppCompatActivity {
-    private static final String TAG = ProfileDetailActivity.class.getSimpleName();
+    private static final String TAG = ProfileActivity.class.getSimpleName();
 
     private static final String USER_ID = "userId";
     private String userId;
@@ -67,8 +67,8 @@ public class ProfileActivity extends AppCompatActivity {
 
 
         final RealmResults<RGroceryItem> groceries = DataStore.getInstance().getRealm()
-                .where(RGroceryItem.class).equalTo(RGroceryItem.RealmKeys.CREATED_BY, userId).findAll();
-        groceries.sort(RGroceryItem.RealmKeys.CREATED_AT, false);
+                .where(RGroceryItem.class).equalTo(RGroceryItem.RealmKeys.CREATED_BY, userId)
+                .findAllSorted(RGroceryItem.RealmKeys.CREATED_AT,false);
 
         RealmBaseAdapter<RGroceryItem> realmBaseAdapter = new RealmBaseAdapter<RGroceryItem>(this, groceries, true) {
             @Override

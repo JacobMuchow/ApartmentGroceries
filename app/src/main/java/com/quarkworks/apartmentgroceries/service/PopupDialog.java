@@ -1,6 +1,5 @@
 package com.quarkworks.apartmentgroceries.service;
 
-import android.app.Activity;
 import android.app.DialogFragment;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -22,11 +21,11 @@ public class PopupDialog extends DialogFragment {
     private static final String TAG = PopupDialog.class.getSimpleName();
 
     private static final String TITLE = "title";
-    private static final String OLD_VALUE = "oldValue";
     private static final String FIELD_NAME = "fieldName";
+    private static final String FIELD_VALUE = "fieldValue";
     private String title;
     private String fieldName;
-    private String oldValue;
+    private String fieldValue;
 
     public Task task;
 
@@ -37,29 +36,18 @@ public class PopupDialog extends DialogFragment {
         void onDialogNegativeClick(PopupDialog dialog);
     }
 
-    NoticeDialogListener noticeDialogListener;
+    private NoticeDialogListener noticeDialogListener;
 
-    public static PopupDialog newInstance(String title, String fieldName, String oldValue) {
+    public static PopupDialog newInstance(String title, String fieldName, String fieldValue) {
         PopupDialog fragment = new PopupDialog();
 
         Bundle args = new Bundle();
         args.putString(TITLE, title);
         args.putString(FIELD_NAME, fieldName);
-        args.putString(OLD_VALUE, oldValue);
+        args.putString(FIELD_VALUE, fieldValue);
         fragment.setArguments(args);
 
         return fragment;
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            noticeDialogListener = (NoticeDialogListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement NoticeDialogListener");
-        }
     }
 
     @Override
@@ -67,7 +55,7 @@ public class PopupDialog extends DialogFragment {
         super.onCreate(savedInstanceState);
         title = getArguments().getString(TITLE);
         fieldName = getArguments().getString(FIELD_NAME);
-        oldValue = getArguments().getString(OLD_VALUE);
+        fieldValue = getArguments().getString(FIELD_VALUE);
 
         int style = DialogFragment.STYLE_NO_TITLE;
         setStyle(style, 0);
@@ -90,7 +78,7 @@ public class PopupDialog extends DialogFragment {
             Set view data
          */
         titleTextView.setText(title);
-        editText.setText(oldValue);
+        editText.setText(fieldValue);
 
         /*
             Set view OnClickListener
@@ -116,7 +104,7 @@ public class PopupDialog extends DialogFragment {
         @Override
         public  void onClick(View v) {
             String newValue = editText.getText().toString();
-            if (!TextUtils.isEmpty(newValue) && !newValue.equals(oldValue)) {
+            if (!TextUtils.isEmpty(newValue) && !newValue.equals(fieldValue)) {
                 task = SyncUser.updateProfile(fieldName, newValue);
                 noticeDialogListener.onDialogPositiveClick(PopupDialog.this);
             } else {
@@ -124,4 +112,8 @@ public class PopupDialog extends DialogFragment {
             }
         }
     };
+
+    public void setNoticeDialogListener(NoticeDialogListener noticeDialogListener) {
+        this.noticeDialogListener = noticeDialogListener;
+    }
 }
