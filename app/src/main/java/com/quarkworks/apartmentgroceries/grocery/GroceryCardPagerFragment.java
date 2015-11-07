@@ -17,7 +17,7 @@ import com.quarkworks.apartmentgroceries.service.DataStore;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryPhoto;
 import com.quarkworks.apartmentgroceries.service.models.RUser;
-import com.quarkworks.apartmentgroceries.user.UserDetailActivity;
+import com.quarkworks.apartmentgroceries.profile.ProfileDetailActivity;
 
 import io.realm.RealmResults;
 
@@ -101,7 +101,7 @@ public class GroceryCardPagerFragment extends Fragment {
     private View.OnClickListener createByOnClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            UserDetailActivity.newIntent(getContext(), rGroceryItem.getCreatedBy());
+            ProfileDetailActivity.newIntent(getContext(), rGroceryItem.getCreatedBy());
         }
     };
 

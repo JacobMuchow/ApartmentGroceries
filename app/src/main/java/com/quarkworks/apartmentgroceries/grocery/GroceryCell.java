@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -18,7 +17,7 @@ import com.quarkworks.apartmentgroceries.service.SyncGroceryItem;
 import com.quarkworks.apartmentgroceries.service.Utilities;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
 import com.quarkworks.apartmentgroceries.service.models.RUser;
-import com.quarkworks.apartmentgroceries.user.UserDetailActivity;
+import com.quarkworks.apartmentgroceries.profile.ProfileActivity;
 
 /**
  * Created by zz on 10/14/15.
@@ -131,14 +130,14 @@ public class GroceryCell extends RelativeLayout {
     private View.OnClickListener createdByOnClick = new OnClickListener() {
         @Override
         public void onClick(View v) {
-            UserDetailActivity.newIntent(getContext(), rGroceryItem.getCreatedBy());
+            ProfileActivity.newIntent(getContext(), rGroceryItem.getCreatedBy());
         }
     };
 
     private View.OnClickListener purchasedByOnClick = new OnClickListener() {
         @Override
         public void onClick(View v) {
-            UserDetailActivity.newIntent(getContext(), rGroceryItem.getPurchasedBy());
+            ProfileActivity.newIntent(getContext(), rGroceryItem.getPurchasedBy());
         }
     };
 

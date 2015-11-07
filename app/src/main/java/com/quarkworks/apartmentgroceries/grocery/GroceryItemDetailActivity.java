@@ -4,14 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.service.DataStore;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
-import com.quarkworks.apartmentgroceries.user.UserDetailActivity;
+import com.quarkworks.apartmentgroceries.profile.ProfileDetailActivity;
 
 public class GroceryItemDetailActivity extends AppCompatActivity {
     private static final String TAG = GroceryItemDetailActivity.class.getSimpleName();
@@ -65,7 +64,7 @@ public class GroceryItemDetailActivity extends AppCompatActivity {
     private View.OnClickListener createdByOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            UserDetailActivity.newIntent(GroceryItemDetailActivity.this, groceryItem.getCreatedBy());
+            ProfileDetailActivity.newIntent(GroceryItemDetailActivity.this, groceryItem.getCreatedBy());
         }
     };
 }

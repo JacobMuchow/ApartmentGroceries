@@ -5,16 +5,17 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
-
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-    
-    <permission android:protectionLevel="signature"
-        android:name="com.quarkworks.apartmentgroceries.permission.C2D_MESSAGE" />
+
+    <permission
+        android:name="com.quarkworks.apartmentgroceries.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
     <uses-permission android:name="com.quarkworks.apartmentgroceries.permission.C2D_MESSAGE" />
 
     <application
@@ -37,11 +38,7 @@
         </activity>
         <activity
             android:name=".auth.SignUpActivity"
-            android:label="@string/title_activity_signup" >
-        </activity>
-        <activity
-            android:name=".user.UserActivity"
-            android:label="@string/title_activity_user" >
+            android:label="@string/title_activity_sign_up" >
         </activity>
         <activity
             android:name=".main.HomeActivity"
@@ -72,12 +69,17 @@
             android:parentActivityName=".group.GroupActivity" >
         </activity>
         <activity
-            android:name=".user.UserDetailActivity"
-            android:label="@string/title_activity_user_detail" >
+            android:name=".profile.ProfileDetailActivity"
+            android:label="@string/title_activity_profile_detail" >
         </activity>
         <activity
             android:name=".main.SettingActivity"
             android:label="@string/title_activity_setting"
+            android:parentActivityName=".main.HomeActivity" >
+        </activity>
+        <activity
+            android:name=".profile.ProfileActivity"
+            android:label="@string/title_activity_profile"
             android:parentActivityName=".main.HomeActivity" >
         </activity>
 
@@ -98,6 +100,7 @@
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+
                 <category android:name="com.quarkworks.apartmentgroceries" />
             </intent-filter>
         </receiver>

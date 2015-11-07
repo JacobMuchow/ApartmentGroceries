@@ -177,7 +177,6 @@ public class UrlTemplateCreator {
             photoObject.put("__type", "File");
             photoObject.put("name", photoName);
 
-            Log.d(TAG, "photoObject:" + photoObject.toString());
             params.put("photo", photoObject.toString());
             params.put("objectId", userId);
 
@@ -354,5 +353,15 @@ public class UrlTemplateCreator {
         String pushStr = "{" + "\"where\":" + groupIdObj.toString() +  ",\"data\":" + messageObj.toString() + "}";
         params.put(PUSH, pushStr);
         return new UrlTemplate(POST, url, params);
+    }
+
+    public static UrlTemplate updateProfile(String userId, String fieldName, String fieldValue) {
+        String url = baseUrl + "users";
+        Map<String, String> params = new HashMap<>();
+
+        params.put(fieldName, fieldValue);
+        params.put("objectId", userId);
+
+        return new UrlTemplate(PUT, url, params, true);
     }
 }

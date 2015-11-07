@@ -2,32 +2,32 @@
     <string name="app_name">Apartment Groceries</string>
 
     <!-- button -->
-    <string name="login_button">Login</string>
-    <string name="sign_up_button">Sign Up</string>
     <string name="add_button">Add</string>
     <string name="join_group_button">Join</string>
+    <string name="login_button">Login</string>
+    <string name="sign_up_button">Sign Up</string>
 
     <!-- menu -->
-    <string name="action_user">User</string>
     <string name="action_add_grocery">Add grocery</string>
     <string name="action_add_group">Add group</string>
     <string name="action_logout">Logout</string>
-    <string name="action_settings">Settings</string>
     <string name="action_post">Post</string>
-    <string name="action_test">Test</string>
+    <string name="action_profile_detail">Profile Detail</string>
+    <string name="action_settings">Settings</string>
 
     <!-- activity title -->
-    <string name="title_activity_login">Login</string>
-    <string name="title_activity_signup">Sign Up</string>
-    <string name="title_activity_user">User</string>d
-    <string name="title_activity_home">Home</string>
+    <string name="title_activity_add_grocery_item">Add Grocery</string>
+    <string name="title_activity_add_group">Add Group</string>
     <string name="title_activity_grocery_card_pager">Grocery</string>
     <string name="title_activity_grocery_item_detail">Grocery Detail</string>
-    <string name="title_activity_add_grocery_item">Add Grocery</string>
     <string name="title_activity_group">Group</string>
-    <string name="title_activity_add_group">Add Group</string>
-    <string name="title_activity_user_detail">Profile</string>
+    <string name="title_activity_home">Home</string>
+    <string name="title_activity_login">Login</string>
+    <string name="title_activity_profile">Profile</string>
+    <string name="title_activity_profile_detail">Profile Detail</string>
+    <string name="title_activity_sign_up">Sign Up</string>
     <string name="title_activity_setting">Setting</string>
+
 
     <!-- login or sign up-->
     <string name="empty_username_or_password">Please input username and password.</string>
@@ -43,15 +43,15 @@
     <string name="sign_up_terms">Click “Sign Up” means you agree to Terms and Privacy?</string>
 
     <!-- response message -->
-    <string name="grocery_item_name_empty">Please input a item name</string>
     <string name="add_grocery_item_success">Added an item successfully</string>
     <string name="add_grocery_item_failure">Added an item failed</string>
     <string name="add_group_success">Added a group successfully</string>
     <string name="add_group_failure">Added a group failed</string>
+    <string name="grocery_item_name_empty">Please input a item name</string>
     <string name="join_group_success">Joined a group successfully</string>
     <string name="join_group_failure">Joined a group failed</string>
-    <string name="photo_update_success">updated photo successfully</string>
-    <string name="photo_update_failure">updated photo failed</string>
+    <string name="update_success">updated successfully</string>
+    <string name="update_failure">updated failed</string>
 
     <!-- photo -->
     <string name="photo_date_format_string">yyyyMMddHHmmss</string>
@@ -63,16 +63,21 @@
 
     <!-- setting -->
     <string name="setting_edit_profile">Edit Profile</string>
-    <string name="edit_photo">Edit Photo</string>
 
     <!-- post grocery -->
     <string name="cancel">Cancel</string>
-    <string name="post">Post</string>
     <string name="grocery_hint">description</string>
+    <string name="post">Post</string>
 
     <!-- dialog -->
     <string name="dialog_cancel">cancel</string>
     <string name="dialog_save">save</string>
+
+    <!-- profile detail-->
+    <string name="email">email</string>
+    <string name="phone">phone</string>
+    <string name="selfie">selfie</string>
+    <string name="username">username</string>
 
     <string name="delete">delete</string>
 </resources>

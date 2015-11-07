@@ -250,7 +250,7 @@ public class SyncUser {
         return networkRequest.runNetworkRequest().continueWith(checkJoiningGroup);
     }
 
-    public static Task<JSONObject> updateProfilePhoto(String photoName, byte[] data) {
+    public static Task<RUser> updateProfilePhoto(String photoName, byte[] data) {
 
         SharedPreferences sharedPreferences =
                 MyApplication.getContext().getSharedPreferences(
@@ -258,11 +258,37 @@ public class SyncUser {
                                 .getString(R.string.login_or_sign_up_session), 0);
         final String userId = sharedPreferences.getString(JsonKeys.USER_ID, null);
 
-        final Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
-
-        Continuation<JSONObject, Void> updateUserPhoto = new Continuation<JSONObject, Void>() {
+        final Continuation<JSONObject, Task<RUser>> onProfilePhotoUpdated = new Continuation<JSONObject, Task<RUser>>() {
             @Override
-            public Void then(Task<JSONObject> task) throws Exception {
+            public Task<RUser> then(Task<JSONObject> task) throws Exception{
+                if (task.isFaulted()) {
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in onProfilePhotoUpdated", exception);
+                    throw exception;
+                }
+
+                try {
+                    String updatedAt = task.getResult().getString(RUser.JsonKeys.UPDATED_AT);
+                    if (TextUtils.isEmpty(updatedAt)) {
+                        throw new InvalidResponseException("Incorrect updating user's photo response");
+                    }
+
+                    Context context = MyApplication.getContext();
+                    SharedPreferences sharedPreferences = context.getSharedPreferences(
+                            context.getString(R.string.login_or_sign_up_session), 0);
+                    String userId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
+
+                    return SyncUser.getById(userId);
+                } catch (JSONException e) {
+                    Log.e(TAG, "Error parsing updating photo response", e);
+                }
+                return null;
+            }
+        };
+
+        Continuation<JSONObject, Task<JSONObject>> updateProfilePhoto = new Continuation<JSONObject, Task<JSONObject>>() {
+            @Override
+            public Task<JSONObject> then(Task<JSONObject> task) throws Exception {
                 if (task.isFaulted()) {
                     Exception exception = task.getError();
                     Log.e(TAG, "Error in uploadPhoto", exception);
@@ -274,43 +300,17 @@ public class SyncUser {
                     throw new InvalidResponseException("Empty response");
                 }
 
-                final UrlTemplate template = UrlTemplateCreator.updateProfilePhoto(userId, photoName);
+                Task<JSONObject>.TaskCompletionSource taskCompletionSource = Task.create();
+                UrlTemplate template = UrlTemplateCreator.updateProfilePhoto(userId, photoName);
 
-                Continuation<JSONObject, Void> UpdatingPhoto = new Continuation<JSONObject, Void>() {
-                    @Override
-                    public Void then(Task<JSONObject> task) throws Exception{
-                        if (task.isFaulted()) {
-                            Exception exception = task.getError();
-                            Log.e(TAG, "Error in UpdatingPhoto", exception);
-                            throw exception;
-                        }
+                return new NetworkRequest(template, taskCompletionSource).runNetworkRequest();
 
-                        try {
-                            String updatedAt = task.getResult().getString(RUser.JsonKeys.UPDATED_AT);
-                            if (!TextUtils.isEmpty(updatedAt)) {
-                                Context context = MyApplication.getContext();
-                                SharedPreferences sharedPreferences = context.getSharedPreferences(
-                                        context.getString(R.string.login_or_sign_up_session), 0);
-                                String userId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
-                                SyncUser.getById(userId);
-                            } else {
-                                throw new InvalidResponseException("Incorrect updating user's photo response");
-                            }
-                        } catch (JSONException e) {
-                            Log.e(TAG, "Error parsing updating photo response", e);
-                        }
-                        return null;
-                    }
-                };
-                new NetworkRequest(template, taskCompletionSource).runNetworkRequest().continueWith(UpdatingPhoto);
-
-                return null;
             }
         };
 
-        SyncPhoto.uploadPhoto(photoName, data).continueWith(updateUserPhoto);
-
-        return taskCompletionSource.getTask();
+        return SyncPhoto.uploadPhoto(photoName, data)
+                .continueWithTask(updateProfilePhoto)
+                .continueWithTask(onProfilePhotoUpdated);
     }
 
     public static Task<RUser> getById(String userId) {
@@ -368,5 +368,43 @@ public class SyncUser {
         };
 
         return networkRequest.runNetworkRequest().continueWith(addSingleUserToRealm);
+    }
+
+    public static Task<RUser> updateProfile(String fieldName, String fieldValue) {
+
+        SharedPreferences sharedPreferences =
+                MyApplication.getContext().getSharedPreferences(
+                        MyApplication.getContext()
+                                .getString(R.string.login_or_sign_up_session), 0);
+        final String userId = sharedPreferences.getString(JsonKeys.USER_ID, null);
+
+        Task<JSONObject>.TaskCompletionSource tcs = Task.create();
+        UrlTemplate template = UrlTemplateCreator.updateProfile(userId, fieldName, fieldValue);
+
+        Continuation<JSONObject, Task<RUser>> updatingProfile = new Continuation<JSONObject, Task<RUser>>() {
+            @Override
+            public Task<RUser> then(Task<JSONObject> task) throws Exception{
+                if (task.isFaulted()) {
+                    Exception exception = task.getError();
+                    Log.e(TAG, "Error in updateProfile", exception);
+                    throw exception;
+                }
+
+                try {
+                    String updatedAt = task.getResult().getString(RUser.JsonKeys.UPDATED_AT);
+                    if (TextUtils.isEmpty(updatedAt)) {
+                         throw new InvalidResponseException("Incorrect updating profile response");
+                    }
+
+                    return SyncUser.getById(userId);
+                } catch (JSONException e) {
+                    Log.e(TAG, "Error parsing updating profile response", e);
+                }
+                return null;
+            }
+        };
+
+        return new NetworkRequest(template, tcs).runNetworkRequest()
+                .continueWithTask(updatingProfile);
     }
 }

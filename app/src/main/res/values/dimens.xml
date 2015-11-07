@@ -25,5 +25,13 @@
     <dimen name="grocery_cell_photo_width_height">40dp</dimen>
     <dimen name="grocery_cell_item_card_view_height">150dp</dimen>
 
+    <!-- profile detail -->
+    <dimen name="profile_detail_text_view_height">38dp</dimen>
+    <dimen name="profile_detail_text_view_padding">4dp</dimen>
+    <dimen name="profile_detail_label_padding">2dp</dimen>
+
+    <dimen name="detail_backdrop_height">256dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+
     <dimen name="pager_title_height">50dp</dimen>
 </resources>

@@ -62,7 +62,7 @@ public class SignUpActivity extends AppCompatActivity {
         /*
             Set view data
          */
-        titleTextView.setText(getString(R.string.title_activity_signup));
+        titleTextView.setText(getString(R.string.title_activity_sign_up));
 
         /*
             Set view OnClickListener

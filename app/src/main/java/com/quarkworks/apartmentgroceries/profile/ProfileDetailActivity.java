@@ -1,9 +1,10 @@
-package com.quarkworks.apartmentgroceries.user;
+package com.quarkworks.apartmentgroceries.profile;
 
 import android.app.FragmentManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
@@ -22,14 +23,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.quarkworks.apartmentgroceries.MyApplication;
 import com.quarkworks.apartmentgroceries.R;
 import com.quarkworks.apartmentgroceries.service.DataStore;
 import com.quarkworks.apartmentgroceries.service.PopupDialog;
 import com.quarkworks.apartmentgroceries.service.SyncUser;
 import com.quarkworks.apartmentgroceries.service.Utilities;
 import com.quarkworks.apartmentgroceries.service.models.RUser;
-
-import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -43,21 +43,24 @@ import java.util.List;
 import bolts.Continuation;
 import bolts.Task;
 
-public class UserDetailActivity extends AppCompatActivity {
-    private static final String TAG = UserDetailActivity.class.getSimpleName();
+public class ProfileDetailActivity extends AppCompatActivity {
+    private static final String TAG = ProfileDetailActivity.class.getSimpleName();
 
     private static final int SELECT_PICTURE_REQUEST_CODE = 1;
     private static final String USER_ID = "userId";
     private String userId;
     private Uri outputFileUri;
+    private RUser rUser;
 
     /*
      * References
      */
+    private TextView emailTextView;
+    private TextView phoneTextView;
     private ImageView profileImageView;
 
     public static void newIntent(Context context, String userId) {
-        Intent intent = new Intent(context, UserDetailActivity.class);
+        Intent intent = new Intent(context, ProfileDetailActivity.class);
         intent.putExtra(USER_ID, userId);
         context.startActivity(intent);
     }
@@ -65,10 +68,11 @@ public class UserDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.user_detail_activity);
+        setContentView(R.layout.profile_detail_activity);
+
 
         userId = getIntent().getStringExtra(USER_ID);
-        RUser rUser = DataStore.getInstance().getRealm().where(RUser.class)
+        rUser = DataStore.getInstance().getRealm().where(RUser.class)
                 .equalTo(USER_ID, userId).findFirst();
 
         /*
@@ -76,20 +80,21 @@ public class UserDetailActivity extends AppCompatActivity {
          */
         Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar_id);
         TextView titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
-        TextView editPhotoTextView = (TextView) findViewById(R.id.user_detail_edit_photo_text_view_id);
-        TextView usernameTextView = (TextView) findViewById(R.id.user_detail_edit_username_text_view_id);
-        TextView phoneTextView = (TextView) findViewById(R.id.user_detail_edit_phone_text_view_id);
-        profileImageView = (ImageView) findViewById(R.id.user_detail_profile_image_view_id);
+        emailTextView = (TextView) findViewById(R.id.user_detail_email_text_view_id);
+        phoneTextView = (TextView) findViewById(R.id.profile_detail_phone_text_view_id);
+        TextView usernameTextView = (TextView) findViewById(R.id.profile_detail_username_text_view_id);
+        profileImageView = (ImageView) findViewById(R.id.profile_detail_profile_image_view_id);
 
         /*
          * Set view data
          */
-        titleTextView.setText(getString(R.string.title_activity_user_detail));
+        titleTextView.setText(getString(R.string.title_activity_profile_detail));
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        usernameTextView.setText(rUser.getUsername());
+        emailTextView.setText(rUser.getEmail());
         phoneTextView.setText(rUser.getPhone());
+        usernameTextView.setText(rUser.getUsername());
 
         Glide.with(this)
                 .load(rUser.getUrl())
@@ -101,14 +106,28 @@ public class UserDetailActivity extends AppCompatActivity {
         /*
             Set view OnClickListener
          */
-        editPhotoTextView.setOnClickListener(editPhotoTextViewOnClick);
-        phoneTextView.setOnClickListener(phoneOnClick);
+
+        if (isAuthorizedUser(userId)) {
+            profileImageView.setOnClickListener(profileImageViewOnClick);
+            emailTextView.setOnClickListener(emailOnClick);
+            phoneTextView.setOnClickListener(phoneOnClick);
+        }
     }
 
-    private View.OnClickListener editPhotoTextViewOnClick =  new View.OnClickListener() {
+    private View.OnClickListener profileImageViewOnClick =  new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             openImageIntent();
+        }
+    };
+
+    private View.OnClickListener emailOnClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            FragmentManager manager = getFragmentManager();
+            PopupDialog editPhoneDialog = PopupDialog.newInstance(getString(R.string.email),
+                    RUser.JsonKeys.EMAIL, emailTextView.getText().toString());
+            editPhoneDialog.show(manager, getString(R.string.email));
         }
     };
 
@@ -116,8 +135,42 @@ public class UserDetailActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             FragmentManager manager = getFragmentManager();
-            PopupDialog editPhoneDialog = PopupDialog.newInstance("phone");
-            editPhoneDialog.show(manager, "phone");
+            PopupDialog editPhoneDialog = PopupDialog.newInstance(getString(R.string.phone),
+                    RUser.JsonKeys.PHONE, phoneTextView.getText().toString());
+            editPhoneDialog.show(manager, getString(R.string.phone));
+            editPhoneDialog.setNoticeDialogListener(noticeDialogListener);
+        }
+    };
+
+    private PopupDialog.NoticeDialogListener noticeDialogListener = new PopupDialog.NoticeDialogListener() {
+        @Override
+        public void onDialogPositiveClick(final PopupDialog dialog) {
+            Continuation<RUser, Void> onUpdateProfileFinished = new Continuation<RUser, Void>() {
+                @Override
+                public Void then(Task<RUser> task){
+                    if (task.isFaulted()) {
+                        Exception exception = task.getError();
+                        Log.e(TAG, "Error in updateProfile", exception);
+                        Toast.makeText(getApplication(), getString(R.string.update_failure), Toast.LENGTH_SHORT).show();
+                    }
+
+                    emailTextView.setText(task.getResult().getEmail());
+                    phoneTextView.setText(task.getResult().getPhone());
+                    Toast.makeText(getApplication().getApplicationContext(), getString(R.string.update_success), Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+
+                    return null;
+                }
+            };
+
+            if (dialog.task != null) {
+                dialog.task.continueWith(onUpdateProfileFinished, Task.UI_THREAD_EXECUTOR);
+            }
+        }
+
+        @Override
+        public void onDialogNegativeClick(PopupDialog dialog) {
+
         }
     };
 
@@ -182,37 +235,25 @@ public class UserDetailActivity extends AppCompatActivity {
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
                         byte[] sampledInputData = stream.toByteArray();
 
-                        Continuation<JSONObject, Void> checkUpdatingPhoto = new Continuation<JSONObject, Void>() {
+                        Continuation<RUser, Void> checkUpdatingPhoto = new Continuation<RUser, Void>() {
                             @Override
-                            public Void then(Task<JSONObject> task) {
+                            public Void then(Task<RUser> task) {
                                 if (task.isFaulted()) {
                                     Log.e(TAG, "Failed updating photo", task.getError());
                                     Toast.makeText(getApplicationContext(),
-                                            getString(R.string.photo_update_failure), Toast.LENGTH_SHORT).show();
+                                            getString(R.string.update_failure), Toast.LENGTH_SHORT).show();
                                     return null;
                                 }
 
+                                Glide.with(getApplication())
+                                        .load(task.getResult().getUrl())
+                                        .placeholder(R.drawable.ic_launcher)
+                                        .centerCrop()
+                                        .crossFade()
+                                        .into(profileImageView);
+
                                 Toast.makeText(getApplicationContext(),
-                                        getString(R.string.photo_update_success), Toast.LENGTH_SHORT).show();
-
-                                SyncUser.getById(userId).continueWith(new Continuation<RUser, Void>() {
-                                    @Override
-                                    public Void then(Task<RUser> task) throws Exception {
-                                        if (task.isFaulted()) {
-                                            Log.e(TAG, "Failed to add grocery", task.getError());
-                                            return null;
-                                        }
-
-                                        Glide.with(getApplication())
-                                                .load(task.getResult().getUrl())
-                                                .placeholder(R.drawable.ic_launcher)
-                                                .centerCrop()
-                                                .crossFade()
-                                                .into(profileImageView);
-
-                                        return null;
-                                    }
-                                }, Task.UI_THREAD_EXECUTOR);
+                                        getString(R.string.update_success), Toast.LENGTH_SHORT).show();
 
                                 return null;
                             }
@@ -228,5 +269,15 @@ public class UserDetailActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    private boolean isAuthorizedUser(String userId) {
+        SharedPreferences sharedPreferences =
+                MyApplication.getContext().getSharedPreferences(
+                        MyApplication.getContext()
+                                .getString(R.string.login_or_sign_up_session), 0);
+        String loginUserId = sharedPreferences.getString(RUser.JsonKeys.USER_ID, null);
+
+        return userId.equals(loginUserId);
     }
 }
