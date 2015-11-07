@@ -3,6 +3,7 @@ package com.quarkworks.apartmentgroceries.main;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -23,18 +24,22 @@ import com.quarkworks.apartmentgroceries.service.SyncUser;
 import com.quarkworks.apartmentgroceries.service.models.RGroceryItem;
 import com.quarkworks.apartmentgroceries.service.models.RUser;
 
+import bolts.Continuation;
+import bolts.Task;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 
 public class HomeActivity extends AppCompatActivity {
-
     private static final String TAG = HomeActivity.class.getSimpleName();
+
+    private String groupId;
 
     /*
         References
      */
     private Toolbar toolbar;
     private TextView titleTextView;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     public static void newIntent(Context context) {
         Intent intent = new Intent(context, HomeActivity.class);
@@ -51,6 +56,7 @@ public class HomeActivity extends AppCompatActivity {
          */
         toolbar = (Toolbar) findViewById(R.id.main_toolbar_id);
         titleTextView = (TextView) toolbar.findViewById(R.id.toolbar_title_id);
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.home_activity_swipe_refresh_layout_id);
 
         /*
             Set view data
@@ -61,7 +67,7 @@ public class HomeActivity extends AppCompatActivity {
 
         SharedPreferences sharedPreferences = getApplication()
                 .getSharedPreferences(getString(R.string.login_or_sign_up_session), 0);
-        String groupId = sharedPreferences.getString(RUser.JsonKeys.GROUP_ID, null);
+        groupId = sharedPreferences.getString(RUser.JsonKeys.GROUP_ID, null);
 
         SyncGroceryItem.getAll(groupId);
         SyncGroceryItem.getAllGroceryPhotosByGroupId(groupId);
@@ -82,7 +88,28 @@ public class HomeActivity extends AppCompatActivity {
 
         ListView listView = (ListView) findViewById(R.id.home_list_view_id);
         listView.setAdapter(realmBaseAdapter);
+
+        swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorPrimaryDark));
+        swipeRefreshLayout.setOnRefreshListener(onSwipeRefresh);
     }
+
+    private SwipeRefreshLayout.OnRefreshListener onSwipeRefresh = new SwipeRefreshLayout.OnRefreshListener() {
+        @Override
+        public void onRefresh() {
+
+            Continuation<Void, Void> onSyncSuccess = new Continuation<Void, Void>() {
+                @Override
+                public Void then(Task<Void> task) throws Exception {
+                    swipeRefreshLayout.setRefreshing(false);
+                    return null;
+                }
+            };
+            SyncGroceryItem.getAll(groupId).continueWith(onSyncSuccess, Task.UI_THREAD_EXECUTOR);
+            SyncGroceryItem.getAllGroceryPhotosByGroupId(groupId);
+            SyncUser.getAll(groupId);
+
+        }
+    };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

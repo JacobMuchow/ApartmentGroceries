@@ -7,17 +7,24 @@
     <!-- toolbar -->
     <include layout="@layout/main_toolbar" />
 
-    <!-- grocery list -->
-    <ListView
-        android:id="@+id/home_list_view_id"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/home_activity_swipe_refresh_layout_id"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/main_toolbar_id"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/main_toolbar_id">
 
-        android:paddingLeft="@dimen/activity_vertical_margin"
-        android:paddingRight="@dimen/activity_vertical_margin"
-        android:listSelector="@android:color/transparent"
-        android:divider="@color/colorPrimary"
-        android:dividerHeight="1px"/>
+        <!-- grocery list -->
+        <ListView
+            android:id="@+id/home_list_view_id"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            android:paddingLeft="@dimen/activity_vertical_margin"
+            android:paddingRight="@dimen/activity_vertical_margin"
+            android:listSelector="@android:color/transparent"
+            android:divider="@color/colorPrimary"
+            android:dividerHeight="1px"/>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </RelativeLayout>
